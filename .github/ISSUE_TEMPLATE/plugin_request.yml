@@ -1,0 +1,169 @@
+name: 🔌 Plugin Request
+description: Request a new plugin or connector for ProcessIQ
+title: "[PLUGIN] "
+labels: ["plugin", "enhancement", "needs-triage"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Request a new plugin/connector for ProcessIQ's extensible architecture!
+
+  - type: input
+    id: service_name
+    attributes:
+      label: Service/Platform Name
+      description: What service or platform should ProcessIQ connect to?
+      placeholder: "Salesforce, SAP, QuickBooks, Custom API, etc."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: plugin_type
+    attributes:
+      label: Plugin Type
+      description: What type of plugin do you need?
+      options:
+        - Data Source Connector (Input)
+        - Export/Output Connector 
+        - AI/Processing Plugin
+        - Authentication Plugin
+        - Transformation Plugin
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Plugin Description
+      description: Describe what this plugin should do
+      placeholder: |
+        This plugin should be able to:
+        - Connect to...
+        - Extract data from...
+        - Transform data by...
+        - Export data to...
+    validations:
+      required: true
+
+  - type: textarea
+    id: data_types
+    attributes:
+      label: Data Types
+      description: What types of data would this plugin handle?
+      placeholder: |
+        - Customer records
+        - Transaction data
+        - Product catalogs
+        - Reports/documents
+        - Images/media
+        - etc.
+
+  - type: textarea
+    id: api_info
+    attributes:
+      label: API/Integration Information
+      description: |
+        Provide details about the service's API or integration methods:
+        - Does it have a REST API?
+        - Is there an official SDK/library?
+        - What authentication methods are supported?
+        - Are there rate limits?
+      placeholder: |
+        API Documentation: https://...
+        Authentication: OAuth 2.0, API Key
+        Rate Limits: 1000 requests/hour
+        Python SDK: available/not available
+
+  - type: textarea
+    id: use_case
+    attributes:
+      label: Use Case
+      description: Describe your specific use case for this plugin
+      placeholder: |
+        I need to:
+        1. Extract customer data from...
+        2. Transform it by...
+        3. Load it into...
+        
+        This would help me automate...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: complexity
+    attributes:
+      label: Estimated Complexity
+      description: How complex do you think this integration would be?
+      options:
+        - Simple - Basic API with good documentation
+        - Medium - Some complexity, custom authentication
+        - Complex - Limited documentation, complex data structures
+        - Very Complex - Legacy system, reverse engineering needed
+        - Unknown
+
+  - type: input
+    id: alternatives
+    attributes:
+      label: Existing Alternatives
+      description: Are there existing tools/libraries that already integrate with this service?
+      placeholder: "library-name, tool-name, etc."
+
+  - type: checkboxes
+    id: requirements
+    attributes:
+      label: Requirements
+      description: What capabilities should this plugin have?
+      options:
+        - label: Real-time data access
+        - label: Bulk data operations
+        - label: Incremental/delta sync
+        - label: Custom field mapping
+        - label: Data validation
+        - label: Error handling/retry logic
+        - label: Credential management
+        - label: Logging and monitoring
+
+  - type: textarea
+    id: config_example
+    attributes:
+      label: Configuration Example
+      description: What would the plugin configuration look like?
+      placeholder: |
+        ```yaml
+        connector_type: my_service
+        config:
+          api_endpoint: https://api.myservice.com
+          credentials:
+            api_key: ${MY_SERVICE_API_KEY}
+          settings:
+            batch_size: 1000
+            timeout: 30
+        ```
+      render: yaml
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution Interest
+      description: Would you be interested in contributing to this plugin?
+      options:
+        - label: I can help develop this plugin
+        - label: I can provide testing and feedback
+        - label: I have access to the service for testing
+        - label: I can help with documentation
+        - label: I can sponsor/fund development
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      description: Please confirm the following
+      options:
+        - label: I have searched existing issues to make sure this plugin isn't already requested
+          required: true
+        - label: I have provided enough information for development
+          required: true
+        - label: This plugin would benefit the broader ProcessIQ community
+          required: true

@@ -1,0 +1,155 @@
+name: 🐛 Bug Report
+description: Report a bug or issue with ProcessIQ
+title: "[BUG] "
+labels: ["bug", "needs-triage"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! Please fill out the form below with as much detail as possible.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is
+      placeholder: Describe what happened...
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to Reproduce
+      description: Steps to reproduce the behavior
+      placeholder: |
+        1. Go to '...'
+        2. Click on '....'
+        3. Scroll down to '....'
+        4. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: A clear and concise description of what you expected to happen
+      placeholder: What should have happened?
+    validations:
+      required: true
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots/Videos
+      description: If applicable, add screenshots or videos to help explain your problem
+      placeholder: Drag and drop images/videos here or paste URLs
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      description: Which component is affected?
+      options:
+        - Web Connector
+        - Desktop Connector
+        - API Connector
+        - Database Connector
+        - File Connector
+        - AI/Vision Processing
+        - Plugin System
+        - Desktop Application
+        - CLI Tool
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: ProcessIQ Version
+      description: What version of ProcessIQ are you running?
+      placeholder: "0.1.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating System
+      description: What operating system are you using?
+      options:
+        - Windows 11
+        - Windows 10
+        - macOS Sonoma
+        - macOS Ventura
+        - macOS Monterey
+        - Ubuntu 22.04
+        - Ubuntu 20.04
+        - Other Linux
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: python
+    attributes:
+      label: Python Version
+      description: What version of Python are you using?
+      placeholder: "3.11.5"
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment Details
+      description: |
+        Any additional environment details that might be relevant:
+        - Browser versions (if web automation issue)
+        - Desktop application versions (if desktop automation issue)
+        - GPU/hardware info (if AI processing issue)
+      placeholder: |
+        Chrome: 120.0.6099.109
+        Firefox: 121.0
+        NVIDIA RTX 3080
+        etc.
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Log Output
+      description: |
+        Please include relevant log output. You can find logs in:
+        - CLI: Add `--verbose` flag for detailed output
+        - Desktop app: Check Help > Show Logs
+        - API: Check server logs
+      placeholder: Paste log output here...
+      render: shell
+
+  - type: textarea
+    id: config
+    attributes:
+      label: Configuration
+      description: |
+        If relevant, include your configuration (remove any sensitive information):
+        - Workflow YAML
+        - Plugin configuration
+        - Environment variables
+      placeholder: Paste configuration here...
+      render: yaml
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      description: Please confirm the following
+      options:
+        - label: I have searched existing issues to make sure this is not a duplicate
+          required: true
+        - label: I have included all relevant information above
+          required: true
+        - label: I have removed any sensitive information from logs/config
+          required: true

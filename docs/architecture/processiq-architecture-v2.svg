@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1400" height="1200" viewBox="0 0 1400 1200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gradients -->
+    <linearGradient id="desktopGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="sourceGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4facfe;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00f2fe;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="engineGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#11998e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#38ef7d;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="aiGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fc4a1a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f7b733;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="targetGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fa709a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#fee140;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="biGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#a855f7;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:1" />
+    </linearGradient>
+
+    <!-- Drop Shadow Filter -->
+    <filter id="dropshadow" x="0" y="0" width="120%" height="120%">
+      <feDropShadow dx="3" dy="3" stdDeviation="3" flood-color="#00000030"/>
+    </filter>
+
+    <!-- Arrow markers -->
+    <defs>
+      <marker id="arrowhead" markerWidth="12" markerHeight="8" refX="11" refY="4" orient="auto" markerUnits="strokeWidth">
+        <path d="M0,0 L0,8 L12,4 z" fill="#4a5568"/>
+      </marker>
+      <marker id="arrowheadWhite" markerWidth="12" markerHeight="8" refX="11" refY="4" orient="auto" markerUnits="strokeWidth">
+        <path d="M0,0 L0,8 L12,4 z" fill="white"/>
+      </marker>
+      <marker id="arrowheadBI" markerWidth="12" markerHeight="8" refX="11" refY="4" orient="auto" markerUnits="strokeWidth">
+        <path d="M0,0 L0,8 L12,4 z" fill="#9333ea"/>
+      </marker>
+    </defs>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1400" height="1200" fill="#f8fafc"/>
+  
+  <!-- Title -->
+  <text x="700" y="40" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#1a202c">
+    ProcessIQ - Modern RPA + AI Platform
+  </text>
+  <text x="700" y="65" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#4a5568">
+    Complete Source → Target Data Pipeline with Optional BI Stack
+  </text>
+  <text x="700" y="85" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#718096">
+    Desktop-First UX | Plug & Play Architecture | Traditional RPA → AI Agents → Future Tech
+  </text>
+  
+  <!-- Desktop Application Control Center -->
+  <rect x="50" y="120" width="1300" height="100" rx="15" fill="url(#desktopGrad)" filter="url(#dropshadow)"/>
+  <text x="700" y="150" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="white">
+    🖥️ ProcessIQ Desktop Application - Visual Workflow Designer & Control Center
+  </text>
+  
+  <!-- Desktop App Components -->
+  <rect x="100" y="170" width="180" height="35" rx="5" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="190" y="190" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="white">Drag & Drop Workflows</text>
+  
+  <rect x="300" y="170" width="180" height="35" rx="5" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="390" y="190" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="white">Real-time Monitoring</text>
+  
+  <rect x="500" y="170" width="180" height="35" rx="5" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="590" y="190" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="white">Plugin Management</text>
+  
+  <rect x="700" y="170" width="180" height="35" rx="5" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="790" y="190" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="white">Configuration Hub</text>
+  
+  <rect x="900" y="170" width="180" height="35" rx="5" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="990" y="190" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="white">Reporting Interface</text>
+  
+  <rect x="1100" y="170" width="180" height="35" rx="5" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="1190" y="190" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="white">CLI & API Access</text>
+
+  <!-- Main Data Flow Pipeline -->
+  
+  <!-- SOURCES Section -->
+  <rect x="50" y="260" width="300" height="180" rx="15" fill="url(#sourceGrad)" filter="url(#dropshadow)"/>
+  <text x="200" y="290" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white">
+    📥 DATA SOURCES
+  </text>
+  <text x="200" y="310" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="rgba(255,255,255,0.9)">
+    Heterogeneous Input Connectors
+  </text>
+  
+  <!-- Web Sources -->
+  <rect x="70" y="325" width="120" height="25" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="130" y="340" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">🌐 Web Scraping</text>
+  
+  <rect x="210" y="325" width="120" height="25" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="270" y="340" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">🖥️ Desktop Apps</text>
+  
+  <rect x="70" y="355" width="120" height="25" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="130" y="370" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">🔗 APIs (REST/GraphQL)</text>
+  
+  <rect x="210" y="355" width="120" height="25" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="270" y="370" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">🗄️ Databases</text>
+  
+  <rect x="70" y="385" width="120" height="25" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="130" y="400" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">📁 Files (Local/Cloud)</text>
+  
+  <rect x="210" y="385" width="120" height="25" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="270" y="400" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">📧 Email/Documents</text>
+  
+  <!-- Processing Engine -->
+  <rect x="380" y="260" width="350" height="180" rx="15" fill="url(#engineGrad)" filter="url(#dropshadow)"/>
+  <text x="555" y="290" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white">
+    ⚙️ PROCESSING ENGINE
+  </text>
+  <text x="555" y="310" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="rgba(255,255,255,0.9)">
+    Core Orchestration + Plugin System
+  </text>
+  
+  <!-- Engine Components -->
+  <rect x="400" y="325" width="100" height="45" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="450" y="342" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Plugin Manager</text>
+  <text x="450" y="355" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Dynamic Loading</text>
+  <text x="450" y="365" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Lifecycle Mgmt</text>
+  
+  <rect x="520" y="325" width="100" height="45" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="570" y="342" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Event Bus</text>
+  <text x="570" y="355" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Pub/Sub System</text>
+  <text x="570" y="365" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Loose Coupling</text>
+  
+  <rect x="640" y="325" width="80" height="45" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="680" y="340" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Task Queue</text>
+  <text x="680" y="353" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Background</text>
+  <text x="680" y="363" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Processing</text>
+  
+  <rect x="400" y="380" width="100" height="45" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="450" y="397" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Data Transform</text>
+  <text x="450" y="410" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">ETL Pipeline</text>
+  <text x="450" y="420" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Validation</text>
+  
+  <rect x="520" y="380" width="100" height="45" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="570" y="397" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">API Server</text>
+  <text x="570" y="410" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">REST/GraphQL</text>
+  <text x="570" y="420" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">WebSocket</text>
+  
+  <rect x="640" y="380" width="80" height="45" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="680" y="397" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Monitoring</text>
+  <text x="680" y="410" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Health Check</text>
+  <text x="680" y="420" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Metrics</text>
+
+  <!-- AI Processing Layer -->
+  <rect x="760" y="260" width="290" height="180" rx="15" fill="url(#aiGrad)" filter="url(#dropshadow)"/>
+  <text x="905" y="290" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white">
+    🤖 AI INTELLIGENCE
+  </text>
+  <text x="905" y="310" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="rgba(255,255,255,0.9)">
+    Traditional → AI → Future Ready
+  </text>
+  
+  <!-- AI Components -->
+  <rect x="780" y="325" width="120" height="45" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="840" y="340" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Vision LLMs</text>
+  <text x="840" y="353" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Qwen2.5-VL</text>
+  <text x="840" y="363" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">GPT-4V/Claude-3V</text>
+  
+  <rect x="920" y="325" width="110" height="45" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="975" y="340" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Hybrid Engine</text>
+  <text x="975" y="353" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Traditional+AI</text>
+  <text x="975" y="363" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Smart Fallback</text>
+  
+  <rect x="780" y="380" width="120" height="45" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="840" y="397" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Learning Engine</text>
+  <text x="840" y="410" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Pattern Recognition</text>
+  <text x="840" y="420" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Self-Improvement</text>
+  
+  <rect x="920" y="380" width="110" height="45" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="975" y="397" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Document AI</text>
+  <text x="975" y="410" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">OCR/NLP</text>
+  <text x="975" y="420" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Multi-modal</text>
+
+  <!-- TARGETS Section -->
+  <rect x="1080" y="260" width="270" height="180" rx="15" fill="url(#targetGrad)" filter="url(#dropshadow)"/>
+  <text x="1215" y="290" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white">
+    📤 DATA TARGETS
+  </text>
+  <text x="1215" y="310" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="rgba(255,255,255,0.9)">
+    Heterogeneous Output Destinations
+  </text>
+  
+  <!-- Target Options -->
+  <rect x="1100" y="325" width="110" height="25" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="1155" y="340" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">📊 Excel/CSV Files</text>
+  
+  <rect x="1230" y="325" width="100" height="25" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="1280" y="340" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">🗄️ Databases</text>
+  
+  <rect x="1100" y="355" width="110" height="25" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="1155" y="370" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">🔗 APIs/Webhooks</text>
+  
+  <rect x="1230" y="355" width="100" height="25" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="1280" y="370" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">☁️ Cloud Storage</text>
+  
+  <rect x="1100" y="385" width="110" height="25" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="1155" y="400" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">📧 Email Reports</text>
+  
+  <rect x="1230" y="385" width="100" height="25" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="1280" y="400" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">📱 Mobile/Slack</text>
+
+  <!-- Main Flow Arrows -->
+  <line x1="350" y1="350" x2="380" y2="350" stroke="#4a5568" stroke-width="4" marker-end="url(#arrowhead)"/>
+  <text x="365" y="340" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#4a5568">COLLECT</text>
+  
+  <line x1="730" y1="350" x2="760" y2="350" stroke="#4a5568" stroke-width="4" marker-end="url(#arrowhead)"/>
+  <text x="745" y="340" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#4a5568">PROCESS</text>
+  
+  <line x1="1050" y1="350" x2="1080" y2="350" stroke="#4a5568" stroke-width="4" marker-end="url(#arrowhead)"/>
+  <text x="1065" y="340" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#4a5568">DELIVER</text>
+
+  <!-- Optional BI Extension Layer -->
+  <rect x="50" y="480" width="1300" height="140" rx="15" fill="url(#biGrad)" filter="url(#dropshadow)" opacity="0.9"/>
+  <text x="700" y="510" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white">
+    📊 OPTIONAL BI EXTENSION STACK
+  </text>
+  <text x="700" y="530" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="rgba(255,255,255,0.9)">
+    Complete Business Intelligence Suite (When Users Need More Than Basic Target Delivery)
+  </text>
+  
+  <!-- BI Components -->
+  <rect x="80" y="550" width="150" height="50" rx="6" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="155" y="570" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="white">Data Warehouse</text>
+  <text x="155" y="585" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Star Schema</text>
+  <text x="155" y="595" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Time Series</text>
+  
+  <rect x="250" y="550" width="150" height="50" rx="6" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="325" y="570" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="white">ETL Engine</text>
+  <text x="325" y="585" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Data Pipeline</text>
+  <text x="325" y="595" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Transformations</text>
+  
+  <rect x="420" y="550" width="150" height="50" rx="6" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="495" y="570" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="white">Analytics Engine</text>
+  <text x="495" y="585" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">SQL Processing</text>
+  <text x="495" y="595" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Aggregations</text>
+  
+  <rect x="590" y="550" width="150" height="50" rx="6" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="665" y="570" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="white">Report Builder</text>
+  <text x="665" y="585" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Drag & Drop</text>
+  <text x="665" y="595" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Templates</text>
+  
+  <rect x="760" y="550" width="150" height="50" rx="6" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="835" y="570" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="white">Dashboards</text>
+  <text x="835" y="585" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Real-time KPIs</text>
+  <text x="835" y="595" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Interactive</text>
+  
+  <rect x="930" y="550" width="150" height="50" rx="6" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="1005" y="570" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="white">Data Visualization</text>
+  <text x="1005" y="585" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Charts & Graphs</text>
+  <text x="1005" y="595" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Custom Views</text>
+  
+  <rect x="1100" y="550" width="220" height="50" rx="6" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="1210" y="570" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="white">Advanced Analytics</text>
+  <text x="1210" y="585" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">ML Insights | Forecasting | Anomaly Detection</text>
+  <text x="1210" y="595" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Pattern Discovery | Predictive Models</text>
+
+  <!-- BI Extension Arrow -->
+  <line x1="700" y1="440" x2="700" y2="480" stroke="#9333ea" stroke-width="3" marker-end="url(#arrowheadBI)" stroke-dasharray="10,5"/>
+  <text x="720" y="460" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#9333ea">EXTEND</text>
+  <text x="720" y="473" font-family="Arial, sans-serif" font-size="10" fill="#9333ea">(Optional)</text>
+
+  <!-- Infrastructure Layer -->
+  <rect x="50" y="650" width="1300" height="100" rx="15" fill="#4a5568" filter="url(#dropshadow)"/>
+  <text x="700" y="680" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white">
+    🏗️ INFRASTRUCTURE & DEPLOYMENT
+  </text>
+  
+  <!-- Infrastructure Components -->
+  <rect x="80" y="700" width="100" height="35" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="130" y="720" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Docker</text>
+  
+  <rect x="200" y="700" width="100" height="35" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="250" y="720" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">PostgreSQL</text>
+  
+  <rect x="320" y="700" width="100" height="35" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="370" y="720" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Redis</text>
+  
+  <rect x="440" y="700" width="100" height="35" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="490" y="720" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Celery</text>
+  
+  <rect x="560" y="700" width="100" height="35" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="610" y="720" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Prometheus</text>
+  
+  <rect x="680" y="700" width="100" height="35" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="730" y="720" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Grafana</text>
+  
+  <rect x="800" y="700" width="120" height="35" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="860" y="720" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Cloud Storage</text>
+  
+  <rect x="940" y="700" width="120" height="35" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="1000" y="720" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Vector Database</text>
+  
+  <rect x="1080" y="700" width="100" height="35" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="1130" y="720" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Kubernetes</text>
+  
+  <rect x="1200" y="700" width="130" height="35" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="1265" y="720" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Security & Auth</text>
+
+  <!-- Use Cases Section -->
+  <rect x="50" y="780" width="1300" height="120" rx="15" fill="#2d3748" filter="url(#dropshadow)"/>
+  <text x="700" y="810" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white">
+    🎯 FLEXIBLE USE CASES - FROM SIMPLE TO ENTERPRISE
+  </text>
+  
+  <!-- Use Case Examples -->
+  <rect x="80" y="830" width="200" height="55" rx="6" fill="rgba(255,255,255,0.1)" stroke="white" stroke-width="1"/>
+  <text x="180" y="845" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#90cdf4">BASIC</text>
+  <text x="180" y="860" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="white">Web Scraping → Excel</text>
+  <text x="180" y="872" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="white">API Data → CSV</text>
+  <text x="180" y="884" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="white">Simple Automation</text>
+  
+  <rect x="300" y="830" width="200" height="55" rx="6" fill="rgba(255,255,255,0.1)" stroke="white" stroke-width="1"/>
+  <text x="400" y="845" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#fbbf24">INTERMEDIATE</text>
+  <text x="400" y="860" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="white">Multi-Source → Database</text>
+  <text x="400" y="872" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="white">Data Transformation</text>
+  <text x="400" y="884" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="white">AI-Assisted Processing</text>
+  
+  <rect x="520" y="830" width="200" height="55" rx="6" fill="rgba(255,255,255,0.1)" stroke="white" stroke-width="1"/>
+  <text x="620" y="845" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#fb7185">ADVANCED</text>
+  <text x="620" y="860" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="white">Complex Workflows</text>
+  <text x="620" y="872" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="white">Desktop + Web + API</text>
+  <text x="620" y="884" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="white">Basic Reports</text>
+  
+  <rect x="740" y="830" width="200" height="55" rx="6" fill="rgba(255,255,255,0.1)" stroke="white" stroke-width="1"/>
+  <text x="840" y="845" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#a78bfa">PROFESSIONAL</text>
+  <text x="840" y="860" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="white">Full ETL Pipelines</text>
+  <text x="840" y="872" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="white">Interactive Dashboards</text>
+  <text x="840" y="884" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="white">Scheduled Reports</text>
+  
+  <rect x="960" y="830" width="200" height="55" rx="6" fill="rgba(255,255,255,0.1)" stroke="white" stroke-width="1"/>
+  <text x="1060" y="845" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#34d399">ENTERPRISE</text>
+  <text x="1060" y="860" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="white">Data Warehouse</text>
+  <text x="1060" y="872" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="white">Advanced Analytics</text>
+  <text x="1060" y="884" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="white">ML Insights</text>
+
+  <!-- Evolution Timeline -->
+  <rect x="50" y="930" width="1300" height="80" rx="15" fill="#1a202c" filter="url(#dropshadow)"/>
+  <text x="700" y="960" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white">
+    🚀 EVOLUTION PATH: Traditional RPA → AI Agents → Future Technologies
+  </text>
+  
+  <!-- Evolution stages -->
+  <circle cx="200" cy="985" r="18" fill="#48bb78" stroke="white" stroke-width="2"/>
+  <text x="200" y="990" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="white">1</text>
+  <text x="200" y="1005" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#a0aec0">Traditional</text>
+  
+  <line x1="218" y1="985" x2="282" y2="985" stroke="white" stroke-width="2" marker-end="url(#arrowheadWhite)"/>
+  
+  <circle cx="350" cy="985" r="18" fill="#ed8936" stroke="white" stroke-width="2"/>
+  <text x="350" y="990" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="white">2</text>
+  <text x="350" y="1005" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#a0aec0">Hybrid</text>
+  
+  <line x1="368" y1="985" x2="432" y2="985" stroke="white" stroke-width="2" marker-end="url(#arrowheadWhite)"/>
+  
+  <circle cx="500" cy="985" r="18" fill="#667eea" stroke="white" stroke-width="2"/>
+  <text x="500" y="990" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="white">3</text>
+  <text x="500" y="1005" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#a0aec0">AI-First</text>
+  
+  <line x1="518" y1="985" x2="582" y2="985" stroke="white" stroke-width="2" marker-end="url(#arrowheadWhite)"/>
+  
+  <circle cx="650" cy="985" r="18" fill="#9f7aea" stroke="white" stroke-width="2"/>
+  <text x="650" y="990" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="white">4</text>
+  <text x="650" y="1005" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#a0aec0">Multi-Agent</text>
+  
+  <line x1="668" y1="985" x2="732" y2="985" stroke="white" stroke-width="2" marker-end="url(#arrowheadWhite)"/>
+  
+  <circle cx="800" cy="985" r="18" fill="#38b2ac" stroke="white" stroke-width="2"/>
+  <text x="800" y="990" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="white">∞</text>
+  <text x="800" y="1005" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#a0aec0">Future</text>
+  
+  <text x="1050" y="980" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#a0aec0">
+    Plugin Architecture Adapts to Any Future Technology
+  </text>
+  <text x="1050" y="1000" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#718096">
+    From Simple Automation to Enterprise AI - One Platform, Infinite Possibilities
+  </text>
+  
+</svg>

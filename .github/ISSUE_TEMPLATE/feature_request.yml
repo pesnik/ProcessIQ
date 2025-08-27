@@ -1,0 +1,135 @@
+name: 💡 Feature Request
+description: Suggest a new feature or enhancement for ProcessIQ
+title: "[FEATURE] "
+labels: ["enhancement", "needs-triage"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for your interest in improving ProcessIQ! Please describe your feature request in detail.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Description
+      description: Is your feature request related to a problem? Please describe what you're trying to accomplish.
+      placeholder: I'm always frustrated when... / I need to be able to... / It would be helpful if...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe the solution you'd like to see implemented
+      placeholder: I would like ProcessIQ to...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component/Area
+      description: Which area of ProcessIQ would this feature affect?
+      options:
+        - Web Automation
+        - Desktop Automation
+        - AI/Vision Processing
+        - Data Connectors
+        - Export/Output
+        - Plugin System
+        - Desktop Application UI
+        - CLI Interface
+        - BI/Analytics Stack
+        - Performance/Scaling
+        - Security
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this feature to you?
+      options:
+        - Low - Nice to have
+        - Medium - Would improve my workflow
+        - High - Critical for my use case
+        - Urgent - Blocking my adoption
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternative Solutions
+      description: Describe any alternative solutions or workarounds you've considered
+      placeholder: I could work around this by... / Other tools handle this by...
+
+  - type: textarea
+    id: use_case
+    attributes:
+      label: Use Case Examples
+      description: |
+        Provide specific examples of how you would use this feature:
+        - What data sources would you connect?
+        - What transformations would you apply?
+        - What outputs would you generate?
+      placeholder: |
+        Example 1: I want to scrape product data from multiple e-commerce sites...
+        Example 2: I need to automate invoice processing from email attachments...
+      render: markdown
+
+  - type: checkboxes
+    id: feature_type
+    attributes:
+      label: Feature Type
+      description: What type of feature is this? (Select all that apply)
+      options:
+        - label: New connector/integration
+        - label: Enhanced AI capabilities
+        - label: UI/UX improvement
+        - label: Performance optimization
+        - label: New export format
+        - label: Developer/API enhancement
+        - label: Security improvement
+        - label: Monitoring/observability
+
+  - type: textarea
+    id: technical_details
+    attributes:
+      label: Technical Considerations
+      description: |
+        Any technical details, constraints, or implementation ideas:
+        - APIs or libraries that might be useful
+        - Performance requirements
+        - Security considerations
+        - Backward compatibility needs
+      placeholder: This might require... / We should consider... / Implementation could use...
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      description: Would you be interested in contributing to this feature?
+      options:
+        - label: I would like to work on implementing this feature
+        - label: I can help with testing this feature
+        - label: I can provide feedback during development
+        - label: I can help with documentation
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      description: Please confirm the following
+      options:
+        - label: I have searched existing issues to make sure this is not a duplicate
+          required: true
+        - label: This feature aligns with ProcessIQ's goal of being a flexible automation platform
+          required: true
+        - label: I have provided enough detail for the maintainers to understand the request
+          required: true
