@@ -1,0 +1,11 @@
+from fastapi import APIRouter
+
+router = APIRouter()
+
+# Import and include all API routers
+from . import workflows, connectors, executions, system
+
+router.include_router(workflows.router, prefix="/workflows", tags=["workflows"])
+router.include_router(connectors.router, prefix="/connectors", tags=["connectors"])
+router.include_router(executions.router, prefix="/executions", tags=["executions"])
+router.include_router(system.router, prefix="/system", tags=["system"])

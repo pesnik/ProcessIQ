@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/processiq-icon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ProcessIQ - Modern RPA + AI Platform</title>
+    <meta name="description" content="ProcessIQ Desktop Application - Visual Workflow Designer & Control Center" />
+    
+    <!-- Prevent zooming on desktop -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    
+    <!-- CSP for security -->
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:;
+      connect-src 'self' http://localhost:* https://localhost:* ws://localhost:* wss://localhost:*;
+      img-src 'self' data: blob: https:;
+      media-src 'self' data: blob:;
+      font-src 'self' data:;
+    ">
+    
+    <!-- Inter font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- JetBrains Mono for code -->
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+      /* Prevent text selection on desktop app */
+      body {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        font-family: 'Inter', system-ui, sans-serif;
+      }
+      
+      /* Allow text selection in input fields and text areas */
+      input, textarea, [contenteditable] {
+        -webkit-user-select: text;
+        -moz-user-select: text;
+        -ms-user-select: text;
+        user-select: text;
+      }
+      
+      /* Loading styles */
+      #app-loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        background: hsl(224 71.4% 4.1%);
+        color: hsl(210 40% 98%);
+      }
+      
+      .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid hsl(215 27.9% 16.9%);
+        border-top: 3px solid hsl(142.1 76.2% 36.3%);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      /* Dark theme variables */
+      :root {
+        --background: 224 71.4% 4.1%;
+        --foreground: 210 40% 98%;
+        --card: 224 71.4% 4.1%;
+        --card-foreground: 210 40% 98%;
+        --popover: 224 71.4% 4.1%;
+        --popover-foreground: 210 40% 98%;
+        --primary: 142.1 76.2% 36.3%;
+        --primary-foreground: 355.7 100% 97.3%;
+        --secondary: 215 27.9% 16.9%;
+        --secondary-foreground: 210 40% 98%;
+        --muted: 215 27.9% 16.9%;
+        --muted-foreground: 217.9 10.6% 64.9%;
+        --accent: 215 27.9% 16.9%;
+        --accent-foreground: 210 40% 98%;
+        --destructive: 0 62.8% 30.6%;
+        --destructive-foreground: 210 40% 98%;
+        --border: 215 27.9% 16.9%;
+        --input: 215 27.9% 16.9%;
+        --ring: 142.1 76.2% 36.3%;
+        --radius: 0.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root">
+      <div id="app-loading">
+        <div style="text-align: center;">
+          <div class="loading-spinner"></div>
+          <p style="margin-top: 1rem; font-size: 0.875rem; opacity: 0.7;">Loading ProcessIQ...</p>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

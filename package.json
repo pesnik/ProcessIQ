@@ -1,0 +1,70 @@
+{
+  "name": "processiq-monorepo",
+  "version": "0.1.0",
+  "description": "ProcessIQ - Modern RPA + AI Automation Platform",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:desktop\"",
+    "dev:backend": "cd apps/backend && python -m uvicorn processiq.main:app --reload --host 0.0.0.0 --port 8000",
+    "dev:desktop": "cd apps/desktop && npm run dev",
+    "build": "npm run build:desktop && npm run build:backend",
+    "build:desktop": "cd apps/desktop && npm run build",
+    "build:backend": "cd apps/backend && python -m build",
+    "test": "npm run test:desktop && npm run test:backend",
+    "test:desktop": "cd apps/desktop && npm test",
+    "test:backend": "cd apps/backend && pytest",
+    "lint": "npm run lint:desktop && npm run lint:backend",
+    "lint:desktop": "cd apps/desktop && npm run lint",
+    "lint:backend": "cd apps/backend && flake8 src/processiq",
+    "format": "npm run format:desktop && npm run format:backend",
+    "format:desktop": "cd apps/desktop && npm run format",
+    "format:backend": "cd apps/backend && black src/ && isort src/",
+    "clean": "npm run clean:desktop && npm run clean:backend",
+    "clean:desktop": "cd apps/desktop && rm -rf dist node_modules",
+    "clean:backend": "cd apps/backend && rm -rf dist build *.egg-info",
+    "setup": "npm install && cd apps/backend && pip install -e .[dev,vision]",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.0"
+  },
+  "lint-staged": {
+    "apps/desktop/**/*.{js,ts,tsx}": [
+      "cd apps/desktop && npm run format",
+      "cd apps/desktop && npm run lint"
+    ],
+    "apps/backend/**/*.py": [
+      "cd apps/backend && black .",
+      "cd apps/backend && isort .",
+      "cd apps/backend && flake8"
+    ]
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pesnik/ProcessIQ.git"
+  },
+  "keywords": [
+    "rpa",
+    "automation",
+    "ai",
+    "vision-language",
+    "workflow",
+    "data-processing",
+    "electron",
+    "fastapi"
+  ],
+  "author": "ProcessIQ Team",
+  "license": "MIT"
+}
