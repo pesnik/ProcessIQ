@@ -22,7 +22,7 @@ from rich.tree import Tree
 from rich import print as rprint
 
 from . import __version__
-from .core.engine import ProcessEngine, create_engine
+from .core.engine import ProcessIQEngine, create_engine
 from .core.config import Settings, get_settings, create_default_config_file
 from .connectors import *
 
@@ -35,7 +35,7 @@ app = typer.Typer(
 console = Console()
 
 # Global state for CLI
-_engine: Optional[ProcessEngine] = None
+_engine: Optional[ProcessIQEngine] = None
 
 
 @app.callback()

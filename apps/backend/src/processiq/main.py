@@ -78,8 +78,8 @@ def main():
     
     uvicorn.run(
         "processiq.main:app",
-        host=settings.host,
-        port=settings.port,
+        host=settings.api.host,
+        port=settings.api.port,
         reload=settings.debug,
         log_level="info" if not settings.debug else "debug"
     )

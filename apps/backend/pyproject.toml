@@ -99,8 +99,7 @@ dev = [
 
 # Vision Language Models
 vision = [
-    "qwen-vl>=0.1.0",  # When available
-    "browser-use>=1.0.0",
+    "browser-use>=0.7.0",
     "opencv-python>=4.8.0",
 ]
 

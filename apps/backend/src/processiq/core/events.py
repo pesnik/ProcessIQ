@@ -143,3 +143,15 @@ class EventBus:
         all_events.update(self._handlers.keys())
         all_events.update(self._async_handlers.keys())
         return sorted(list(all_events))
+    
+    async def start(self) -> None:
+        """Start the event bus"""
+        await self.emit("system.event_bus.started", {})
+    
+    async def stop(self) -> None:
+        """Stop the event bus"""
+        await self.emit("system.event_bus.stopped", {})
+
+
+# Global event bus instance
+event_bus = EventBus()

@@ -19,7 +19,7 @@ from .exceptions import ProcessIQError
 from .plugin_manager import PluginManager
 
 
-class ProcessEngine:
+class ProcessIQEngine:
     """
     Main ProcessIQ engine that orchestrates the entire platform
     
@@ -277,6 +277,43 @@ class ProcessEngine:
         # Close database connections, Redis connections, etc.
         pass
     
+    async def cleanup(self) -> None:
+        """
+        Clean up the ProcessIQ engine
+        
+        - Stop background tasks
+        - Shutdown plugins
+        - Close connections
+        """
+        if not self._initialized:
+            return
+        
+        try:
+            await self.event_bus.emit("engine.shutting_down", {
+                "version": self.settings.version
+            })
+            
+            # Stop background tasks
+            await self._stop_background_tasks()
+            
+            # Shutdown plugins
+            await self.plugin_manager.shutdown_all_plugins()
+            
+            # Cleanup core services
+            await self._cleanup_core_services()
+            
+            self._running = False
+            self._initialized = False
+            
+            await self.event_bus.emit("engine.shutdown", {})
+            
+        except Exception as e:
+            print(f"Error during engine cleanup: {e}")
+    
+    async def shutdown(self) -> None:
+        """Alias for cleanup() for backwards compatibility"""
+        await self.cleanup()
+    
     @asynccontextmanager
     async def lifespan(self):
         """Async context manager for engine lifespan"""
@@ -289,14 +326,14 @@ class ProcessEngine:
 
 # Convenience functions for common use cases
 
-async def create_engine(settings: Optional[Settings] = None) -> ProcessEngine:
+async def create_engine(settings: Optional[Settings] = None) -> ProcessIQEngine:
     """Create and initialize a ProcessIQ engine"""
-    engine = ProcessEngine(settings)
+    engine = ProcessIQEngine(settings)
     await engine.initialize()
     return engine
 
 
-async def quick_start(plugin_directory: str = "./plugins") -> ProcessEngine:
+async def quick_start(plugin_directory: str = "./plugins") -> ProcessIQEngine:
     """Quick start ProcessIQ with minimal configuration"""
     settings = get_settings()
     settings.plugin_directory = plugin_directory

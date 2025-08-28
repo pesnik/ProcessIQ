@@ -12,8 +12,8 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 from functools import lru_cache
 
-from pydantic import BaseSettings, Field
-from pydantic.env_settings import SettingsSourceCallable
+from pydantic import Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class DatabaseConfig(BaseSettings):
@@ -22,6 +22,8 @@ class DatabaseConfig(BaseSettings):
     pool_size: int = Field(default=10)
     max_overflow: int = Field(default=20)
     echo: bool = Field(default=False)
+    
+    model_config = SettingsConfigDict(env_prefix="DB_")
 
 
 class RedisConfig(BaseSettings):
@@ -120,25 +122,12 @@ class Settings(BaseSettings):
     plugin_directory: str = Field(default="./plugins")
     plugin_configs: Dict[str, Dict[str, Any]] = Field(default_factory=dict)
     
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
-        env_nested_delimiter = "__"
-        case_sensitive = False
-        
-        # Load settings from multiple sources
-        @classmethod
-        def customise_sources(
-            cls,
-            init_settings: SettingsSourceCallable,
-            env_settings: SettingsSourceCallable,
-            file_secret_settings: SettingsSourceCallable,
-        ) -> tuple[SettingsSourceCallable, ...]:
-            return (
-                init_settings,
-                env_settings,
-                file_secret_settings,
-            )
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        env_nested_delimiter="__",
+        case_sensitive=False
+    )
     
     def is_development(self) -> bool:
         """Check if running in development mode"""
