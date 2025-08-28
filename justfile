@@ -10,7 +10,7 @@ setup:
     @echo "🚀 Setting up ProcessIQ development environment..."
     uv venv --python 3.11
     @echo "📦 Installing backend dependencies..."
-    bash -c 'source .venv/bin/activate && uv pip install -e apps/backend[dev,vision]'
+    bash -c 'source .venv/bin/activate && uv pip install -e apps/backend[dev]'
     @echo "📦 Installing frontend dependencies..."
     cd apps/desktop && npm install
     @echo "✅ Setup complete! Run 'just dev' to start development servers"
@@ -18,7 +18,7 @@ setup:
 # Install dependencies
 install:
     @echo "📦 Installing backend dependencies..."
-    bash -c 'source .venv/bin/activate && uv pip install -e apps/backend[dev,vision]'
+    bash -c 'source .venv/bin/activate && uv pip install -e apps/backend[dev]'
     @echo "📦 Installing frontend dependencies..."
     cd apps/desktop && npm install
 
@@ -246,10 +246,27 @@ docs:
     @echo "Frontend: http://localhost:5173"
     @echo "Project README: Open README.md"
 
+# Pricing tier installations - Pay-as-you-grow model
+install-starter:
+    @echo "💼 Installing STARTER tier (Traditional RPA only)..."
+    bash -c 'source .venv/bin/activate && uv pip install -e apps/backend'
+
+install-smart:
+    @echo "🧠 Installing SMART tier (Traditional RPA + AI)..."
+    bash -c 'source .venv/bin/activate && uv pip install -e apps/backend[ai]'
+
+install-pro:
+    @echo "👁️  Installing PRO tier (Traditional RPA + AI + Vision)..."
+    bash -c 'source .venv/bin/activate && uv pip install -e apps/backend[pro]'
+
+install-enterprise:
+    @echo "🏢 Installing ENTERPRISE tier (All features)..."
+    bash -c 'source .venv/bin/activate && uv pip install -e apps/backend[enterprise]'
+
 # Maintenance
 update:
     @echo "🔄 Updating dependencies..."
-    bash -c 'source .venv/bin/activate && uv pip install --upgrade -e apps/backend[dev,vision]'
+    bash -c 'source .venv/bin/activate && uv pip install --upgrade -e apps/backend[dev]'
     cd apps/desktop && npm update
 
 security-check:

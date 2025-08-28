@@ -125,7 +125,7 @@ async def stream_demo_progress(execution_id: str):
     
     return StreamingResponse(
         event_generator(),
-        media_type="text/plain",
+        media_type="text/event-stream",
         headers={
             "Cache-Control": "no-cache",
             "Connection": "keep-alive",
@@ -190,6 +190,9 @@ async def execute_demo_workflow(execution_id: str, request: RPAExecutionRequest)
     headless_mode = options.get("headless", True)
     show_browser = options.get("showBrowser", False)
     
+    # Determine if we should run browser in visible mode
+    use_visible_browser = show_browser or not headless_mode
+    
     try:
         for i, step_id in enumerate(request.steps):
             if execution["status"] == "stopped":
@@ -201,9 +204,9 @@ async def execute_demo_workflow(execution_id: str, request: RPAExecutionRequest)
             # Execute step based on type
             start_time = time.time()
             
-            if step_id == "web_scraping" and not headless_mode:
+            if step_id == "web_scraping" and use_visible_browser:
                 # Real browser automation for web scraping when in visible mode
-                step_result = await execute_browser_step(step_id, headless_mode)
+                step_result = await execute_browser_step(step_id, not use_visible_browser)
             else:
                 # Simulate other steps or headless execution
                 await asyncio.sleep(1 + (i * 0.5))  # Varying execution times
@@ -248,11 +251,12 @@ async def execute_browser_step(step_id: str, headless: bool = False) -> Dict[str
         # Check if we're in WSL2/headless environment
         is_wsl = os.path.exists('/proc/version') and 'WSL' in open('/proc/version').read()
         is_ssh = 'SSH_CLIENT' in os.environ or 'SSH_TTY' in os.environ
+        is_macos = os.uname().sysname == 'Darwin'
         has_display = 'DISPLAY' in os.environ
         has_wslg = is_wsl and has_display and os.environ.get('DISPLAY') == ':0'
         
-        # Force headless mode only if no display available or SSH (but allow WSLg)
-        effective_headless = headless or is_ssh or (not has_display) or (is_wsl and not has_wslg)
+        # Force headless mode only if no display available or SSH (but allow WSLg and macOS)
+        effective_headless = headless or is_ssh or (not is_macos and not has_display and not has_wslg)
         
         async with async_playwright() as p:
             # Launch browser with appropriate mode
@@ -312,7 +316,7 @@ async def execute_browser_step(step_id: str, headless: bool = False) -> Dict[str
                     "screenshot_taken": True,
                     "browser_mode": "visible" if not effective_headless else "headless",
                     "automation_tool": "Playwright",
-                    "environment": "WSL2+WSLg" if has_wslg else ("WSL2" if is_wsl else "Linux"),
+                    "environment": "WSL2+WSLg" if has_wslg else ("WSL2" if is_wsl else ("macOS" if is_macos else "Linux")),
                     "display_available": has_display,
                     "wslg_support": has_wslg,
                     "requested_mode": "visible" if not headless else "headless",

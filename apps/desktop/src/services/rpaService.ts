@@ -41,7 +41,7 @@ class RPAService {
 
   async startDemo(request: RPAExecutionRequest): Promise<RPAExecutionResponse> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/rpa/execute`, {
+      const response = await fetch(`${API_BASE_URL}/api/v1/rpa/execute`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -66,7 +66,7 @@ class RPAService {
     if (!this.executionId) return;
 
     try {
-      await fetch(`${API_BASE_URL}/api/rpa/execute/${this.executionId}/stop`, {
+      await fetch(`${API_BASE_URL}/api/v1/rpa/execute/${this.executionId}/stop`, {
         method: 'POST',
       });
     } catch (error) {
@@ -90,7 +90,7 @@ class RPAService {
 
     try {
       this.eventSource = new EventSource(
-        `${API_BASE_URL}/api/rpa/execute/${this.executionId}/stream`
+        `${API_BASE_URL}/api/v1/rpa/execute/${this.executionId}/stream`
       );
 
       this.eventSource.onmessage = (event) => {
@@ -136,7 +136,7 @@ class RPAService {
 
     try {
       const response = await fetch(
-        `${API_BASE_URL}/api/rpa/execute/${this.executionId}/status`
+        `${API_BASE_URL}/api/v1/rpa/execute/${this.executionId}/status`
       );
 
       if (!response.ok) {
@@ -152,7 +152,7 @@ class RPAService {
 
   async getAvailableArtifacts(): Promise<string[]> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/rpa/artifacts`);
+      const response = await fetch(`${API_BASE_URL}/api/v1/rpa/artifacts`);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -168,7 +168,7 @@ class RPAService {
 
   async downloadArtifact(filename: string): Promise<Blob> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/rpa/artifacts/${filename}`);
+      const response = await fetch(`${API_BASE_URL}/api/v1/rpa/artifacts/${filename}`);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
