@@ -1,4 +1,4 @@
-# ProcessIQ - Modern RPA + AI Platform
+# ProcessIQ
 
 ProcessIQ is the complete **Source → Target** data automation platform that scales from simple data collection to full enterprise BI solutions. Built with a plug-and-play architecture that evolves from traditional RPA to AI agents to future technologies.
 
@@ -75,14 +75,60 @@ ProcessIQ is the complete **Source → Target** data automation platform that sc
 - **Configuration Hub**: Environment settings and credential management
 - **BI Interface**: Dashboard viewer and report designer (when BI stack enabled)
 
-## Technology Stack
+## 🏛️ **Project Structure**
 
-- **Backend**: Python FastAPI + Celery + Redis
-- **Frontend**: Electron + React + TypeScript
-- **AI/ML**: Qwen2.5-VL, OpenAI, Anthropic APIs
-- **Automation**: Playwright + Browser-use + Custom agents
-- **Database**: PostgreSQL + Vector DB (Pinecone/Weaviate)
-- **Deployment**: Docker + Kubernetes ready
+ProcessIQ is organized as a modern **monorepo** with clearly separated concerns:
+
+```
+ProcessIQ/
+├── apps/
+│   ├── backend/           # Python FastAPI backend
+│   │   └── src/processiq/
+│   │       ├── api/       # REST API endpoints
+│   │       ├── connectors/ # Data source integrations
+│   │       ├── core/      # Engine, events, plugins
+│   │       ├── agents/    # AI automation agents
+│   │       └── processors/ # Data transformation
+│   └── desktop/           # Electron + React frontend
+│       ├── src/
+│       │   ├── components/ # UI components
+│       │   ├── pages/     # Application screens
+│       │   ├── store/     # State management
+│       │   └── hooks/     # Custom React hooks
+│       └── electron/      # Electron main process
+├── packages/              # Shared libraries
+├── plugins/               # Plugin ecosystem
+├── config/                # Environment configurations
+├── docs/                  # Documentation & architecture
+└── examples/              # Sample workflows
+```
+
+## 💻 **Technology Stack**
+
+### **Backend (Python)**
+- **Core Framework**: FastAPI + Uvicorn + SQLAlchemy + Alembic
+- **Task Processing**: Celery + Redis for background jobs
+- **Web Automation**: Playwright + Selenium + Browser-use
+- **AI/ML**: OpenAI + Anthropic + Transformers + PyTorch
+- **Data Processing**: Pandas + Polars + OpenPyXL
+- **Desktop Automation**: PyAutoGUI + OpenCV + PyGetWindow
+- **Document Processing**: PyTesseract + PDF2Image + PDFPlumber
+- **Database**: PostgreSQL + MongoDB drivers
+
+### **Desktop App (TypeScript)**
+- **Framework**: Electron + React 18 + TypeScript
+- **UI Components**: Radix UI + Tailwind CSS + Lucide Icons
+- **State Management**: Zustand + TanStack Query
+- **Data Visualization**: Recharts for charts and analytics
+- **Form Handling**: React Hook Form + Zod validation
+- **Build Tools**: Vite + Electron Builder
+
+### **Infrastructure & DevOps**
+- **Containerization**: Docker + Docker Compose
+- **Development**: Concurrently + Hot reloading
+- **Code Quality**: ESLint + Prettier + Black + MyPy
+- **Testing**: Pytest + Vitest + React Testing Library
+- **Deployment**: Kubernetes ready + Multi-platform builds
 
 ## 🎯 **Use Cases - From Simple to Enterprise**
 
@@ -120,29 +166,33 @@ Custom Report Builder → Advanced Visualizations → Executive Dashboards
 
 ## 🚀 **Quick Start**
 
-### Option 1: Desktop Application (Recommended)
+### Option 1: Development Setup (Recommended)
 ```bash
-# Install ProcessIQ
-pip install processiq
+# Clone the repository
+git clone https://github.com/pesnik/ProcessIQ.git
+cd ProcessIQ
 
-# Initialize project
-processiq init my-project
-cd my-project
+# Install dependencies (Node.js + Python)
+npm run setup
 
-# Launch desktop application
-processiq app
+# Start development servers (Backend + Desktop app)
+npm run dev
+
+# Access desktop application at http://localhost:3000
+# Backend API available at http://localhost:8000
 ```
 
-### Option 2: CLI/API Usage
+### Option 2: Production Desktop App
 ```bash
-# Start ProcessIQ engine
-processiq start
+# Install backend
+cd apps/backend
+pip install -e .[vision]
 
-# Create simple workflow
-processiq run examples/web-to-excel.yaml
-
-# Monitor via web interface
-open http://localhost:8000
+# Build and run desktop application
+cd ../desktop
+npm install
+npm run build
+npm run dev:electron
 ```
 
 ### Option 3: Docker Deployment
@@ -150,8 +200,20 @@ open http://localhost:8000
 # Full stack deployment
 docker-compose up -d
 
-# Access desktop app proxy
-open http://localhost:3000
+# Access services:
+# - Desktop app: http://localhost:3000
+# - Backend API: http://localhost:8000
+# - Redis: localhost:6379
+```
+
+### Option 4: Backend Only (API Mode)
+```bash
+# Install and start backend
+cd apps/backend
+pip install -e .[dev,vision]
+python -m uvicorn processiq.main:app --reload
+
+# API documentation: http://localhost:8000/docs
 ```
 
 ## 📈 **Scaling Your Usage**
@@ -182,16 +244,22 @@ ProcessIQ is an open-source project built for the community. We welcome contribu
 git clone https://github.com/pesnik/ProcessIQ.git
 cd ProcessIQ
 
-# Set up development environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-pip install -e .[dev]
+# Set up development environment (installs both Node.js and Python deps)
+npm run setup
 
-# Run tests
-pytest
+# Development workflow commands:
+npm run dev          # Start both backend and desktop app
+npm run test         # Run all tests (backend + desktop)
+npm run lint         # Lint all code (Python + TypeScript)  
+npm run format       # Format all code
+npm run build        # Build both applications
 
-# Start development server
-processiq start --reload
+# Individual app development:
+npm run dev:backend  # Backend only (FastAPI)
+npm run dev:desktop  # Desktop app only (Electron + React)
+
+# Clean build artifacts
+npm run clean
 ```
 
 ### **📚 Documentation & Support**
