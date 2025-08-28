@@ -32,7 +32,7 @@ function App() {
 
   if (isLoading) {
     return (
-      <ThemeProvider defaultTheme="dark" storageKey="processiq-theme">
+      <ThemeProvider defaultTheme="system" storageKey="processiq-theme">
         <div className="flex items-center justify-center h-screen bg-background">
           <div className="text-center">
             <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
@@ -45,7 +45,7 @@ function App() {
   }
 
   return (
-    <ThemeProvider defaultTheme="dark" storageKey="processiq-theme">
+    <ThemeProvider defaultTheme="system" storageKey="processiq-theme">
       <div className="h-screen bg-background text-foreground">
         <Layout 
           backendStatus={{ 

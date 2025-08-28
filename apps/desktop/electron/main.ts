@@ -2,7 +2,7 @@ import { app, BrowserWindow, Menu, ipcMain, dialog, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import Store from 'electron-store';
-import path from 'path';
+import * as path from 'path';
 import { spawn, ChildProcessWithoutNullStreams } from 'child_process';
 
 // Configure logging
@@ -24,13 +24,13 @@ class ProcessIQApp {
   }
 
   private setupApp(): void {
-    // Enable live reload for development
-    if (this.isDev) {
-      require('electron-reload')(__dirname, {
-        electron: path.join(__dirname, '..', 'node_modules', '.bin', 'electron'),
-        hardResetMethod: 'exit'
-      });
-    }
+    // Enable live reload for development (disabled for WSL2 compatibility)
+    // if (this.isDev) {
+    //   require('electron-reload')(__dirname, {
+    //     electron: require('electron'),
+    //     hardResetMethod: 'exit'
+    //   });
+    // }
 
     // Set app user model ID for Windows
     if (process.platform === 'win32') {
@@ -231,7 +231,7 @@ class ProcessIQApp {
           { role: 'cut' },
           { role: 'copy' },
           { role: 'paste' },
-          { role: 'selectall' }
+          { role: 'selectAll' }
         ]
       },
       {
@@ -394,8 +394,8 @@ app.on('certificate-error', (event, webContents, url, error, certificate, callba
 
 // Security: Prevent new window creation
 app.on('web-contents-created', (event, contents) => {
-  contents.on('new-window', (event, navigationUrl) => {
-    event.preventDefault();
-    shell.openExternal(navigationUrl);
+  contents.setWindowOpenHandler(({ url }) => {
+    shell.openExternal(url);
+    return { action: 'deny' };
   });
 });
