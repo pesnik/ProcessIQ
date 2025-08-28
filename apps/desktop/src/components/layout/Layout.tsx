@@ -35,6 +35,9 @@ export function Layout({ children, backendStatus }: LayoutProps) {
             <a href="/plugins" className="block px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground">
               Plugins
             </a>
+            <a href="/rpa-demo" className="block px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground">
+              RPA Demo
+            </a>
             <a href="/logs" className="block px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground">
               Logs
             </a>
