@@ -133,6 +133,7 @@ export default function RPADemo() {
         }
       );
 
+
       // Cleanup on unmount or completion
       return unsubscribe;
 
@@ -295,6 +296,7 @@ export default function RPADemo() {
   // Cleanup on unmount
   useEffect(() => {
     return () => {
+      // Stop backend execution
       if (executionId) {
         rpaService.stopDemo().catch(console.error);
       }

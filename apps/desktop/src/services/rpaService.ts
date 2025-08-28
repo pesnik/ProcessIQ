@@ -97,6 +97,11 @@ class RPAService {
         try {
           const data = JSON.parse(event.data);
           onProgress(data);
+          
+          // Close EventSource immediately after receiving completion status
+          if (data.status === 'completed' || data.status === 'failed') {
+            this.closeEventStream();
+          }
         } catch (parseError) {
           console.error('Failed to parse SSE data:', parseError);
         }
@@ -104,7 +109,9 @@ class RPAService {
 
       this.eventSource.onerror = (event) => {
         console.error('SSE connection error:', event);
-        if (onError) {
+        // Only call error callback if EventSource is still active
+        // (not if we intentionally closed it after completion)
+        if (this.eventSource && this.eventSource.readyState !== EventSource.CLOSED && onError) {
           onError(new Error('Connection to backend lost'));
         }
       };

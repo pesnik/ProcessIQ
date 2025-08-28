@@ -99,6 +99,7 @@ async def stream_demo_progress(execution_id: str):
     
     async def event_generator():
         last_update = 0
+        
         while execution_id in active_executions:
             execution = active_executions[execution_id]
             
@@ -116,11 +117,11 @@ async def stream_demo_progress(execution_id: str):
                 
                 yield f"data: {response.model_dump_json()}\n\n"
                 last_update = current_update
-            
-            # Stop streaming if execution is complete
-            if execution["status"] in ["completed", "failed", "stopped"]:
-                break
                 
+                # Immediately close stream after sending final event
+                if execution["status"] in ["completed", "failed", "stopped"]:
+                    return  # This properly closes the generator/stream
+            
             await asyncio.sleep(0.5)  # Update every 500ms
     
     return StreamingResponse(
@@ -229,15 +230,19 @@ async def execute_demo_workflow(execution_id: str, request: RPAExecutionRequest)
         
         # Mark as completed
         execution["status"] = "completed"
+        execution["end_time"] = datetime.now()  # Track completion time
         execution["artifacts"] = {
             "excel_file": f"sales_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx",
             "summary_report": f"demo_summary_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json",
             "screenshots": [f"screenshot_step{i+1}.png" for i in range(len(request.steps))]
         }
         
+        
     except Exception as e:
         execution["status"] = "failed"
+        execution["end_time"] = datetime.now()  # Track failure time
         execution["error"] = str(e)
+
 
 async def execute_browser_step(step_id: str, headless: bool = False) -> Dict[str, Any]:
     """Execute real browser automation step using Playwright"""
