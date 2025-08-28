@@ -1,0 +1,431 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1400" height="1400" viewBox="0 0 1400 1400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- n8n Integration Gradients -->
+    <linearGradient id="n8nGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ea384c;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#c62d42;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Core RPA Gradients -->
+    <linearGradient id="coreDesktopGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2563eb;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1e40af;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="coreSourceGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#059669;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#047857;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="coreEngineGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#dc2626;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#b91c1c;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="coreTargetGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#7c3aed;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#6d28d9;stop-opacity:1" />
+    </linearGradient>
+
+    <!-- AI Extension Gradients -->
+    <linearGradient id="aiExtGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f59e0b;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#d97706;stop-opacity:0.8" />
+    </linearGradient>
+    
+    <linearGradient id="agentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10b981;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#059669;stop-opacity:0.8" />
+    </linearGradient>
+
+    <!-- Infrastructure -->
+    <linearGradient id="infraGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#374151;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1f2937;stop-opacity:1" />
+    </linearGradient>
+
+    <!-- Filters -->
+    <filter id="dropshadow" x="0" y="0" width="120%" height="120%">
+      <feDropShadow dx="3" dy="3" stdDeviation="3" flood-color="#00000030"/>
+    </filter>
+    
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#ea384c80"/>
+    </filter>
+
+    <!-- Arrow markers -->
+    <marker id="arrowhead" markerWidth="12" markerHeight="8" refX="11" refY="4" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,8 L12,4 z" fill="#4a5568"/>
+    </marker>
+    <marker id="arrowheadCore" markerWidth="12" markerHeight="8" refX="11" refY="4" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,8 L12,4 z" fill="#1e40af"/>
+    </marker>
+    <marker id="arrowheadN8n" markerWidth="12" markerHeight="8" refX="11" refY="4" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,8 L12,4 z" fill="#ea384c"/>
+    </marker>
+    <marker id="arrowheadExtension" markerWidth="12" markerHeight="8" refX="11" refY="4" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,8 L12,4 z" fill="#f59e0b"/>
+    </marker>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1400" height="1400" fill="#f8fafc"/>
+  
+  <!-- Title -->
+  <text x="700" y="40" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#1a202c">
+    ProcessIQ - n8n Integration Architecture
+  </text>
+  <text x="700" y="65" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#4a5568">
+    Leverage n8n Workflow Engine + Custom RPA Nodes + Optional AI Extensions
+  </text>
+  <text x="700" y="85" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#718096">
+    80% Less Development Time | Production-Ready UI | Extensible Architecture
+  </text>
+
+  <!-- n8n FOUNDATION LAYER -->
+  <rect x="50" y="110" width="1300" height="30" rx="15" fill="#ea384c" />
+  <text x="700" y="130" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="white">
+    🏗️ n8n WORKFLOW ENGINE FOUNDATION - Battle-Tested, Self-Hosted, Extensible
+  </text>
+
+  <!-- Desktop Application with n8n Integration -->
+  <rect x="50" y="160" width="1300" height="120" rx="15" fill="url(#coreDesktopGrad)" filter="url(#dropshadow)"/>
+  <text x="700" y="190" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="white">
+    🖥️ ProcessIQ Desktop App - Multi-Modal Workflow Creation
+  </text>
+  <text x="700" y="210" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="rgba(255,255,255,0.9)">
+    Electron Shell with Embedded n8n Editor + Custom Extensions
+  </text>
+  
+  <!-- Desktop Features -->
+  <rect x="80" y="225" width="140" height="40" rx="5" fill="url(#n8nGrad)" stroke="white" stroke-width="1"/>
+  <text x="150" y="242" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">n8n Visual Editor</text>
+  <text x="150" y="255" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Embedded WebView</text>
+  
+  <rect x="240" y="225" width="140" height="40" rx="5" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="310" y="242" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Chat → n8n</text>
+  <text x="310" y="255" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Workflow Generator</text>
+  
+  <rect x="400" y="225" width="140" height="40" rx="5" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="470" y="242" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">BRD → n8n</text>
+  <text x="470" y="255" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Template Generator</text>
+  
+  <rect x="560" y="225" width="140" height="40" rx="5" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="630" y="242" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Workflow Templates</text>
+  <text x="630" y="255" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Library & Import</text>
+  
+  <rect x="720" y="225" width="140" height="40" rx="5" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="790" y="242" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Real-time Monitor</text>
+  <text x="790" y="255" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">n8n Execution View</text>
+  
+  <rect x="880" y="225" width="140" height="40" rx="5" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="950" y="242" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Node Management</text>
+  <text x="950" y="255" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Install RPA Nodes</text>
+  
+  <rect x="1040" y="225" width="140" height="40" rx="5" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="1110" y="242" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Extension Control</text>
+  <text x="1110" y="255" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Enable AI/Agents</text>
+  
+  <rect x="1200" y="225" width="140" height="40" rx="5" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="1270" y="242" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">API & CLI</text>
+  <text x="1270" y="255" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">n8n API Access</text>
+
+  <!-- n8n Workflow Execution Layer -->
+  <rect x="50" y="300" width="1300" height="140" rx="15" fill="url(#n8nGrad)" filter="url(#glow)"/>
+  <text x="700" y="330" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="white">
+    ⚙️ n8n WORKFLOW ORCHESTRATION ENGINE
+  </text>
+  <text x="700" y="350" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="rgba(255,255,255,0.9)">
+    Visual Flow Programming + Custom ProcessIQ RPA Nodes
+  </text>
+  
+  <!-- n8n Core Features -->
+  <rect x="80" y="370" width="160" height="55" rx="6" fill="rgba(255,255,255,0.3)" stroke="white" stroke-width="1"/>
+  <text x="160" y="390" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="white">Visual Flow Editor</text>
+  <text x="160" y="405" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Drag & Drop Interface</text>
+  <text x="160" y="415" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Node-based Workflows</text>
+  
+  <rect x="260" y="370" width="160" height="55" rx="6" fill="rgba(255,255,255,0.3)" stroke="white" stroke-width="1"/>
+  <text x="340" y="390" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="white">Execution Engine</text>
+  <text x="340" y="405" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Triggers & Scheduling</text>
+  <text x="340" y="415" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Error Handling</text>
+  
+  <rect x="440" y="370" width="160" height="55" rx="6" fill="rgba(255,255,255,0.3)" stroke="white" stroke-width="1"/>
+  <text x="520" y="390" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="white">400+ Integrations</text>
+  <text x="520" y="405" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">APIs, DBs, Files</text>
+  <text x="520" y="415" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">SaaS Connectors</text>
+  
+  <rect x="620" y="370" width="160" height="55" rx="6" fill="rgba(255,255,255,0.3)" stroke="white" stroke-width="1"/>
+  <text x="700" y="390" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="white">Custom Node API</text>
+  <text x="700" y="405" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Easy Extension</text>
+  <text x="700" y="415" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">TypeScript Support</text>
+  
+  <rect x="800" y="370" width="160" height="55" rx="6" fill="rgba(255,255,255,0.3)" stroke="white" stroke-width="1"/>
+  <text x="880" y="390" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="white">Self-Hosted</text>
+  <text x="880" y="405" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Data Control</text>
+  <text x="880" y="415" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Security</text>
+  
+  <rect x="980" y="370" width="160" height="55" rx="6" fill="rgba(255,255,255,0.3)" stroke="white" stroke-width="1"/>
+  <text x="1060" y="390" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="white">ProcessIQ Bridge</text>
+  <text x="1060" y="405" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">RPA Execution</text>
+  <text x="1060" y="415" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">AI/Agent Router</text>
+  
+  <rect x="1160" y="370" width="160" height="55" rx="6" fill="rgba(255,255,255,0.3)" stroke="white" stroke-width="1"/>
+  <text x="1240" y="390" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="white">Workflow Templates</text>
+  <text x="1240" y="405" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">RPA Patterns</text>
+  <text x="1240" y="415" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Best Practices</text>
+
+  <!-- CORE RPA NODES -->
+  <rect x="50" y="460" width="1300" height="30" rx="15" fill="#1e40af" />
+  <text x="700" y="480" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="white">
+    🔧 @processiq/n8n-rpa-nodes - Custom Node Package (Always Available)
+  </text>
+
+  <!-- RPA Nodes Grid -->
+  <rect x="50" y="510" width="640" height="160" rx="15" fill="url(#coreEngineGrad)" filter="url(#dropshadow)"/>
+  <text x="370" y="540" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white">
+    🤖 CORE RPA NODES
+  </text>
+  <text x="370" y="560" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="rgba(255,255,255,0.9)">
+    Traditional Automation - No GPU Required
+  </text>
+  
+  <!-- RPA Node Types -->
+  <rect x="70" y="575" width="120" height="45" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="130" y="592" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Playwright Node</text>
+  <text x="130" y="605" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Web Automation</text>
+  <text x="130" y="615" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Cross-Browser</text>
+  
+  <rect x="200" y="575" width="120" height="45" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="260" y="592" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Robot Framework</text>
+  <text x="260" y="605" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Enterprise RPA</text>
+  <text x="260" y="615" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Keyword-Driven</text>
+  
+  <rect x="330" y="575" width="120" height="45" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="390" y="592" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">TagUI Node</text>
+  <text x="390" y="605" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Visual RPA</text>
+  <text x="390" y="615" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Natural Language</text>
+  
+  <rect x="460" y="575" width="120" height="45" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="520" y="592" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Desktop Node</text>
+  <text x="520" y="605" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">UI Automation</text>
+  <text x="520" y="615" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">PyAutoGUI</text>
+  
+  <rect x="70" y="630" width="120" height="25" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="130" y="645" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">📊 Excel/CSV</text>
+  
+  <rect x="200" y="630" width="120" height="25" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="260" y="645" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">🗄️ Database</text>
+  
+  <rect x="330" y="630" width="120" height="25" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="390" y="645" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">📧 Email</text>
+  
+  <rect x="460" y="630" width="120" height="25" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="520" y="645" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">📁 File Ops</text>
+
+  <!-- Management & Security -->
+  <rect x="710" y="510" width="640" height="160" rx="15" fill="#4a5568" filter="url(#dropshadow)"/>
+  <text x="1030" y="540" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white">
+    🛠️ MANAGEMENT & SECURITY
+  </text>
+  <text x="1030" y="560" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="rgba(255,255,255,0.9)">
+    Built on n8n's Security Foundation
+  </text>
+  
+  <!-- Management Components -->
+  <rect x="730" y="575" width="140" height="45" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="800" y="592" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Credential Store</text>
+  <text x="800" y="605" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">n8n Vault</text>
+  <text x="800" y="615" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Encrypted</text>
+  
+  <rect x="890" y="575" width="140" height="45" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="960" y="592" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Execution Logs</text>
+  <text x="960" y="605" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">n8n History</text>
+  <text x="960" y="615" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Audit Trail</text>
+  
+  <rect x="1050" y="575" width="140" height="45" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="1120" y="592" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Error Handling</text>
+  <text x="1120" y="605" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">n8n Retries</text>
+  <text x="1120" y="615" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Screenshots</text>
+  
+  <rect x="1210" y="575" width="120" height="45" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="1270" y="592" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Performance</text>
+  <text x="1270" y="605" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Metrics</text>
+  <text x="1270" y="615" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Monitoring</text>
+
+  <rect x="730" y="630" width="140" height="25" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="800" y="645" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">🔐 RBAC</text>
+  
+  <rect x="890" y="630" width="140" height="25" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="960" y="645" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">📊 Analytics</text>
+  
+  <rect x="1050" y="630" width="140" height="25" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="1120" y="645" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">⏰ Scheduling</text>
+  
+  <rect x="1210" y="630" width="120" height="25" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="1270" y="645" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">🔄 Webhooks</text>
+
+  <!-- OPTIONAL EXTENSIONS SEPARATOR -->
+  <rect x="50" y="690" width="1300" height="30" rx="15" fill="#f59e0b" />
+  <text x="700" y="710" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="white">
+    🚀 OPTIONAL AI/AGENT EXTENSIONS - n8n Custom Nodes (Pay-as-you-grow)
+  </text>
+
+  <!-- AI EXTENSIONS -->
+  <rect x="50" y="740" width="640" height="140" rx="15" fill="url(#aiExtGrad)" stroke="#f59e0b" stroke-width="2" stroke-dasharray="8,4"/>
+  <text x="370" y="770" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white">
+    🤖 AI NODES EXTENSION
+  </text>
+  <text x="370" y="790" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="rgba(255,255,255,0.9)">
+    Optional AI-Powered n8n Nodes
+  </text>
+  
+  <!-- AI Nodes -->
+  <rect x="70" y="805" width="120" height="35" rx="4" fill="rgba(255,255,255,0.3)" stroke="white" stroke-width="1"/>
+  <text x="130" y="825" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Vision LLM Node</text>
+  
+  <rect x="200" y="805" width="120" height="35" rx="4" fill="rgba(255,255,255,0.3)" stroke="white" stroke-width="1"/>
+  <text x="260" y="825" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">NLP Processing</text>
+  
+  <rect x="330" y="805" width="120" height="35" rx="4" fill="rgba(255,255,255,0.3)" stroke="white" stroke-width="1"/>
+  <text x="390" y="825" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Smart Router</text>
+  
+  <rect x="460" y="805" width="120" height="35" rx="4" fill="rgba(255,255,255,0.3)" stroke="white" stroke-width="1"/>
+  <text x="520" y="825" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Learning Node</text>
+  
+  <rect x="70" y="850" width="120" height="20" rx="4" fill="rgba(255,255,255,0.3)" stroke="white" stroke-width="1"/>
+  <text x="130" y="863" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="white">Chat → Workflow</text>
+  
+  <rect x="200" y="850" width="120" height="20" rx="4" fill="rgba(255,255,255,0.3)" stroke="white" stroke-width="1"/>
+  <text x="260" y="863" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="white">BRD → Template</text>
+  
+  <rect x="330" y="850" width="120" height="20" rx="4" fill="rgba(255,255,255,0.3)" stroke="white" stroke-width="1"/>
+  <text x="390" y="863" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="white">AI vs Traditional</text>
+  
+  <rect x="460" y="850" width="120" height="20" rx="4" fill="rgba(255,255,255,0.3)" stroke="white" stroke-width="1"/>
+  <text x="520" y="863" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="white">Self-Optimize</text>
+
+  <!-- AGENT EXTENSIONS -->
+  <rect x="710" y="740" width="640" height="140" rx="15" fill="url(#agentGrad)" stroke="#10b981" stroke-width="2" stroke-dasharray="8,4"/>
+  <text x="1030" y="770" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white">
+    🤖 AGENT ORCHESTRATION NODES
+  </text>
+  <text x="1030" y="790" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="rgba(255,255,255,0.9)">
+    Optional Multi-Agent n8n Workflows
+  </text>
+  
+  <!-- Agent Nodes -->
+  <rect x="730" y="805" width="130" height="35" rx="4" fill="rgba(255,255,255,0.3)" stroke="white" stroke-width="1"/>
+  <text x="795" y="825" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Agent Execution Node</text>
+  
+  <rect x="880" y="805" width="130" height="35" rx="4" fill="rgba(255,255,255,0.3)" stroke="white" stroke-width="1"/>
+  <text x="945" y="825" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Monitor Agent Node</text>
+  
+  <rect x="1030" y="805" width="130" height="35" rx="4" fill="rgba(255,255,255,0.3)" stroke="white" stroke-width="1"/>
+  <text x="1095" y="825" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Security Agent Node</text>
+  
+  <rect x="1180" y="805" width="150" height="35" rx="4" fill="rgba(255,255,255,0.3)" stroke="white" stroke-width="1"/>
+  <text x="1255" y="825" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Multi-Agent Coordinator</text>
+  
+  <rect x="730" y="850" width="130" height="20" rx="4" fill="rgba(255,255,255,0.3)" stroke="white" stroke-width="1"/>
+  <text x="795" y="863" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="white">SAP/Email/Excel Bots</text>
+  
+  <rect x="880" y="850" width="130" height="20" rx="4" fill="rgba(255,255,255,0.3)" stroke="white" stroke-width="1"/>
+  <text x="945" y="863" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="white">Health & Auto-Heal</text>
+  
+  <rect x="1030" y="850" width="130" height="20" rx="4" fill="rgba(255,255,255,0.3)" stroke="white" stroke-width="1"/>
+  <text x="1095" y="863" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="white">Access Control</text>
+  
+  <rect x="1180" y="850" width="150" height="20" rx="4" fill="rgba(255,255,255,0.3)" stroke="white" stroke-width="1"/>
+  <text x="1255" y="863" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="white">Distributed Workflows</text>
+
+  <!-- Implementation Phases -->
+  <rect x="50" y="900" width="1300" height="100" rx="15" fill="#2d3748" filter="url(#dropshadow)"/>
+  <text x="700" y="930" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white">
+    🛣️ IMPLEMENTATION ROADMAP - Leverage n8n Foundation
+  </text>
+  
+  <!-- Phase Boxes -->
+  <rect x="80" y="950" width="200" height="35" rx="6" fill="rgba(234,56,76,0.3)" stroke="#ea384c" stroke-width="2"/>
+  <text x="180" y="970" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="white">Phase 1: n8n Integration</text>
+  <text x="180" y="982" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Embed n8n + Basic RPA Node</text>
+  
+  <rect x="300" y="950" width="200" height="35" rx="6" fill="rgba(30,64,175,0.3)" stroke="#1e40af" stroke-width="2"/>
+  <text x="400" y="970" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="white">Phase 2: Core RPA Nodes</text>
+  <text x="400" y="982" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Playwright, Robot Framework, TagUI</text>
+  
+  <rect x="520" y="950" width="200" height="35" rx="6" fill="rgba(16,185,129,0.3)" stroke="#10b981" stroke-width="2"/>
+  <text x="620" y="970" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="white">Phase 3: Multi-Modal UI</text>
+  <text x="620" y="982" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Chat → n8n, BRD → Templates</text>
+  
+  <rect x="740" y="950" width="200" height="35" rx="6" fill="rgba(245,158,11,0.3)" stroke="#f59e0b" stroke-width="2"/>
+  <text x="840" y="970" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="white">Phase 4: AI Extensions</text>
+  <text x="840" y="982" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Vision LLM, Smart Router Nodes</text>
+  
+  <rect x="960" y="950" width="200" height="35" rx="6" fill="rgba(139,92,246,0.3)" stroke="#8b5cf6" stroke-width="2"/>
+  <text x="1060" y="970" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="white">Phase 5: Agent Network</text>
+  <text x="1060" y="982" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Multi-Agent Orchestration</text>
+
+  <!-- Benefits -->
+  <rect x="50" y="1020" width="1300" height="80" rx="15" fill="#065f46" filter="url(#dropshadow)"/>
+  <text x="700" y="1050" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white">
+    ⚡ KEY BENEFITS - 80% Less Development Time, Production-Ready from Day 1
+  </text>
+  
+  <!-- Benefit Points -->
+  <rect x="80" y="1070" width="150" height="20" rx="4" fill="rgba(255,255,255,0.1)" stroke="white" stroke-width="1"/>
+  <text x="155" y="1083" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="white">🚀 Rapid Development</text>
+  
+  <rect x="250" y="1070" width="150" height="20" rx="4" fill="rgba(255,255,255,0.1)" stroke="white" stroke-width="1"/>
+  <text x="325" y="1083" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="white">🏢 Battle-Tested UI</text>
+  
+  <rect x="420" y="1070" width="150" height="20" rx="4" fill="rgba(255,255,255,0.1)" stroke="white" stroke-width="1"/>
+  <text x="495" y="1083" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="white">🔌 Easy Extensions</text>
+  
+  <rect x="590" y="1070" width="150" height="20" rx="4" fill="rgba(255,255,255,0.1)" stroke="white" stroke-width="1"/>
+  <text x="665" y="1083" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="white">🧠 Focus on RPA Logic</text>
+  
+  <rect x="760" y="1070" width="150" height="20" rx="4" fill="rgba(255,255,255,0.1)" stroke="white" stroke-width="1"/>
+  <text x="835" y="1083" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="white">💰 Cost Effective</text>
+  
+  <rect x="930" y="1070" width="150" height="20" rx="4" fill="rgba(255,255,255,0.1)" stroke="white" stroke-width="1"/>
+  <text x="1005" y="1083" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="white">👥 Community Support</text>
+  
+  <rect x="1100" y="1070" width="150" height="20" rx="4" fill="rgba(255,255,255,0.1)" stroke="white" stroke-width="1"/>
+  <text x="1175" y="1083" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="white">🔄 Migration Path</text>
+
+  <!-- Technical Details -->
+  <rect x="50" y="1120" width="1300" height="100" rx="15" fill="#1a202c" filter="url(#dropshadow)"/>
+  <text x="700" y="1150" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white">
+    🛠️ TECHNICAL IMPLEMENTATION STRATEGY
+  </text>
+  
+  <!-- Implementation Details -->
+  <rect x="80" y="1170" width="300" height="35" rx="6" fill="rgba(255,255,255,0.1)" stroke="white" stroke-width="1"/>
+  <text x="230" y="1185" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#60a5fa">Electron App + n8n WebView</text>
+  <text x="230" y="1197" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Embed n8n editor as iframe/webview component</text>
+  
+  <rect x="400" y="1170" width="300" height="35" rx="6" fill="rgba(255,255,255,0.1)" stroke="white" stroke-width="1"/>
+  <text x="550" y="1185" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#fbbf24">@processiq/n8n-rpa-nodes</text>
+  <text x="550" y="1197" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">TypeScript package with custom RPA nodes</text>
+  
+  <rect x="720" y="1170" width="300" height="35" rx="6" fill="rgba(255,255,255,0.1)" stroke="white" stroke-width="1"/>
+  <text x="870" y="1185" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#34d399">ProcessIQ Execution Bridge</text>
+  <text x="870" y="1197" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Connect n8n workflows to RPA tools</text>
+  
+  <rect x="1040" y="1170" width="280" height="35" rx="6" fill="rgba(255,255,255,0.1)" stroke="white" stroke-width="1"/>
+  <text x="1180" y="1185" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#a78bfa">Chat/BRD → n8n Generators</text>
+  <text x="1180" y="1197" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">AI-powered workflow template creation</text>
+
+  <!-- Flow Arrows -->
+  <path d="M 700 440 Q 700 450 700 460" stroke="#ea384c" stroke-width="3" marker-end="url(#arrowheadN8n)" fill="none"/>
+  <text x="720" y="450" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#ea384c">n8n Orchestration</text>
+  
+  <path d="M 370 670 Q 370 730 370 740" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrowheadExtension)" stroke-dasharray="6,4" fill="none"/>
+  <text x="280" y="705" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#f59e0b">Optional AI</text>
+  
+  <path d="M 1030 670 Q 1030 730 1030 740" stroke="#10b981" stroke-width="2" marker-end="url(#arrowheadExtension)" stroke-dasharray="6,4" fill="none"/>
+  <text x="1060" y="705" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#10b981">Optional Agents</text>
+
+</svg>

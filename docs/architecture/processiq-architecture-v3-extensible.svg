@@ -1,0 +1,455 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1400" height="1300" viewBox="0 0 1400 1300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Core RPA Gradients (Always Available) -->
+    <linearGradient id="coreDesktopGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2563eb;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1e40af;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="coreSourceGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#059669;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#047857;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="coreEngineGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#dc2626;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#b91c1c;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="coreTargetGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#7c3aed;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#6d28d9;stop-opacity:1" />
+    </linearGradient>
+
+    <!-- AI Extension Gradients (Optional) -->
+    <linearGradient id="aiExtGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f59e0b;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#d97706;stop-opacity:0.8" />
+    </linearGradient>
+    
+    <linearGradient id="agentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10b981;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#059669;stop-opacity:0.8" />
+    </linearGradient>
+
+    <!-- Infrastructure -->
+    <linearGradient id="infraGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#374151;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1f2937;stop-opacity:1" />
+    </linearGradient>
+
+    <!-- Filters and Effects -->
+    <filter id="dropshadow" x="0" y="0" width="120%" height="120%">
+      <feDropShadow dx="3" dy="3" stdDeviation="3" flood-color="#00000030"/>
+    </filter>
+    
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#f59e0b80"/>
+    </filter>
+
+    <!-- Arrow markers -->
+    <marker id="arrowhead" markerWidth="12" markerHeight="8" refX="11" refY="4" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,8 L12,4 z" fill="#4a5568"/>
+    </marker>
+    <marker id="arrowheadCore" markerWidth="12" markerHeight="8" refX="11" refY="4" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,8 L12,4 z" fill="#1e40af"/>
+    </marker>
+    <marker id="arrowheadExtension" markerWidth="12" markerHeight="8" refX="11" refY="4" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,8 L12,4 z" fill="#f59e0b"/>
+    </marker>
+    <marker id="arrowheadAgent" markerWidth="12" markerHeight="8" refX="11" refY="4" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,8 L12,4 z" fill="#10b981"/>
+    </marker>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1400" height="1300" fill="#f8fafc"/>
+  
+  <!-- Title -->
+  <text x="700" y="40" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#1a202c">
+    ProcessIQ - Extensible RPA + AI Platform
+  </text>
+  <text x="700" y="65" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#4a5568">
+    Core Traditional RPA (Always Available) + Optional AI Extensions (Pay-as-you-grow)
+  </text>
+
+  <!-- CORE RPA FOUNDATION (Always Available) -->
+  <rect x="50" y="90" width="1300" height="30" rx="15" fill="#1e40af" />
+  <text x="700" y="110" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="white">
+    🏗️ CORE RPA FOUNDATION - No AI/GPU Required - Traditional Automation Only
+  </text>
+
+  <!-- Desktop Application Control Center -->
+  <rect x="50" y="140" width="1300" height="100" rx="15" fill="url(#coreDesktopGrad)" filter="url(#dropshadow)"/>
+  <text x="700" y="170" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="white">
+    🖥️ Electron Desktop App - Multi-Channel Workflow Creation
+  </text>
+  
+  <!-- Core Desktop Features -->
+  <rect x="100" y="190" width="160" height="35" rx="5" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="180" y="210" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="white">Drag & Drop Builder</text>
+  
+  <rect x="280" y="190" width="160" height="35" rx="5" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="360" y="210" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="white">Chat Interface</text>
+  
+  <rect x="460" y="190" width="160" height="35" rx="5" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="540" y="210" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="white">BRD Upload</text>
+  
+  <rect x="640" y="190" width="160" height="35" rx="5" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="720" y="210" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="white">Real-time Monitor</text>
+  
+  <rect x="820" y="190" width="160" height="35" rx="5" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="900" y="210" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="white">Plugin Management</text>
+  
+  <rect x="1000" y="190" width="160" height="35" rx="5" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="1080" y="210" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="white">Workflow Templates</text>
+  
+  <rect x="1180" y="190" width="160" height="35" rx="5" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="1260" y="210" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="white">CLI & API</text>
+
+  <!-- Core RPA Pipeline -->
+  <!-- SOURCES -->
+  <rect x="50" y="280" width="300" height="180" rx="15" fill="url(#coreSourceGrad)" filter="url(#dropshadow)"/>
+  <text x="200" y="310" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white">
+    📥 DATA SOURCES
+  </text>
+  <text x="200" y="330" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="rgba(255,255,255,0.9)">
+    Traditional Input Methods
+  </text>
+  
+  <!-- Source Options -->
+  <rect x="70" y="345" width="120" height="25" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="130" y="360" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">🌐 Web Scraping</text>
+  
+  <rect x="210" y="345" width="120" height="25" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="270" y="360" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">🖥️ Desktop Apps</text>
+  
+  <rect x="70" y="375" width="120" height="25" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="130" y="390" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">🔗 REST APIs</text>
+  
+  <rect x="210" y="375" width="120" height="25" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="270" y="390" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">🗄️ Databases</text>
+  
+  <rect x="70" y="405" width="120" height="25" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="130" y="420" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">📁 Files (CSV/Excel)</text>
+  
+  <rect x="210" y="405" width="120" height="25" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="270" y="420" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">📧 Email/Attachments</text>
+
+  <!-- CORE RPA ENGINE -->
+  <rect x="380" y="280" width="350" height="180" rx="15" fill="url(#coreEngineGrad)" filter="url(#dropshadow)"/>
+  <text x="555" y="310" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white">
+    ⚙️ CORE RPA ENGINE
+  </text>
+  <text x="555" y="330" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="rgba(255,255,255,0.9)">
+    Traditional RPA Tools - No GPU Required
+  </text>
+  
+  <!-- Core RPA Tools -->
+  <rect x="400" y="345" width="100" height="45" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="450" y="362" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Playwright</text>
+  <text x="450" y="375" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Web Automation</text>
+  <text x="450" y="385" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Cross-Browser</text>
+  
+  <rect x="520" y="345" width="100" height="45" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="570" y="362" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Robot Framework</text>
+  <text x="570" y="375" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Keyword-Driven</text>
+  <text x="570" y="385" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Enterprise RPA</text>
+  
+  <rect x="640" y="345" width="80" height="45" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="680" y="360" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">TagUI</text>
+  <text x="680" y="373" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Visual RPA</text>
+  <text x="680" y="383" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Natural Language</text>
+  
+  <rect x="400" y="400" width="100" height="45" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="450" y="417" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Selenium</text>
+  <text x="450" y="430" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Web Driver</text>
+  <text x="450" y="440" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Legacy Support</text>
+  
+  <rect x="520" y="400" width="100" height="45" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="570" y="417" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Data Transform</text>
+  <text x="570" y="430" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Pandas/SQL</text>
+  <text x="570" y="440" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Validation</text>
+  
+  <rect x="640" y="400" width="80" height="45" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="680" y="417" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Scheduler</text>
+  <text x="680" y="430" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Cron Jobs</text>
+  <text x="680" y="440" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Triggers</text>
+
+  <!-- TARGETS -->
+  <rect x="760" y="280" width="270" height="180" rx="15" fill="url(#coreTargetGrad)" filter="url(#dropshadow)"/>
+  <text x="895" y="310" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white">
+    📤 DATA TARGETS
+  </text>
+  <text x="895" y="330" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="rgba(255,255,255,0.9)">
+    Output Destinations
+  </text>
+  
+  <!-- Target Options -->
+  <rect x="780" y="345" width="110" height="25" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="835" y="360" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">📊 Excel/CSV Files</text>
+  
+  <rect x="910" y="345" width="100" height="25" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="960" y="360" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">🗄️ Databases</text>
+  
+  <rect x="780" y="375" width="110" height="25" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="835" y="390" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">🔗 APIs/Webhooks</text>
+  
+  <rect x="910" y="375" width="100" height="25" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="960" y="390" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">☁️ Cloud Storage</text>
+  
+  <rect x="780" y="405" width="110" height="25" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="835" y="420" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">📧 Email Reports</text>
+  
+  <rect x="910" y="405" width="100" height="25" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="960" y="420" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">📱 Notifications</text>
+
+  <!-- Management Layer -->
+  <rect x="1060" y="280" width="290" height="180" rx="15" fill="#4a5568" filter="url(#dropshadow)"/>
+  <text x="1205" y="310" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white">
+    🛠️ MANAGEMENT
+  </text>
+  <text x="1205" y="330" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="rgba(255,255,255,0.9)">
+    Security & Monitoring
+  </text>
+  
+  <!-- Management Components -->
+  <rect x="1080" y="345" width="120" height="45" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="1140" y="362" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Credential Store</text>
+  <text x="1140" y="375" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">OS Keychain</text>
+  <text x="1140" y="385" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Encrypted</text>
+  
+  <rect x="1220" y="345" width="110" height="45" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="1275" y="362" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Audit Logging</text>
+  <text x="1275" y="375" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Execution Trace</text>
+  <text x="1275" y="385" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Compliance</text>
+  
+  <rect x="1080" y="400" width="120" height="45" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="1140" y="417" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Error Handling</text>
+  <text x="1140" y="430" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Screenshots</text>
+  <text x="1140" y="440" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Retry Logic</text>
+  
+  <rect x="1220" y="400" width="110" height="45" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="1275" y="417" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Performance</text>
+  <text x="1275" y="430" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Metrics</text>
+  <text x="1275" y="440" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Monitoring</text>
+
+  <!-- Core Flow Arrows -->
+  <line x1="350" y1="370" x2="380" y2="370" stroke="#1e40af" stroke-width="4" marker-end="url(#arrowheadCore)"/>
+  <text x="365" y="360" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#1e40af">COLLECT</text>
+  
+  <line x1="730" y1="370" x2="760" y2="370" stroke="#1e40af" stroke-width="4" marker-end="url(#arrowheadCore)"/>
+  <text x="745" y="360" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#1e40af">PROCESS</text>
+  
+  <line x1="1030" y1="370" x2="1060" y2="370" stroke="#1e40af" stroke-width="4" marker-end="url(#arrowheadCore)"/>
+  <text x="1045" y="360" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#1e40af">DELIVER</text>
+
+  <!-- OPTIONAL EXTENSIONS SEPARATOR -->
+  <rect x="50" y="480" width="1300" height="30" rx="15" fill="#f59e0b" />
+  <text x="700" y="500" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="white">
+    🚀 OPTIONAL AI EXTENSIONS - Requires GPU/Cloud - Pay-as-you-grow
+  </text>
+
+  <!-- AI INTELLIGENCE EXTENSION -->
+  <rect x="50" y="530" width="640" height="160" rx="15" fill="url(#aiExtGrad)" filter="url(#glow)" stroke="#f59e0b" stroke-width="2" stroke-dasharray="8,4"/>
+  <text x="370" y="560" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white">
+    🤖 AI INTELLIGENCE EXTENSION
+  </text>
+  <text x="370" y="580" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="rgba(255,255,255,0.9)">
+    Optional AI/LLM Layer - Enhanced Automation Capabilities
+  </text>
+  
+  <!-- AI Components -->
+  <rect x="70" y="595" width="120" height="45" rx="4" fill="rgba(255,255,255,0.3)" stroke="white" stroke-width="1"/>
+  <text x="130" y="612" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Vision LLMs</text>
+  <text x="130" y="625" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">GPT-4V/Claude-3V</text>
+  <text x="130" y="635" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">UI Understanding</text>
+  
+  <rect x="210" y="595" width="120" height="45" rx="4" fill="rgba(255,255,255,0.3)" stroke="white" stroke-width="1"/>
+  <text x="270" y="612" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">NLP Engine</text>
+  <text x="270" y="625" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Chat Processing</text>
+  <text x="270" y="635" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">BRD Analysis</text>
+  
+  <rect x="350" y="595" width="120" height="45" rx="4" fill="rgba(255,255,255,0.3)" stroke="white" stroke-width="1"/>
+  <text x="410" y="612" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Smart Router</text>
+  <text x="410" y="625" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">AI vs Traditional</text>
+  <text x="410" y="635" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Fallback Logic</text>
+  
+  <rect x="490" y="595" width="120" height="45" rx="4" fill="rgba(255,255,255,0.3)" stroke="white" stroke-width="1"/>
+  <text x="550" y="612" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Learning Engine</text>
+  <text x="550" y="625" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Pattern Learning</text>
+  <text x="550" y="635" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Self-Optimization</text>
+
+  <!-- AGENTS EXTENSION -->
+  <rect x="710" y="530" width="640" height="160" rx="15" fill="url(#agentGrad)" filter="url(#glow)" stroke="#10b981" stroke-width="2" stroke-dasharray="8,4"/>
+  <text x="1030" y="560" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white">
+    🤖 DISTRIBUTED AGENTS EXTENSION
+  </text>
+  <text x="1030" y="580" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="rgba(255,255,255,0.9)">
+    Optional Multi-Agent System - Specialized Bot Network
+  </text>
+  
+  <!-- Agent Types -->
+  <rect x="730" y="595" width="110" height="45" rx="4" fill="rgba(255,255,255,0.3)" stroke="white" stroke-width="1"/>
+  <text x="785" y="612" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Execution Agents</text>
+  <text x="785" y="625" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Task Specialists</text>
+  <text x="785" y="635" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">SAP/Web/Email</text>
+  
+  <rect x="860" y="595" width="110" height="45" rx="4" fill="rgba(255,255,255,0.3)" stroke="white" stroke-width="1"/>
+  <text x="915" y="612" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Monitor Agents</text>
+  <text x="915" y="625" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Health Checks</text>
+  <text x="915" y="635" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Auto-Healing</text>
+  
+  <rect x="990" y="595" width="110" height="45" rx="4" fill="rgba(255,255,255,0.3)" stroke="white" stroke-width="1"/>
+  <text x="1045" y="612" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Security Agents</text>
+  <text x="1045" y="625" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Access Control</text>
+  <text x="1045" y="635" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Audit Trails</text>
+  
+  <rect x="1120" y="595" width="110" height="45" rx="4" fill="rgba(255,255,255,0.3)" stroke="white" stroke-width="1"/>
+  <text x="1175" y="612" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Learning Agents</text>
+  <text x="1175" y="625" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Usage Analytics</text>
+  <text x="1175" y="635" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="rgba(255,255,255,0.8)">Optimization</text>
+
+  <!-- Extension Connection Arrows -->
+  <path d="M 555 460 Q 370 490 370 530" stroke="#f59e0b" stroke-width="3" marker-end="url(#arrowheadExtension)" stroke-dasharray="6,4" fill="none"/>
+  <text x="460" y="490" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#f59e0b">AI Enhancement</text>
+  
+  <path d="M 555 460 Q 1030 490 1030 530" stroke="#10b981" stroke-width="3" marker-end="url(#arrowheadAgent)" stroke-dasharray="6,4" fill="none"/>
+  <text x="800" y="490" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#10b981">Agent Distribution</text>
+
+  <!-- Infrastructure Layer -->
+  <rect x="50" y="720" width="1300" height="100" rx="15" fill="url(#infraGrad)" filter="url(#dropshadow)"/>
+  <text x="700" y="750" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white">
+    🏗️ INFRASTRUCTURE & DEPLOYMENT
+  </text>
+  
+  <!-- Infrastructure Components -->
+  <rect x="80" y="770" width="100" height="35" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="130" y="790" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Docker</text>
+  
+  <rect x="200" y="770" width="100" height="35" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="250" y="790" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">PostgreSQL</text>
+  
+  <rect x="320" y="770" width="100" height="35" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="370" y="790" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Redis</text>
+  
+  <rect x="440" y="770" width="100" height="35" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="490" y="790" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Celery</text>
+
+  <!-- Optional Infrastructure (AI/GPU) -->
+  <rect x="560" y="770" width="120" height="35" rx="4" fill="rgba(255,153,0,0.3)" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4,2"/>
+  <text x="620" y="790" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">GPU Cluster</text>
+  
+  <rect x="700" y="770" width="120" height="35" rx="4" fill="rgba(255,153,0,0.3)" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4,2"/>
+  <text x="760" y="790" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Vector DB</text>
+  
+  <rect x="840" y="770" width="120" height="35" rx="4" fill="rgba(16,185,129,0.3)" stroke="#10b981" stroke-width="1" stroke-dasharray="4,2"/>
+  <text x="900" y="790" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Agent Mesh</text>
+  
+  <rect x="980" y="770" width="120" height="35" rx="4" fill="rgba(16,185,129,0.3)" stroke="#10b981" stroke-width="1" stroke-dasharray="4,2"/>
+  <text x="1040" y="790" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Message Bus</text>
+
+  <rect x="1120" y="770" width="100" height="35" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="1170" y="790" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Kubernetes</text>
+  
+  <rect x="1240" y="770" width="100" height="35" rx="4" fill="rgba(255,255,255,0.2)" stroke="white" stroke-width="1"/>
+  <text x="1290" y="790" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white">Security</text>
+
+  <!-- Pricing Tiers -->
+  <rect x="50" y="850" width="1300" height="120" rx="15" fill="#2d3748" filter="url(#dropshadow)"/>
+  <text x="700" y="880" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white">
+    💰 FLEXIBLE PRICING TIERS - Pay Only for What You Use
+  </text>
+  
+  <!-- Pricing Boxes -->
+  <rect x="80" y="900" width="220" height="55" rx="6" fill="rgba(30,64,175,0.2)" stroke="#1e40af" stroke-width="2"/>
+  <text x="190" y="918" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#60a5fa">STARTER - Core RPA Only</text>
+  <text x="190" y="934" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="white">Traditional RPA • No GPU • No AI</text>
+  <text x="190" y="946" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="white">Web/Desktop/API Automation</text>
+  
+  <rect x="320" y="900" width="220" height="55" rx="6" fill="rgba(245,158,11,0.2)" stroke="#f59e0b" stroke-width="2"/>
+  <text x="430" y="918" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#fbbf24">SMART - Core + AI</text>
+  <text x="430" y="934" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="white">Core RPA + Vision LLMs</text>
+  <text x="430" y="946" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="white">Chat Interface • BRD Processing</text>
+  
+  <rect x="560" y="900" width="220" height="55" rx="6" fill="rgba(16,185,129,0.2)" stroke="#10b981" stroke-width="2"/>
+  <text x="670" y="918" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#34d399">PRO - Core + AI + Agents</text>
+  <text x="670" y="934" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="white">Full Stack • Distributed Agents</text>
+  <text x="670" y="946" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="white">Multi-Agent Orchestration</text>
+  
+  <rect x="800" y="900" width="220" height="55" rx="6" fill="rgba(139,92,246,0.2)" stroke="#8b5cf6" stroke-width="2"/>
+  <text x="910" y="918" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#a78bfa">ENTERPRISE</text>
+  <text x="910" y="934" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="white">White-label • Custom Agents</text>
+  <text x="910" y="946" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="white">On-Premise • Dedicated Support</text>
+  
+  <rect x="1040" y="900" width="280" height="55" rx="6" fill="rgba(99,102,241,0.2)" stroke="#6366f1" stroke-width="2"/>
+  <text x="1180" y="918" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#818cf8">CUSTOM - Build Your Stack</text>
+  <text x="1180" y="934" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="white">Mix & Match Any Components</text>
+  <text x="1180" y="946" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" fill="white">Usage-Based Billing • API Access</text>
+
+  <!-- Evolution Path -->
+  <rect x="50" y="990" width="1300" height="80" rx="15" fill="#1a202c" filter="url(#dropshadow)"/>
+  <text x="700" y="1020" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white">
+    🚀 EVOLUTION PATH: Start Simple → Scale Smart → Pay as You Grow
+  </text>
+  
+  <!-- Evolution stages -->
+  <circle cx="200" cy="1045" r="18" fill="#1e40af" stroke="white" stroke-width="2"/>
+  <text x="200" y="1050" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="white">1</text>
+  <text x="200" y="1065" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#a0aec0">Core RPA</text>
+  
+  <line x1="218" y1="1045" x2="282" y2="1045" stroke="white" stroke-width="2"/>
+  
+  <circle cx="350" cy="1045" r="18" fill="#f59e0b" stroke="white" stroke-width="2"/>
+  <text x="350" y="1050" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="white">2</text>
+  <text x="350" y="1065" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#a0aec0">Add AI</text>
+  
+  <line x1="368" y1="1045" x2="432" y2="1045" stroke="white" stroke-width="2"/>
+  
+  <circle cx="500" cy="1045" r="18" fill="#10b981" stroke="white" stroke-width="2"/>
+  <text x="500" y="1050" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="white">3</text>
+  <text x="500" y="1065" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#a0aec0">Add Agents</text>
+  
+  <line x1="518" y1="1045" x2="582" y2="1045" stroke="white" stroke-width="2"/>
+  
+  <circle cx="650" cy="1045" r="18" fill="#8b5cf6" stroke="white" stroke-width="2"/>
+  <text x="650" y="1050" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="white">4</text>
+  <text x="650" y="1065" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#a0aec0">Enterprise</text>
+  
+  <text x="1000" y="1040" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#a0aec0">
+    Extensible Architecture - Never Pay for Unused Features
+  </text>
+  <text x="1000" y="1060" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#718096">
+    Start with Traditional RPA → Upgrade Only When You Need Advanced Features
+  </text>
+
+  <!-- Key Benefits -->
+  <rect x="50" y="1090" width="1300" height="80" rx="15" fill="#065f46" filter="url(#dropshadow)"/>
+  <text x="700" y="1120" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white">
+    ✅ KEY BENEFITS - Traditional RPA Reliability + Optional AI Innovation
+  </text>
+  
+  <!-- Benefit Points -->
+  <rect x="80" y="1140" width="160" height="20" rx="4" fill="rgba(255,255,255,0.1)" stroke="white" stroke-width="1"/>
+  <text x="160" y="1153" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="white">⚡ No GPU Required (Core)</text>
+  
+  <rect x="260" y="1140" width="160" height="20" rx="4" fill="rgba(255,255,255,0.1)" stroke="white" stroke-width="1"/>
+  <text x="340" y="1153" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="white">💰 Pay Only What You Use</text>
+  
+  <rect x="440" y="1140" width="160" height="20" rx="4" fill="rgba(255,255,255,0.1)" stroke="white" stroke-width="1"/>
+  <text x="520" y="1153" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="white">🔧 Proven RPA Tools</text>
+  
+  <rect x="620" y="1140" width="160" height="20" rx="4" fill="rgba(255,255,255,0.1)" stroke="white" stroke-width="1"/>
+  <text x="700" y="1153" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="white">🧠 Optional AI Enhancement</text>
+  
+  <rect x="800" y="1140" width="160" height="20" rx="4" fill="rgba(255,255,255,0.1)" stroke="white" stroke-width="1"/>
+  <text x="880" y="1153" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="white">🤖 Agent Specialization</text>
+  
+  <rect x="980" y="1140" width="160" height="20" rx="4" fill="rgba(255,255,255,0.1)" stroke="white" stroke-width="1"/>
+  <text x="1060" y="1153" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="white">🏢 Enterprise Ready</text>
+  
+  <rect x="1160" y="1140" width="160" height="20" rx="4" fill="rgba(255,255,255,0.1)" stroke="white" stroke-width="1"/>
+  <text x="1240" y="1153" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="white">🔄 Future-Proof Design</text>
+
+</svg>
