@@ -592,6 +592,107 @@ def _display_schema(schema: Dict[str, Any]) -> None:
     console.print(json.dumps(schema, indent=2))
 
 
+@app.command()
+def demo(
+    output_dir: Optional[str] = typer.Option(
+        None, 
+        "--output", 
+        "-o", 
+        help="Output directory for demo artifacts"
+    ),
+    headless: bool = typer.Option(
+        True,
+        "--headless/--no-headless",
+        help="Run browser in headless mode"
+    )
+) -> None:
+    """Run ProcessIQ Kaggle-to-Excel RPA demonstration"""
+    
+    console.print("🎯 Starting ProcessIQ RPA Demonstration", style="bold blue")
+    console.print("This demo showcases:", style="italic")
+    console.print("• Multi-tool RPA orchestration", style="dim")
+    console.print("• Web automation with Playwright", style="dim") 
+    console.print("• Data processing with Pandas", style="dim")
+    console.print("• Excel generation with charts", style="dim")
+    console.print("• Error handling and recovery", style="dim")
+    console.print("")
+    
+    # Set up output directory
+    if output_dir:
+        output_path = Path(output_dir)
+    else:
+        output_path = Path.cwd() / "processiq_demo_output"
+    
+    output_path.mkdir(parents=True, exist_ok=True)
+    
+    console.print(f"📁 Output directory: {output_path.absolute()}", style="dim")
+    console.print("")
+    
+    # Import and run demo
+    try:
+        from .examples.kaggle_to_excel_demo import run_kaggle_excel_demo
+        
+        # Run the demo
+        with console.status("[bold blue]Running ProcessIQ demo...") as status:
+            results = asyncio.run(run_kaggle_excel_demo(output_path))
+        
+        # Display results
+        if results["success"]:
+            console.print("✅ Demo completed successfully!", style="bold green")
+            
+            # Show timing
+            total_time = sum(step.get("duration_ms", 0) for step in results["steps"])
+            console.print(f"⏱️  Total execution time: {total_time/1000:.2f} seconds")
+            
+            # Show step details
+            console.print("\n📋 Execution Steps:", style="bold")
+            for step in results["steps"]:
+                status_icon = "✅" if step["success"] else "❌"
+                duration = step.get("duration_ms", 0) / 1000
+                console.print(f"   {status_icon} Step {step['step']}: {step['name']} ({duration:.2f}s)")
+            
+            # Show artifacts
+            if "artifacts" in results:
+                console.print("\n📦 Generated Artifacts:", style="bold")
+                for artifact_type, artifact_path in results["artifacts"].items():
+                    if isinstance(artifact_path, list):
+                        console.print(f"   📁 {artifact_type}: {len(artifact_path)} files")
+                        for i, path in enumerate(artifact_path[:3]):  # Show first 3
+                            console.print(f"      • {Path(str(path)).name}", style="dim")
+                        if len(artifact_path) > 3:
+                            console.print(f"      ... and {len(artifact_path) - 3} more", style="dim")
+                    else:
+                        console.print(f"   📄 {artifact_type}: {Path(str(artifact_path)).name}")
+            
+            # Show next steps
+            console.print("\n🎉 Next Steps:", style="bold yellow")
+            console.print("1. Open the generated Excel file to see the visualizations")
+            console.print("2. Check the screenshots to see browser automation in action")  
+            console.print("3. Review the summary report for detailed execution metrics")
+            console.print(f"4. Explore all files in: {output_path.absolute()}")
+            
+        else:
+            console.print("❌ Demo failed!", style="bold red")
+            error_msg = results.get("error", "Unknown error")
+            console.print(f"Error: {error_msg}", style="red")
+            
+            # Show partial results if available
+            if results.get("steps"):
+                console.print(f"\nCompleted {len(results['steps'])} steps before failure:")
+                for step in results["steps"]:
+                    status = "✅" if step["success"] else "❌"
+                    console.print(f"  {status} Step {step['step']}: {step['name']}")
+        
+    except ImportError as e:
+        console.print("❌ Demo requires additional dependencies", style="bold red")
+        console.print("Install with: pip install 'processiq[demo]'", style="yellow")
+        console.print(f"Missing: {e}", style="dim")
+        raise typer.Exit(1)
+    except Exception as e:
+        console.print(f"❌ Demo execution failed: {e}", style="bold red")
+        raise typer.Exit(1)
+
+
 # Main entry point
 def main_cli():
     """Main CLI entry point"""

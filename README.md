@@ -1,6 +1,8 @@
 # ProcessIQ
 
-ProcessIQ is the complete **Source → Target** data automation platform that scales from simple data collection to full enterprise BI solutions. Built with a plug-and-play architecture that evolves from traditional RPA to AI agents to future technologies.
+ProcessIQ is an **intelligent RPA orchestration platform** that transforms automation by leveraging the best existing tools rather than building from scratch. We provide the AI orchestration layer that makes powerful RPA tools accessible, intelligent, and enterprise-ready.
+
+> 📖 **[See Complete RPA Orchestration Overview](docs/RPA_ORCHESTRATION_OVERVIEW.md)** for detailed architecture, integrations, and capabilities.
 
 ## 🎯 **Core Value Proposition**
 
