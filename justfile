@@ -31,13 +31,13 @@ dev:
     npx concurrently \
         --names "BACKEND,DESKTOP" \
         --prefix-colors "blue,green" \
-        "bash -c 'source .venv/bin/activate && cd apps/backend && python -m uvicorn processiq.main:app --reload --host 0.0.0.0 --port 8000'" \
+        "bash -c 'source .venv/bin/activate && cd apps/backend && PYTHONPATH=src python -m uvicorn processiq.main:app --reload --host 0.0.0.0 --port 8000'" \
         "cd apps/desktop && npm run dev"
 
 # Start individual services
 dev-backend:
     @echo "🐍 Starting backend server..."
-    bash -c 'source .venv/bin/activate && cd apps/backend && python -m uvicorn processiq.main:app --reload --host 0.0.0.0 --port 8000'
+    bash -c 'source .venv/bin/activate && cd apps/backend && PYTHONPATH=src python -m uvicorn processiq.main:app --reload --host 0.0.0.0 --port 8000'
 
 dev-frontend:
     @echo "⚛️  Starting frontend development server..."

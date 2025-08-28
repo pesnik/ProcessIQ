@@ -4,9 +4,10 @@
   "description": "ProcessIQ Desktop Application - Visual Workflow Designer & Control Center",
   "main": "dist/main.js",
   "scripts": {
-    "dev": "concurrently \"npm run dev:electron\" \"npm run dev:react\"",
+    "dev": "npm run compile:electron && concurrently \"npm run dev:electron\" \"npm run dev:react\"",
     "dev:electron": "cross-env NODE_ENV=development electron . --no-sandbox",
     "dev:react": "vite",
+    "compile:electron": "tsc electron/main.ts electron/preload.ts --outDir dist --target ES2020 --module commonjs --moduleResolution node --esModuleInterop --allowSyntheticDefaultImports --skipLibCheck",
     "build": "npm run build:react && npm run build:electron",
     "build:react": "vite build",
     "build:electron": "electron-builder",
