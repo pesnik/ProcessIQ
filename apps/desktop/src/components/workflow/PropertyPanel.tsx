@@ -35,23 +35,23 @@ export function PropertyPanel({ selectedNode, onClose, onUpdateNode }: PropertyP
         return (
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 URL
               </label>
               <input
                 type="url"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
                 placeholder="https://example.com"
                 value={config.url || ''}
                 onChange={(e) => handleConfigChange('url', e.target.value)}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Wait For
               </label>
               <select
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
                 value={config.wait_for || 'networkidle'}
                 onChange={(e) => handleConfigChange('wait_for', e.target.value)}
               >
@@ -67,23 +67,23 @@ export function PropertyPanel({ selectedNode, onClose, onUpdateNode }: PropertyP
         return (
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 CSS Selector
               </label>
               <input
                 type="text"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
                 placeholder=".data-element"
                 value={config.selector || ''}
                 onChange={(e) => handleConfigChange('selector', e.target.value)}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Extract Type
               </label>
               <select
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
                 value={config.extract_type || 'text'}
                 onChange={(e) => handleConfigChange('extract_type', e.target.value)}
               >
@@ -94,12 +94,12 @@ export function PropertyPanel({ selectedNode, onClose, onUpdateNode }: PropertyP
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Variable Name
               </label>
               <input
                 type="text"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
                 placeholder="extracted_data"
                 value={config.variable_name || ''}
                 onChange={(e) => handleConfigChange('variable_name', e.target.value)}
@@ -112,35 +112,35 @@ export function PropertyPanel({ selectedNode, onClose, onUpdateNode }: PropertyP
         return (
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 To
               </label>
               <input
                 type="email"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
                 placeholder="recipient@example.com"
                 value={config.to || ''}
                 onChange={(e) => handleConfigChange('to', e.target.value)}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Subject
               </label>
               <input
                 type="text"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
                 placeholder="Email subject"
                 value={config.subject || ''}
                 onChange={(e) => handleConfigChange('subject', e.target.value)}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Body
               </label>
               <textarea
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
                 rows={4}
                 placeholder="Email body content"
                 value={config.body || ''}
@@ -155,24 +155,24 @@ export function PropertyPanel({ selectedNode, onClose, onUpdateNode }: PropertyP
         return (
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 File Path
               </label>
               <input
                 type="text"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
                 placeholder="/path/to/file.xlsx"
                 value={config.file_path || ''}
                 onChange={(e) => handleConfigChange('file_path', e.target.value)}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Sheet Name
               </label>
               <input
                 type="text"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
                 placeholder="Sheet1"
                 value={config.sheet_name || ''}
                 onChange={(e) => handleConfigChange('sheet_name', e.target.value)}
@@ -213,23 +213,23 @@ export function PropertyPanel({ selectedNode, onClose, onUpdateNode }: PropertyP
         return (
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Connection
               </label>
               <input
                 type="text"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
                 placeholder="db_connection"
                 value={config.connection || ''}
                 onChange={(e) => handleConfigChange('connection', e.target.value)}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Query
               </label>
               <textarea
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground font-mono text-sm"
                 rows={4}
                 placeholder="SELECT * FROM table_name"
                 value={config.query || ''}
@@ -237,12 +237,12 @@ export function PropertyPanel({ selectedNode, onClose, onUpdateNode }: PropertyP
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Result Variable
               </label>
               <input
                 type="text"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
                 placeholder="query_result"
                 value={config.result_variable || ''}
                 onChange={(e) => handleConfigChange('result_variable', e.target.value)}
@@ -255,11 +255,11 @@ export function PropertyPanel({ selectedNode, onClose, onUpdateNode }: PropertyP
         return (
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Python Code
               </label>
               <textarea
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground font-mono text-sm"
                 rows={10}
                 placeholder="# Enter your Python code here
 import pandas as pd
@@ -270,24 +270,24 @@ import pandas as pd
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Input Variables (comma-separated)
               </label>
               <input
                 type="text"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
                 placeholder="var1, var2, var3"
                 value={config.input_variables?.join(', ') || ''}
                 onChange={(e) => handleConfigChange('input_variables', e.target.value.split(',').map(v => v.trim()).filter(v => v))}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Output Variables (comma-separated)
               </label>
               <input
                 type="text"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
                 placeholder="result1, result2"
                 value={config.output_variables?.join(', ') || ''}
                 onChange={(e) => handleConfigChange('output_variables', e.target.value.split(',').map(v => v.trim()).filter(v => v))}
@@ -300,12 +300,12 @@ import pandas as pd
         return (
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Condition
               </label>
               <input
                 type="text"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
                 placeholder="${variable} == 'value'"
                 value={config.condition || ''}
                 onChange={(e) => handleConfigChange('condition', e.target.value)}
@@ -318,11 +318,11 @@ import pandas as pd
         return (
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Method
               </label>
               <select
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
                 value={config.method || 'GET'}
                 onChange={(e) => handleConfigChange('method', e.target.value)}
               >
@@ -334,24 +334,24 @@ import pandas as pd
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 URL
               </label>
               <input
                 type="url"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
                 placeholder="https://api.example.com/endpoint"
                 value={config.url || ''}
                 onChange={(e) => handleConfigChange('url', e.target.value)}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Response Variable
               </label>
               <input
                 type="text"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
                 placeholder="http_response"
                 value={config.response_variable || ''}
                 onChange={(e) => handleConfigChange('response_variable', e.target.value)}
