@@ -8,30 +8,30 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:desktop\"",
+    "dev": "concurrently \"pnpm run dev:backend\" \"pnpm run dev:desktop\"",
     "dev:backend": "cd apps/backend && python -m uvicorn processiq.main:app --reload --host 0.0.0.0 --port 8000",
-    "dev:desktop": "cd apps/desktop && npm run dev",
-    "build": "npm run build:packages && npm run build:desktop && npm run build:backend",
-    "build:packages": "cd packages/n8n-rpa-nodes && npm run build",
-    "build:desktop": "cd apps/desktop && npm run build",
+    "dev:desktop": "cd apps/desktop && pnpm run dev",
+    "build": "pnpm run build:packages && pnpm run build:desktop && pnpm run build:backend",
+    "build:packages": "cd packages/n8n-rpa-nodes && pnpm run build",
+    "build:desktop": "cd apps/desktop && pnpm run build",
     "build:backend": "cd apps/backend && python -m build",
-    "test": "npm run test:packages && npm run test:desktop && npm run test:backend",
-    "test:packages": "cd packages/n8n-rpa-nodes && npm test",
-    "test:desktop": "cd apps/desktop && npm test",
+    "test": "pnpm run test:packages && pnpm run test:desktop && pnpm run test:backend",
+    "test:packages": "cd packages/n8n-rpa-nodes && pnpm test",
+    "test:desktop": "cd apps/desktop && pnpm test",
     "test:backend": "cd apps/backend && pytest",
-    "lint": "npm run lint:packages && npm run lint:desktop && npm run lint:backend",
-    "lint:packages": "cd packages/n8n-rpa-nodes && npm run lint",
-    "lint:desktop": "cd apps/desktop && npm run lint",
+    "lint": "pnpm run lint:packages && pnpm run lint:desktop && pnpm run lint:backend",
+    "lint:packages": "cd packages/n8n-rpa-nodes && pnpm run lint",
+    "lint:desktop": "cd apps/desktop && pnpm run lint",
     "lint:backend": "cd apps/backend && flake8 src/processiq",
-    "format": "npm run format:packages && npm run format:desktop && npm run format:backend",
-    "format:packages": "cd packages/n8n-rpa-nodes && npm run format",
-    "format:desktop": "cd apps/desktop && npm run format",
+    "format": "pnpm run format:packages && pnpm run format:desktop && pnpm run format:backend",
+    "format:packages": "cd packages/n8n-rpa-nodes && pnpm run format",
+    "format:desktop": "cd apps/desktop && pnpm run format",
     "format:backend": "cd apps/backend && black src/ && isort src/",
-    "clean": "npm run clean:packages && npm run clean:desktop && npm run clean:backend",
+    "clean": "pnpm run clean:packages && pnpm run clean:desktop && pnpm run clean:backend",
     "clean:packages": "cd packages/n8n-rpa-nodes && rm -rf dist node_modules",
     "clean:desktop": "cd apps/desktop && rm -rf dist node_modules",
     "clean:backend": "cd apps/backend && rm -rf dist build *.egg-info",
-    "setup": "npm install && cd packages/n8n-rpa-nodes && npm install && cd ../../apps/backend && pip install -e .[dev,vision]",
+    "setup": "pnpm install && cd packages/n8n-rpa-nodes && pnpm install && cd ../../apps/backend && pip install -e .[dev,vision]",
     "docker:build": "docker-compose build",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down"
@@ -43,8 +43,8 @@
   },
   "lint-staged": {
     "apps/desktop/**/*.{js,ts,tsx}": [
-      "cd apps/desktop && npm run format",
-      "cd apps/desktop && npm run lint"
+      "cd apps/desktop && pnpm run format",
+      "cd apps/desktop && pnpm run lint"
     ],
     "apps/backend/**/*.py": [
       "cd apps/backend && black .",
@@ -54,7 +54,7 @@
   },
   "engines": {
     "node": ">=18.0.0",
-    "npm": ">=8.0.0"
+    "pnpm": ">=8.0.0"
   },
   "repository": {
     "type": "git",

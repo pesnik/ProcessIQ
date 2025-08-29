@@ -34,7 +34,9 @@
     "nodes": [
       "dist/nodes/PlaywrightNode/PlaywrightNode.node.js",
       "dist/nodes/ExcelNode/ExcelNode.node.js",
-      "dist/nodes/RobotFrameworkNode/RobotFrameworkNode.node.js"
+      "dist/nodes/SeleniumNode/SeleniumNode.node.js",
+      "dist/nodes/DatabaseNode/DatabaseNode.node.js",
+      "dist/nodes/PythonBridgeNode/PythonBridgeNode.node.js"
     ]
   },
   "keywords": [
@@ -43,16 +45,26 @@
     "rpa",
     "automation",
     "playwright",
+    "selenium",
     "excel",
+    "database",
+    "python",
     "robot-framework",
     "web-automation",
-    "desktop-automation"
+    "desktop-automation",
+    "computer-vision",
+    "opencv",
+    "pyautogui"
   ],
   "dependencies": {
     "n8n-workflow": "~1.0.0",
     "playwright": "^1.40.0",
+    "selenium-webdriver": "^4.15.0",
     "xlsx": "^0.18.5",
-    "robotframework": "^1.0.0"
+    "pg": "^8.11.0",
+    "mysql2": "^3.6.0",
+    "mongodb": "^6.0.0",
+    "sqlite3": "^5.1.0"
   },
   "devDependencies": {
     "@types/jest": "^29.5.0",

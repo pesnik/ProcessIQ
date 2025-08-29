@@ -28,6 +28,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getPlatform: () => process.platform,
   getUserDataPath: () => ipcRenderer.invoke('get-user-data-path'),
 
+  // n8n workflow engine operations
+  n8nStart: () => ipcRenderer.invoke('n8n-start'),
+  n8nStop: () => ipcRenderer.invoke('n8n-stop'),
+  n8nStatus: () => ipcRenderer.invoke('n8n-status'),
+  n8nGetWorkflows: () => ipcRenderer.invoke('n8n-get-workflows'),
+  n8nExecuteWorkflow: (workflowId: string, data?: any) => ipcRenderer.invoke('n8n-execute-workflow', workflowId, data),
+  n8nImportWorkflow: (workflowData: any) => ipcRenderer.invoke('n8n-import-workflow', workflowData),
+
   // Window controls (for custom title bar if needed)
   minimize: () => ipcRenderer.invoke('window-minimize'),
   maximize: () => ipcRenderer.invoke('window-maximize'),
@@ -52,6 +60,12 @@ declare global {
       getVersion: () => string;
       getPlatform: () => string;
       getUserDataPath: () => Promise<string>;
+      n8nStart: () => Promise<boolean>;
+      n8nStop: () => Promise<void>;
+      n8nStatus: () => Promise<boolean>;
+      n8nGetWorkflows: () => Promise<any[]>;
+      n8nExecuteWorkflow: (workflowId: string, data?: any) => Promise<any>;
+      n8nImportWorkflow: (workflowData: any) => Promise<any>;
       minimize: () => Promise<void>;
       maximize: () => Promise<void>;
       close: () => Promise<void>;

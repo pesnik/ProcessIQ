@@ -1,87 +1,56 @@
 /**
- * Workflow Engine Service - Manages embedded workflow server and editor
+ * Workflow Engine Service - Manages n8n workflow server via Electron IPC
  */
 
 interface WorkflowEngineConfig {
   port: number;
   host: string;
-  userFolder: string;
-  customNodes: string[];
 }
 
 class WorkflowEngineService {
-  private server: express.Application | null = null;
-  private serverInstance: any = null;
   private config: WorkflowEngineConfig;
-  private mockServerRunning: boolean = false;
 
   constructor() {
     this.config = {
-      port: 5678, // Workflow engine port
-      host: 'localhost',
-      userFolder: '', // Will be set when needed
-      customNodes: [
-        // Will be set dynamically when needed
-      ]
+      port: 5678, // n8n default port
+      host: 'localhost'
     };
-    this.initializeUserFolder();
-  }
-
-  private async initializeUserFolder(): Promise<void> {
-    try {
-      // Get user data path from electron if available, otherwise use fallback
-      const userDataPath = typeof window !== 'undefined' && window.electronAPI 
-        ? await window.electronAPI.getUserDataPath() 
-        : './processiq-data';
-        
-      this.config.userFolder = `${userDataPath}/workflow-engine`;
-      
-      // Set custom nodes path relative to the app
-      this.config.customNodes = [
-        `${userDataPath}/workflow-nodes/@processiq/n8n-rpa-nodes/dist`
-      ];
-    } catch (error) {
-      console.warn('Could not get user data path, using fallback:', error);
-      this.config.userFolder = './processiq-data/workflow-engine';
-      this.config.customNodes = ['./processiq-data/workflow-nodes'];
-    }
   }
 
   /**
-   * Start embedded workflow server
+   * Start n8n workflow server via Electron main process
    */
   async startWorkflowEngine(): Promise<boolean> {
-    try {
-      console.log('Starting workflow engine...');
-      
-      // Simulate startup delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // For now, use mock server - actual workflow engine integration will be implemented
-      // when we have proper workflow dependencies installed
-      this.mockServerRunning = true;
-      console.log(`Mock workflow engine started on http://${this.config.host}:${this.config.port}`);
-      return true;
-      
-    } catch (error) {
-      console.error('Failed to start workflow engine:', error);
+    if (typeof window !== 'undefined' && (window as any).electronAPI) {
+      try {
+        console.log('Starting n8n workflow engine via Electron IPC...');
+        const result = await (window as any).electronAPI.n8nStart();
+        console.log('n8n start result:', result);
+        return result;
+      } catch (error) {
+        console.error('Failed to start n8n via IPC:', error);
+        return false;
+      }
+    } else {
+      console.error('ElectronAPI not available - running outside of Electron');
       return false;
     }
   }
 
   /**
-   * Stop workflow server
+   * Stop n8n workflow server via Electron main process
    */
   async stopWorkflowEngine(): Promise<void> {
-    try {
-      this.mockServerRunning = false;
-      if (this.serverInstance) {
-        await this.serverInstance.close();
-        this.serverInstance = null;
+    if (typeof window !== 'undefined' && (window as any).electronAPI) {
+      try {
+        console.log('Stopping n8n workflow engine via Electron IPC...');
+        await (window as any).electronAPI.n8nStop();
+        console.log('✅ n8n workflow engine stopped');
+      } catch (error) {
+        console.error('Error stopping n8n via IPC:', error);
       }
-      console.log('Workflow engine stopped');
-    } catch (error) {
-      console.error('Error stopping workflow engine:', error);
+    } else {
+      console.error('ElectronAPI not available - running outside of Electron');
     }
   }
 
@@ -100,31 +69,39 @@ class WorkflowEngineService {
   }
 
   /**
-   * Check if workflow engine is running
+   * Check if n8n workflow engine is running via Electron main process
    */
   async isServerRunning(): Promise<boolean> {
-    // For mock implementation, return the mock server status
-    return this.mockServerRunning;
+    if (typeof window !== 'undefined' && (window as any).electronAPI) {
+      try {
+        const result = await (window as any).electronAPI.n8nStatus();
+        return result;
+      } catch (error) {
+        console.error('Error checking n8n status via IPC:', error);
+        return false;
+      }
+    } else {
+      console.error('ElectronAPI not available - running outside of Electron');
+      return false;
+    }
   }
 
   /**
-   * Execute workflow by ID
+   * Execute workflow by ID via Electron main process
    */
   async executeWorkflow(workflowId: string, data?: any): Promise<any> {
-    if (!this.mockServerRunning) {
-      throw new Error('Workflow engine is not running');
+    if (typeof window !== 'undefined' && (window as any).electronAPI) {
+      try {
+        const result = await (window as any).electronAPI.n8nExecuteWorkflow(workflowId, data);
+        console.log(`✅ n8n workflow execution started for ${workflowId}:`, result);
+        return result;
+      } catch (error) {
+        console.error('Execute workflow error via IPC:', error);
+        throw error;
+      }
+    } else {
+      throw new Error('ElectronAPI not available - running outside of Electron');
     }
-
-    // Return mock execution result
-    const executionId = `exec_${Date.now()}`;
-    console.log(`Mock execution started for workflow ${workflowId}:`, executionId);
-    
-    return {
-      executionId,
-      workflowId,
-      status: 'running',
-      startedAt: new Date().toISOString()
-    };
   }
 
   /**
@@ -146,62 +123,56 @@ class WorkflowEngineService {
   }
 
   /**
-   * List available workflows
+   * List available workflows via Electron main process
    */
   async getWorkflows(): Promise<any[]> {
-    if (!this.mockServerRunning) {
+    if (typeof window !== 'undefined' && (window as any).electronAPI) {
+      try {
+        const result = await (window as any).electronAPI.n8nGetWorkflows();
+        return result;
+      } catch (error) {
+        console.error('Get workflows error via IPC:', error);
+        
+        // Return demo workflows as fallback
+        return [
+          {
+            id: 'rpa-demo-workflow',
+            name: 'ProcessIQ RPA Demo - Complete Automation Pipeline',
+            active: false,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          }
+        ];
+      }
+    } else {
+      console.error('ElectronAPI not available - running outside of Electron');
       return [];
     }
-
-    // Return mock workflows for demo
-    return [
-      {
-        id: 'rpa-demo-workflow',
-        name: 'ProcessIQ RPA Demo - Kaggle to Excel',
-        active: false,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      },
-      {
-        id: 'web-automation-workflow',
-        name: 'Web Data Extraction',
-        active: true,
-        createdAt: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
-        updatedAt: new Date().toISOString()
-      }
-    ];
   }
 
   /**
-   * Import workflow from JSON
+   * Import workflow from JSON via Electron main process
    */
   async importWorkflow(workflowData: any): Promise<any> {
-    try {
-      const response = await fetch(`${this.getApiUrl()}/workflows`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(workflowData),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to import workflow: ${response.statusText}`);
+    if (typeof window !== 'undefined' && (window as any).electronAPI) {
+      try {
+        const result = await (window as any).electronAPI.n8nImportWorkflow(workflowData);
+        return result;
+      } catch (error) {
+        console.error('Import workflow error via IPC:', error);
+        throw error;
       }
-
-      return await response.json();
-    } catch (error) {
-      console.error('Import workflow error:', error);
-      throw error;
+    } else {
+      throw new Error('ElectronAPI not available - running outside of Electron');
     }
   }
 
   /**
-   * Create ProcessIQ RPA demo workflow
+   * Create ProcessIQ RPA demo workflow with Phase 2 nodes
    */
   async createRPADemoWorkflow(): Promise<any> {
     const demoWorkflow = {
-      name: 'ProcessIQ RPA Demo - Kaggle to Excel',
+      name: 'ProcessIQ RPA Demo - Complete Automation Pipeline',
       nodes: [
         {
           parameters: {
@@ -212,7 +183,7 @@ class WorkflowEngineService {
           id: 'playwright-1',
           name: 'Navigate to Demo Site',
           type: 'playwright',
-          position: [250, 300],
+          position: [100, 200],
           typeVersion: 1
         },
         {
@@ -224,29 +195,100 @@ class WorkflowEngineService {
           id: 'playwright-2',
           name: 'Fill Customer Name',
           type: 'playwright',
-          position: [450, 300],
+          position: [300, 200],
           typeVersion: 1
         },
         {
           parameters: {
-            operation: 'fillField',
-            selector: 'input[name="custemail"]',
-            text: 'demo@processiq.com'
+            operation: 'extractData',
+            selector: 'form',
+            dataType: 'form'
           },
           id: 'playwright-3',
-          name: 'Fill Email',
+          name: 'Extract Form Data',
           type: 'playwright',
-          position: [650, 300],
+          position: [500, 200],
           typeVersion: 1
         },
         {
           parameters: {
-            operation: 'screenshot'
+            operation: 'writeExcel',
+            outputFileName: '/tmp/demo-output.xlsx',
+            sheetName: 'Demo Data',
+            includeHeaders: true
           },
-          id: 'playwright-4',
-          name: 'Take Screenshot',
-          type: 'playwright',
-          position: [850, 300],
+          id: 'excel-1',
+          name: 'Save to Excel',
+          type: 'excel',
+          position: [700, 200],
+          typeVersion: 1
+        },
+        {
+          parameters: {
+            operation: 'query',
+            databaseType: 'postgresql',
+            connection: {
+              host: 'localhost',
+              port: 5432,
+              database: 'processiq_demo',
+              username: 'demo_user',
+              password: 'demo_pass'
+            },
+            query: 'INSERT INTO form_submissions (name, email, created_at) VALUES ($1, $2, NOW())'
+          },
+          id: 'database-1',
+          name: 'Store in Database',
+          type: 'database',
+          position: [900, 200],
+          typeVersion: 1
+        },
+        {
+          parameters: {
+            operation: 'desktopAutomation',
+            desktopAction: 'screenshot',
+            parameters: {
+              parameter: [{
+                name: 'filename',
+                value: '/tmp/desktop-screenshot.png',
+                type: 'string'
+              }]
+            }
+          },
+          id: 'python-1',
+          name: 'Desktop Screenshot',
+          type: 'pythonBridge',
+          position: [500, 400],
+          typeVersion: 1
+        },
+        {
+          parameters: {
+            operation: 'computerVision',
+            cvTask: 'imageRecognition',
+            parameters: {
+              parameter: [{
+                name: 'image_path',
+                value: '/tmp/desktop-screenshot.png',
+                type: 'string'
+              }]
+            }
+          },
+          id: 'python-2',
+          name: 'Analyze Screenshot',
+          type: 'pythonBridge',
+          position: [700, 400],
+          typeVersion: 1
+        },
+        {
+          parameters: {
+            operation: 'navigate',
+            url: 'https://www.google.com',
+            browserType: 'chrome',
+            headless: false
+          },
+          id: 'selenium-1',
+          name: 'Advanced Web Navigation',
+          type: 'selenium',
+          position: [300, 600],
           typeVersion: 1
         }
       ],
@@ -266,18 +308,50 @@ class WorkflowEngineService {
           main: [
             [
               {
-                node: 'Fill Email',
+                node: 'Extract Form Data',
                 type: 'main',
                 index: 0
               }
             ]
           ]
         },
-        'Fill Email': {
+        'Extract Form Data': {
           main: [
             [
               {
-                node: 'Take Screenshot',
+                node: 'Save to Excel',
+                type: 'main',
+                index: 0
+              },
+              {
+                node: 'Store in Database',
+                type: 'main',
+                index: 0
+              },
+              {
+                node: 'Desktop Screenshot',
+                type: 'main',
+                index: 0
+              }
+            ]
+          ]
+        },
+        'Desktop Screenshot': {
+          main: [
+            [
+              {
+                node: 'Analyze Screenshot',
+                type: 'main',
+                index: 0
+              }
+            ]
+          ]
+        },
+        'Save to Excel': {
+          main: [
+            [
+              {
+                node: 'Advanced Web Navigation',
                 type: 'main',
                 index: 0
               }

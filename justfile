@@ -12,7 +12,7 @@ setup:
     @echo "📦 Installing backend dependencies..."
     bash -c 'source .venv/bin/activate && uv pip install -e apps/backend[dev]'
     @echo "📦 Installing frontend dependencies..."
-    cd apps/desktop && npm install
+    cd apps/desktop && pnpm install
     @echo "✅ Setup complete! Run 'just dev' to start development servers"
 
 # Install dependencies
@@ -20,7 +20,7 @@ install:
     @echo "📦 Installing backend dependencies..."
     bash -c 'source .venv/bin/activate && uv pip install -e apps/backend[dev]'
     @echo "📦 Installing frontend dependencies..."
-    cd apps/desktop && npm install
+    cd apps/desktop && pnpm install
 
 # Start all development servers
 dev:
@@ -32,7 +32,7 @@ dev:
         --names "BACKEND,DESKTOP" \
         --prefix-colors "blue,green" \
         "bash -c 'source .venv/bin/activate && cd apps/backend && PYTHONPATH=src python -m uvicorn processiq.main:app --reload --host 0.0.0.0 --port 8000'" \
-        "cd apps/desktop && npm run dev"
+        "cd apps/desktop && pnpm run dev"
 
 # Start individual services
 dev-backend:
@@ -41,15 +41,19 @@ dev-backend:
 
 dev-frontend:
     @echo "⚛️  Starting frontend development server..."
-    cd apps/desktop && npm run dev:react
+    cd apps/desktop && pnpm run dev:react
 
 dev-electron:
     @echo "🖥️  Starting Electron desktop app..."
-    cd apps/desktop && npm run dev:electron
+    cd apps/desktop && pnpm run dev:electron
 
 dev-desktop:
     @echo "🖥️  Starting complete desktop app (React + Electron)..."
-    cd apps/desktop && npm run dev
+    cd apps/desktop && pnpm run dev
+
+dev-desktop-full:
+    @echo "🖥️  Starting full desktop app with Electron (may fail due to binary issues)..."
+    cd apps/desktop && pnpm run dev:full
 
 # Build commands
 build:
@@ -63,16 +67,16 @@ build-backend:
 
 build-frontend:
     @echo "🏗️  Building frontend..."
-    cd apps/desktop && npm run build
+    cd apps/desktop && pnpm run build
 
 build-electron:
     @echo "🏗️  Building Electron app..."
-    cd apps/desktop && npm run build:electron
+    cd apps/desktop && pnpm run build:electron
 
 # Package Electron app for all platforms
 package:
     @echo "📦 Packaging Electron app for all platforms..."
-    cd apps/desktop && npm run build:all
+    cd apps/desktop && pnpm run build:all
 
 # Testing commands
 test:
@@ -86,7 +90,7 @@ test-backend:
 
 test-frontend:
     @echo "🧪 Running frontend tests..."
-    cd apps/desktop && npm test
+    cd apps/desktop && pnpm test
 
 # Linting and formatting
 lint:
@@ -100,7 +104,7 @@ lint-backend:
 
 lint-frontend:
     @echo "🔍 Linting frontend..."
-    cd apps/desktop && npm run lint
+    cd apps/desktop && pnpm run lint
 
 format:
     @echo "✨ Formatting code..."
@@ -113,7 +117,7 @@ format-backend:
 
 format-frontend:
     @echo "✨ Formatting frontend..."
-    cd apps/desktop && npm run format
+    cd apps/desktop && pnpm run format
 
 # Type checking
 typecheck:
@@ -127,7 +131,7 @@ typecheck-backend:
 
 typecheck-frontend:
     @echo "🔍 Type checking frontend..."
-    cd apps/desktop && npm run typecheck
+    cd apps/desktop && pnpm run typecheck
 
 # Database commands
 db-reset:
@@ -208,7 +212,7 @@ env-check:
     @echo "🔍 Checking environment..."
     @echo "Python: $(python --version 2>/dev/null || echo "❌ Not found")"
     @echo "Node: $(node --version 2>/dev/null || echo "❌ Not found")"
-    @echo "npm: $(npm --version 2>/dev/null || echo "❌ Not found")"
+    @echo "pnpm: $(pnpm --version 2>/dev/null || echo "❌ Not found")"
     @echo "uv: $(uv --version 2>/dev/null || echo "❌ Not found")"
     @echo "Virtual env: $(.venv/bin/python --version 2>/dev/null && echo "✅ Active" || echo "❌ Not found")"
 
@@ -267,12 +271,12 @@ install-enterprise:
 update:
     @echo "🔄 Updating dependencies..."
     bash -c 'source .venv/bin/activate && uv pip install --upgrade -e apps/backend[dev]'
-    cd apps/desktop && npm update
+    cd apps/desktop && pnpm update
 
 security-check:
     @echo "🔒 Running security checks..."
     bash -c 'source .venv/bin/activate && cd apps/backend && pip-audit'
-    cd apps/desktop && npm audit
+    cd apps/desktop && pnpm audit
 
 # WSL2 specific helpers
 wsl-setup:
