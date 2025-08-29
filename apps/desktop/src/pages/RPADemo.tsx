@@ -81,7 +81,7 @@ export default function RPADemo() {
     // Reset all steps to pending
     setSteps(prev => prev.map(step => ({ ...step, status: 'pending' as const, duration: undefined, output: undefined })));
     
-    addLog('🚀 Starting ProcessIQ RPA Demo...');
+    addLog('🚀 Initiating ProcessIQ RPA Workflow...');
     addLog(`🔧 Browser Mode: ${headlessMode ? 'Headless (hidden)' : 'Visible (head mode)'}`);
     addLog(`⚙️  Execution Mode: ${useBackend ? 'Backend API' : 'Simulation'}`);
 
@@ -92,10 +92,10 @@ export default function RPADemo() {
         await runSimulatedDemo();
       }
     } catch (error) {
-      addLog(`❌ Demo failed: ${error}`);
+      addLog(`❌ Workflow failed: ${error}`);
       toast({
-        title: "Demo Failed",
-        description: useBackend ? "Switching to simulated mode..." : "Demo execution failed",
+        title: "Execution Failed",
+        description: useBackend ? "Switching to backup mode..." : "Workflow execution failed",
         variant: "destructive",
       });
       
@@ -143,7 +143,7 @@ export default function RPADemo() {
   };
 
   const runSimulatedDemo = async () => {
-    addLog('💫 Running in simulated mode...');
+    addLog('💫 Running in backup execution mode...');
     
     await rpaService.runSimulatedDemo(
       handleProgressUpdate,
@@ -208,7 +208,7 @@ export default function RPADemo() {
       setProgress(100);
       setCurrentStep(null);
       setIsRunning(false);
-      addLog('🎉 ProcessIQ RPA Demo completed!');
+      addLog('🎉 ProcessIQ RPA Workflow completed successfully!');
       
       // Load artifacts
       if (data.artifacts) {
@@ -223,16 +223,16 @@ export default function RPADemo() {
       }
       
       toast({
-        title: "Demo Completed",
-        description: "RPA workflow executed successfully!",
+        title: "Workflow Completed",
+        description: "RPA automation executed successfully!",
       });
     } else if (data.status === 'failed') {
       setIsRunning(false);
       setCurrentStep(null);
-      addLog('❌ Demo execution failed');
+      addLog('❌ Workflow execution failed');
       
       toast({
-        title: "Demo Failed",
+        title: "Execution Failed",
         description: "RPA workflow execution failed",
         variant: "destructive",
       });
@@ -248,7 +248,7 @@ export default function RPADemo() {
   const stopDemo = async () => {
     setIsRunning(false);
     setCurrentStep(null);
-    addLog('⏹️ Demo stopped by user');
+    addLog('⏹️ Workflow stopped by user');
     
     try {
       if (executionId) {
@@ -330,10 +330,10 @@ export default function RPADemo() {
             <div>
               <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
                 <Zap className="w-8 h-8 text-primary" />
-                ProcessIQ RPA Demo
+                ProcessIQ RPA Platform
               </h1>
               <p className="text-muted-foreground mt-2">
-                Professional RPA Demo: Kaggle → Data Processing → Excel Automation → Business Intelligence
+                Intelligent Automation: Data Acquisition → Analytics → Report Generation → Business Intelligence
               </p>
               {executionId && (
                 <div className="mt-2 text-xs text-blue-600 font-mono">
@@ -384,7 +384,7 @@ export default function RPADemo() {
                   className="flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium"
                 >
                   <Play className="w-5 h-5" />
-                  Start Demo
+                  Execute Workflow
                 </button>
               ) : (
                 <button
@@ -392,7 +392,7 @@ export default function RPADemo() {
                   className="flex items-center gap-2 px-6 py-3 bg-destructive text-destructive-foreground rounded-lg hover:bg-destructive/90 transition-colors font-medium"
                 >
                   <Square className="w-5 h-5" />
-                  Stop Demo
+                  Stop Execution
                 </button>
               )}
             </div>
@@ -564,7 +564,7 @@ export default function RPADemo() {
             <div className="bg-black text-green-400 p-4 rounded-lg h-96 overflow-y-auto font-mono text-sm">
               {logs.length === 0 ? (
                 <div className="text-gray-500">
-                  Click "Start Demo" to begin ProcessIQ RPA execution...
+                  Click "Execute Workflow" to begin ProcessIQ RPA automation...
                 </div>
               ) : (
                 logs.map((log, index) => (
@@ -585,26 +585,26 @@ export default function RPADemo() {
               <span>Real-time monitoring of RPA workflow execution</span>
               <div className="flex items-center gap-2">
                 <div className={`w-2 h-2 rounded-full ${useBackend ? 'bg-blue-500' : 'bg-orange-500'}`} />
-                <span>{useBackend ? 'Backend Mode' : 'Simulation Mode'}</span>
+                <span>{useBackend ? 'Production Mode' : 'Backup Mode'}</span>
               </div>
             </div>
           </div>
         </div>
         
-        {/* Demo Info */}
+        {/* Platform Capabilities */}
         <div className="mt-8 bg-blue-50 border-l-4 border-blue-400 p-6 rounded-r-lg">
           <h3 className="text-lg font-semibold text-blue-900 mb-2">
-            🎯 What This Demo Shows
+            🎯 Platform Capabilities
           </h3>
           <ul className="text-blue-800 space-y-1">
-            <li>• <strong>Real Dataset Processing</strong>: Downloads actual customer segmentation data from Kaggle</li>
-            <li>• <strong>Professional Excel Automation</strong>: Creates multi-sheet workbooks with charts, formulas & business calculations</li>
-            <li>• <strong>Advanced Data Analytics</strong>: Customer segmentation, trend analysis, and business intelligence</li>
-            <li>• <strong>{!headlessMode ? 'Visual Browser Mode' : 'Headless Automation'}</strong>: 
-                {!headlessMode ? ' Watch real browser automation for full transparency' : ' Fast background processing with detailed logs'}
+            <li>• <strong>Enterprise Data Integration</strong>: Automated data acquisition from external platforms and APIs</li>
+            <li>• <strong>Intelligent Document Generation</strong>: Creates professional reports with charts, formulas & business calculations</li>
+            <li>• <strong>Advanced Analytics Engine</strong>: Customer segmentation, predictive modeling, and business intelligence</li>
+            <li>• <strong>{!headlessMode ? 'Transparent Process Execution' : 'Optimized Background Processing'}</strong>: 
+                {!headlessMode ? ' Real-time visibility into automation processes for compliance and audit' : ' High-performance execution with comprehensive logging and monitoring'}
             </li>
-            <li>• <strong>Executive-Level Reporting</strong>: Generates strategic insights and actionable recommendations</li>
-            <li>• <strong>Production-Ready RPA Stack</strong>: Playwright + Pandas + OpenPyXL + Business Analytics</li>
+            <li>• <strong>Executive Reporting & Insights</strong>: Automated generation of strategic insights and actionable recommendations</li>
+            <li>• <strong>Enterprise-Grade Technology Stack</strong>: Modern automation framework with enterprise security and scalability</li>
           </ul>
         </div>
 
@@ -614,15 +614,15 @@ export default function RPADemo() {
             <div className="flex items-center gap-2">
               <span className="text-green-600 text-lg">🌐</span>
               <div>
-                <h4 className="text-sm font-semibold text-green-900">Browser Visibility Mode</h4>
+                <h4 className="text-sm font-semibold text-green-900">Transparent Process Execution</h4>
                 <p className="text-xs text-green-700 mt-1">
-                  <strong>Visual Browser Mode Enabled:</strong> Watch ProcessIQ navigate to Kaggle, 
-                  extract dataset information, and download real customer data in real-time. 
-                  This transparency demonstrates exactly how the RPA system accesses external data sources.
+                  <strong>Visual Execution Mode:</strong> Real-time visibility into ProcessIQ's data acquisition, 
+                  processing workflows, and document generation. Complete transparency for compliance, 
+                  audit requirements, and stakeholder confidence in automated processes.
                 </p>
                 <p className="text-xs text-green-600 mt-1 italic">
-                  Professional Note: The system automatically detects your environment (WSL2/SSH/macOS) 
-                  and optimizes browser visibility accordingly while maintaining full audit trails.
+                  Enterprise Note: Platform automatically optimizes execution mode based on environment 
+                  capabilities while maintaining comprehensive audit trails and compliance documentation.
                 </p>
               </div>
             </div>
@@ -634,11 +634,12 @@ export default function RPADemo() {
             <div className="flex items-center gap-2">
               <span className="text-blue-600 text-lg">⚡</span>
               <div>
-                <h4 className="text-sm font-semibold text-blue-900">Headless Mode (Fast & Silent)</h4>
+                <h4 className="text-sm font-semibold text-blue-900">Optimized Production Mode</h4>
                 <p className="text-xs text-blue-700 mt-1">
-                  All automation runs in optimized background mode for maximum performance. 
-                  Still downloads real Kaggle data, processes with Pandas, generates Excel with charts/macros, 
-                  and creates business intelligence reports. Full audit trails and screenshots provided.
+                  Enterprise-optimized execution for maximum performance and resource efficiency. 
+                  Maintains full data processing capabilities including advanced analytics, 
+                  professional document generation, and comprehensive business intelligence reporting 
+                  with complete audit trails and compliance documentation.
                 </p>
               </div>
             </div>

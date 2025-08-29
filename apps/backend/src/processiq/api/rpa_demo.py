@@ -1,5 +1,5 @@
 """
-RPA Demo API endpoints for interactive demonstration
+ProcessIQ RPA Platform API endpoints for intelligent automation workflows
 """
 import asyncio
 import uuid
@@ -13,7 +13,7 @@ import time
 
 router = APIRouter()
 
-# In-memory storage for demo executions
+# In-memory storage for active workflow executions
 active_executions: Dict[str, Dict[str, Any]] = {}
 
 class RPAExecutionRequest(BaseModel):
@@ -37,8 +37,8 @@ class RPAExecutionResponse(BaseModel):
     artifacts: Optional[Dict[str, Any]] = None
 
 @router.post("/execute", response_model=RPAExecutionResponse)
-async def start_rpa_demo(request: RPAExecutionRequest):
-    """Start RPA demo execution"""
+async def start_rpa_workflow(request: RPAExecutionRequest):
+    """Start RPA workflow execution"""
     execution_id = str(uuid.uuid4())
     
     # Initialize execution state
@@ -55,7 +55,7 @@ async def start_rpa_demo(request: RPAExecutionRequest):
     }
     
     # Start background execution
-    asyncio.create_task(execute_demo_workflow(execution_id, request))
+    asyncio.create_task(execute_rpa_workflow(execution_id, request))
     
     return RPAExecutionResponse(
         executionId=execution_id,
@@ -64,8 +64,8 @@ async def start_rpa_demo(request: RPAExecutionRequest):
     )
 
 @router.post("/execute/{execution_id}/stop")
-async def stop_rpa_demo(execution_id: str):
-    """Stop RPA demo execution"""
+async def stop_rpa_workflow(execution_id: str):
+    """Stop RPA workflow execution"""
     if execution_id not in active_executions:
         raise HTTPException(status_code=404, detail="Execution not found")
     
@@ -76,8 +76,8 @@ async def stop_rpa_demo(execution_id: str):
     return {"message": "Execution stopped", "executionId": execution_id}
 
 @router.get("/execute/{execution_id}/status", response_model=RPAExecutionResponse)
-async def get_demo_status(execution_id: str):
-    """Get current status of RPA demo execution"""
+async def get_workflow_status(execution_id: str):
+    """Get current status of RPA workflow execution"""
     if execution_id not in active_executions:
         raise HTTPException(status_code=404, detail="Execution not found")
     
@@ -92,8 +92,8 @@ async def get_demo_status(execution_id: str):
     )
 
 @router.get("/execute/{execution_id}/stream")
-async def stream_demo_progress(execution_id: str):
-    """Stream real-time progress updates for RPA demo execution"""
+async def stream_workflow_progress(execution_id: str):
+    """Stream real-time progress updates for RPA workflow execution"""
     if execution_id not in active_executions:
         raise HTTPException(status_code=404, detail="Execution not found")
     
@@ -136,10 +136,10 @@ async def stream_demo_progress(execution_id: str):
 
 @router.get("/artifacts")
 async def get_available_artifacts():
-    """Get list of available artifacts from recent demo runs"""
+    """Get list of available artifacts from recent workflow executions"""
     import os
     
-    output_dir = "/tmp/processiq_demo"
+    output_dir = "/tmp/processiq_workflow"
     artifacts = []
     
     if os.path.exists(output_dir):
@@ -158,7 +158,7 @@ async def download_artifact(filename: str):
     from pathlib import Path
     
     # Look for the file in the demo output directory
-    output_dir = "/tmp/processiq_demo"
+    output_dir = "/tmp/processiq_workflow"
     file_path = os.path.join(output_dir, filename)
     
     # If file doesn't exist, try alternative names/locations
@@ -221,8 +221,8 @@ async def download_artifact(filename: str):
         headers={"Content-Disposition": f"attachment; filename={filename}"}
     )
 
-async def execute_demo_workflow(execution_id: str, request: RPAExecutionRequest):
-    """Background task to execute the demo workflow"""
+async def execute_rpa_workflow(execution_id: str, request: RPAExecutionRequest):
+    """Background task to execute the RPA workflow"""
     if execution_id not in active_executions:
         return
         
@@ -286,7 +286,7 @@ async def execute_demo_workflow(execution_id: str, request: RPAExecutionRequest)
         
         # Collect actual generated artifacts
         import os
-        output_dir = "/tmp/processiq_demo"
+        output_dir = "/tmp/processiq_workflow"
         actual_artifacts = {}
         
         # Look for Excel file
@@ -335,8 +335,8 @@ async def execute_browser_step(step_id: str, headless: bool = False) -> Dict[str
         # Force headless mode only if no display available or SSH (but allow WSLg and macOS)
         effective_headless = headless or is_ssh or (not is_macos and not has_display and not has_wslg)
         
-        # Create demo output directory in /tmp
-        output_dir = "/tmp/processiq_demo"
+        # Create workflow output directory in /tmp
+        output_dir = "/tmp/processiq_workflow"
         os.makedirs(output_dir, exist_ok=True)
         
         async with async_playwright() as p:
@@ -534,7 +534,7 @@ async def execute_data_processing_step(step_id: str) -> Dict[str, Any]:
         import numpy as np
         import os
         
-        output_dir = "/tmp/processiq_demo"
+        output_dir = "/tmp/processiq_workflow"
         os.makedirs(output_dir, exist_ok=True)
         
         # Look for the dataset from previous step
@@ -666,7 +666,7 @@ async def execute_excel_generation_step(step_id: str) -> Dict[str, Any]:
         from openpyxl.utils.dataframe import dataframe_to_rows
         import os
         
-        output_dir = "/tmp/processiq_demo"
+        output_dir = "/tmp/processiq_workflow"
         os.makedirs(output_dir, exist_ok=True)
         
         # Load processed data
@@ -850,7 +850,7 @@ async def execute_analysis_report_step(step_id: str) -> Dict[str, Any]:
         import os
         from datetime import datetime
         
-        output_dir = "/tmp/processiq_demo"
+        output_dir = "/tmp/processiq_workflow"
         os.makedirs(output_dir, exist_ok=True)
         
         # Load processed data
