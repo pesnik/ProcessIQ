@@ -1,4 +1,21 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useRef, useMemo } from 'react';
+import ReactFlow, {
+  Node,
+  Edge,
+  addEdge,
+  Connection,
+  useNodesState,
+  useEdgesState,
+  Controls,
+  MiniMap,
+  Background,
+  BackgroundVariant,
+  ReactFlowProvider,
+  ReactFlowInstance,
+  MarkerType,
+} from 'reactflow';
+import 'reactflow/dist/style.css';
+
 import { 
   Play, 
   Pause, 
@@ -6,32 +23,24 @@ import {
   Save, 
   Upload, 
   Download,
-  Zap,
   Monitor,
-  Database,
-  Mail,
-  FileText,
-  Globe,
-  Settings,
   Bug,
+  Shield,
+  Settings,
   Users,
-  Shield
+  FileText,
+  Zap
 } from 'lucide-react';
 
-interface WorkflowNode {
-  id: string;
-  type: string;
-  name: string;
-  position: { x: number; y: number };
-  config: Record<string, any>;
-  connections: string[];
-}
+import CustomNode, { CustomNodeData } from '../components/workflow/CustomNode';
+import NodeSidebar, { NODE_TYPES } from '../components/workflow/NodeSidebar';
+import PropertyPanel from '../components/workflow/PropertyPanel';
 
 interface WorkflowDefinition {
   id: string;
   name: string;
   description: string;
-  nodes: Record<string, WorkflowNode>;
+  nodes: Record<string, any>;
   variables: Record<string, any>;
   triggers: any[];
 }
@@ -48,197 +57,489 @@ interface WorkflowExecution {
   variables: Record<string, any>;
 }
 
-const NODE_TYPES = [
-  { type: 'start', name: 'Start', icon: Play, category: 'Control' },
-  { type: 'end', name: 'End', icon: Square, category: 'Control' },
-  { type: 'browser_open', name: 'Open Browser', icon: Globe, category: 'Web' },
-  { type: 'browser_navigate', name: 'Navigate', icon: Globe, category: 'Web' },
-  { type: 'browser_extract', name: 'Extract Data', icon: Globe, category: 'Web' },
-  { type: 'excel_read', name: 'Read Excel', icon: FileText, category: 'Data' },
-  { type: 'excel_write', name: 'Write Excel', icon: FileText, category: 'Data' },
-  { type: 'email_send', name: 'Send Email', icon: Mail, category: 'Communication' },
-  { type: 'database_query', name: 'Database Query', icon: Database, category: 'Data' },
-  { type: 'python_script', name: 'Python Script', icon: Zap, category: 'Processing' },
-];
+// Custom node types
+const nodeTypes = {
+  custom: CustomNode,
+};
 
-export default function WorkflowDesigner() {
-  const [workflow, setWorkflow] = useState<WorkflowDefinition>({
-    id: 'new-workflow',
-    name: 'New Workflow',
-    description: 'Untitled workflow',
-    nodes: {},
-    variables: {},
-    triggers: []
-  });
-  
-  const [selectedNode, setSelectedNode] = useState<string | null>(null);
+function WorkflowDesignerContent() {
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [selectedNode, setSelectedNode] = useState<Node<CustomNodeData> | null>(null);
   const [execution, setExecution] = useState<WorkflowExecution | null>(null);
   const [isExecuting, setIsExecuting] = useState(false);
-  const [showDebugger, setShowDebugger] = useState(false);
   const [activeTab, setActiveTab] = useState<'design' | 'execute' | 'debug' | 'security'>('design');
-
-  // Node management
-  const addNode = useCallback((nodeType: string, position: { x: number; y: number }) => {
-    const nodeId = `node_${Date.now()}`;
-    const nodeTemplate = NODE_TYPES.find(n => n.type === nodeType);
-    
-    const newNode: WorkflowNode = {
-      id: nodeId,
-      type: nodeType,
-      name: nodeTemplate?.name || nodeType,
-      position,
-      config: {},
-      connections: []
-    };
-
-    setWorkflow(prev => ({
-      ...prev,
-      nodes: {
-        ...prev.nodes,
-        [nodeId]: newNode
-      }
-    }));
+  const [workflowName, setWorkflowName] = useState('New Workflow');
+  
+  const reactFlowWrapper = useRef<HTMLDivElement>(null);
+  const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null);
+  
+  // Stop execution function
+  const stopExecution = useCallback(() => {
+    setIsExecuting(false);
+    setExecution(null);
   }, []);
 
-  const deleteNode = useCallback((nodeId: string) => {
-    setWorkflow(prev => {
-      const newNodes = { ...prev.nodes };
-      delete newNodes[nodeId];
-      
-      // Remove connections to this node
-      Object.values(newNodes).forEach(node => {
-        node.connections = node.connections.filter(conn => conn !== nodeId);
+  // Drag and drop functionality
+  const onDragStart = useCallback((event: React.DragEvent<HTMLDivElement>, nodeType: string) => {
+    event.dataTransfer.setData('application/reactflow', nodeType);
+    event.dataTransfer.effectAllowed = 'move';
+  }, []);
+
+  const onDrop = useCallback(
+    (event: React.DragEvent<HTMLDivElement>) => {
+      event.preventDefault();
+
+      const reactFlowBounds = reactFlowWrapper.current?.getBoundingClientRect();
+      const nodeType = event.dataTransfer.getData('application/reactflow');
+
+      if (!nodeType || !reactFlowBounds || !reactFlowInstance) {
+        return;
+      }
+
+      const position = reactFlowInstance.project({
+        x: event.clientX - reactFlowBounds.left,
+        y: event.clientY - reactFlowBounds.top,
       });
 
-      return { ...prev, nodes: newNodes };
+      const nodeTemplate = NODE_TYPES.find(n => n.type === nodeType);
+      const newNode: Node<CustomNodeData> = {
+        id: `${nodeType}_${Date.now()}`,
+        type: 'custom',
+        position,
+        data: {
+          label: nodeTemplate?.name || nodeType,
+          nodeType: nodeType,
+          config: {},
+          status: 'idle'
+        },
+      };
+
+      setNodes((nds) => nds.concat(newNode));
+    },
+    [reactFlowInstance, setNodes]
+  );
+
+  const onDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+  }, []);
+
+  // Connection validation
+  const isValidConnection = useCallback((connection: Connection) => {
+    const { source, target } = connection;
+    
+    if (!source || !target) return false;
+    
+    // Get source and target nodes
+    const sourceNode = nodes.find(node => node.id === source);
+    const targetNode = nodes.find(node => node.id === target);
+    
+    if (!sourceNode || !targetNode) return false;
+    
+    // Prevent self-connections
+    if (source === target) return false;
+    
+    // Prevent duplicate connections
+    const existingEdge = edges.find(edge => 
+      edge.source === source && edge.target === target
+    );
+    if (existingEdge) return false;
+    
+    // Start nodes can connect to anything except other start nodes
+    if (sourceNode.data.nodeType === 'start' && targetNode.data.nodeType === 'start') {
+      return false;
+    }
+    
+    // End nodes cannot connect to anything
+    if (sourceNode.data.nodeType === 'end') {
+      return false;
+    }
+    
+    // Nothing can connect to start nodes (except during initial setup)
+    if (targetNode.data.nodeType === 'start') {
+      return false;
+    }
+    
+    // Condition nodes should have specific connection rules
+    if (sourceNode.data.nodeType === 'condition') {
+      // Conditions can have at most 2 outgoing connections (true/false paths)
+      const outgoingConnections = edges.filter(edge => edge.source === source);
+      if (outgoingConnections.length >= 2) return false;
+    }
+    
+    return true;
+  }, [nodes, edges]);
+
+  // Connection handling
+  const onConnect = useCallback(
+    (params: Connection) => {
+      if (!isValidConnection(params)) {
+        console.warn('Invalid connection attempt', params);
+        return;
+      }
+      
+      const newEdge = {
+        ...params,
+        id: `edge_${params.source}_${params.target}`,
+        markerEnd: {
+          type: MarkerType.ArrowClosed,
+          width: 20,
+          height: 20,
+        },
+        style: { strokeWidth: 2 },
+      };
+      setEdges((eds) => addEdge(newEdge, eds));
+    },
+    [setEdges, isValidConnection]
+  );
+
+  // Node selection
+  const onNodeClick = useCallback((_event: React.MouseEvent, node: Node<CustomNodeData>) => {
+    setSelectedNode(node);
+  }, []);
+
+  // Node updates
+  const onUpdateNode = useCallback((nodeId: string, updates: Partial<CustomNodeData>) => {
+    setNodes((nds) =>
+      nds.map((node) => {
+        if (node.id === nodeId) {
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              ...updates,
+            },
+          };
+        }
+        return node;
+      })
+    );
+  }, [setNodes]);
+
+  // Convert React Flow state to workflow definition
+  const getWorkflowDefinition = useCallback((): WorkflowDefinition => {
+    const workflowNodes: Record<string, any> = {};
+    
+    nodes.forEach(node => {
+      const connections = edges
+        .filter(edge => edge.source === node.id)
+        .map(edge => edge.target);
+        
+      workflowNodes[node.id] = {
+        id: node.id,
+        type: node.data.nodeType,
+        name: node.data.label,
+        position: node.position,
+        config: node.data.config,
+        connections
+      };
+    });
+
+    return {
+      id: `workflow_${Date.now()}`,
+      name: workflowName,
+      description: `Workflow created with ProcessIQ Designer`,
+      nodes: workflowNodes,
+      variables: {},
+      triggers: []
+    };
+  }, [nodes, edges, workflowName]);
+
+  // Validate workflow before execution
+  const validateWorkflow = useCallback(() => {
+    // Check if workflow has at least one start node
+    const startNodes = nodes.filter(node => node.data.nodeType === 'start');
+    if (startNodes.length === 0) {
+      alert('Workflow must have at least one Start node');
+      return false;
+    }
+    
+    if (startNodes.length > 1) {
+      alert('Workflow can only have one Start node');
+      return false;
+    }
+    
+    // Check if workflow has at least one end node
+    const endNodes = nodes.filter(node => node.data.nodeType === 'end');
+    if (endNodes.length === 0) {
+      alert('Workflow must have at least one End node');
+      return false;
+    }
+    
+    // Check if all nodes (except end nodes) have outgoing connections
+    const nodeConnections = new Map<string, string[]>();
+    edges.forEach(edge => {
+      if (!nodeConnections.has(edge.source)) {
+        nodeConnections.set(edge.source, []);
+      }
+      nodeConnections.get(edge.source)!.push(edge.target);
     });
     
-    if (selectedNode === nodeId) {
-      setSelectedNode(null);
+    const disconnectedNodes = nodes.filter(node => 
+      node.data.nodeType !== 'end' && 
+      (!nodeConnections.has(node.id) || nodeConnections.get(node.id)!.length === 0)
+    );
+    
+    if (disconnectedNodes.length > 0) {
+      const nodeNames = disconnectedNodes.map(node => node.data.label).join(', ');
+      alert(`The following nodes are not connected to anything: ${nodeNames}`);
+      return false;
     }
-  }, [selectedNode]);
-
-  const updateNodeConfig = useCallback((nodeId: string, config: Record<string, any>) => {
-    setWorkflow(prev => ({
-      ...prev,
-      nodes: {
-        ...prev.nodes,
-        [nodeId]: {
-          ...prev.nodes[nodeId],
-          config: { ...prev.nodes[nodeId].config, ...config }
+    
+    // Validate node configurations
+    for (const node of nodes) {
+      const { nodeType, config } = node.data;
+      
+      // Check browser_navigate nodes have URL
+      if (nodeType === 'browser_navigate' && (!config.url || config.url.trim() === '')) {
+        alert(`Browser Navigate node "${node.data.label}" requires a URL`);
+        return false;
+      }
+      
+      // Check email_send nodes have required fields
+      if (nodeType === 'email_send') {
+        if (!config.to || config.to.trim() === '') {
+          alert(`Email Send node "${node.data.label}" requires a recipient email`);
+          return false;
+        }
+        if (!config.subject || config.subject.trim() === '') {
+          alert(`Email Send node "${node.data.label}" requires a subject`);
+          return false;
         }
       }
-    }));
-  }, []);
+      
+      // Check database_query nodes have query
+      if (nodeType === 'database_query' && (!config.query || config.query.trim() === '')) {
+        alert(`Database Query node "${node.data.label}" requires a SQL query`);
+        return false;
+      }
+      
+      // Check condition nodes have condition
+      if (nodeType === 'condition' && (!config.condition || config.condition.trim() === '')) {
+        alert(`Condition node "${node.data.label}" requires a condition expression`);
+        return false;
+      }
+    }
+    
+    return true;
+  }, [nodes, edges]);
 
   // Workflow execution
   const executeWorkflow = useCallback(async () => {
+    // Validate workflow first
+    if (!validateWorkflow()) {
+      return;
+    }
+    
+    const workflow = getWorkflowDefinition();
     setIsExecuting(true);
+    
+    // Reset node statuses
+    setNodes((nds) =>
+      nds.map((node) => ({
+        ...node,
+        data: { ...node.data, status: 'idle', error: undefined }
+      }))
+    );
+    
     try {
       const response = await fetch('/api/workflows/execute', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           workflow_definition: workflow,
-          variables: workflow.variables,
+          variables: workflow.variables || {},
           triggered_by: 'manual'
         })
       });
 
       if (response.ok) {
         const result = await response.json();
+        console.log('Workflow execution started:', result);
         
         // Poll for execution status
         const pollExecution = async (executionId: string) => {
-          const statusResponse = await fetch(`/api/workflows/execution/${executionId}`);
-          if (statusResponse.ok) {
-            const executionData = await statusResponse.json();
-            setExecution(executionData);
-            
-            if (executionData.status === 'running') {
-              setTimeout(() => pollExecution(executionId), 1000);
+          try {
+            const statusResponse = await fetch(`/api/workflows/execution/${executionId}`);
+            if (statusResponse.ok) {
+              const executionData = await statusResponse.json();
+              setExecution(executionData);
+              
+              // Update node statuses based on execution state
+              setNodes((nds) =>
+                nds.map((node) => {
+                  let status: 'idle' | 'running' | 'completed' | 'failed' = 'idle';
+                  let error: string | undefined = undefined;
+                  
+                  if (executionData.current_nodes && executionData.current_nodes.includes(node.id)) {
+                    status = 'running';
+                  } else if (executionData.completed_nodes && executionData.completed_nodes > 0) {
+                    // In a real implementation, you'd track individual node completion
+                    // For now, we'll mark nodes as completed based on execution progress
+                    const nodeIndex = nds.findIndex(n => n.id === node.id);
+                    if (nodeIndex < executionData.completed_nodes) {
+                      status = 'completed';
+                    }
+                  }
+                  
+                  // Handle failed nodes
+                  if (executionData.failed_nodes && executionData.failed_nodes > 0) {
+                    // This is simplified - in practice you'd get specific error info
+                    if (status !== 'completed' && status !== 'running') {
+                      status = 'failed';
+                      error = 'Node execution failed';
+                    }
+                  }
+                  
+                  return {
+                    ...node,
+                    data: { ...node.data, status, error }
+                  };
+                })
+              );
+              
+              if (executionData.status === 'running' || executionData.status === 'pending') {
+                setTimeout(() => pollExecution(executionId), 1000);
+              } else {
+                setIsExecuting(false);
+                console.log('Workflow execution completed:', executionData.status);
+              }
             } else {
+              console.error('Failed to get execution status');
               setIsExecuting(false);
             }
+          } catch (error) {
+            console.error('Error polling execution status:', error);
+            setIsExecuting(false);
           }
         };
 
         await pollExecution(result.execution_id);
+      } else {
+        const errorData = await response.text();
+        console.error('Workflow execution failed:', errorData);
+        alert(`Failed to execute workflow: ${errorData}`);
+        setIsExecuting(false);
       }
     } catch (error) {
-      console.error('Workflow execution failed:', error);
+      console.error('Workflow execution error:', error);
+      alert(`Workflow execution error: ${error}`);
       setIsExecuting(false);
     }
-  }, [workflow]);
+  }, [getWorkflowDefinition, setNodes, validateWorkflow]);
 
-  const stopExecution = useCallback(async () => {
-    if (execution) {
-      try {
-        await fetch(`/api/workflows/execution/${execution.execution_id}`, {
-          method: 'DELETE'
-        });
-        setIsExecuting(false);
-      } catch (error) {
-        console.error('Failed to stop execution:', error);
-      }
-    }
-  }, [execution]);
+  // Save workflow
+  const saveWorkflow = useCallback(() => {
+    const workflow = getWorkflowDefinition();
+    const blob = new Blob([JSON.stringify(workflow, null, 2)], {
+      type: 'application/json'
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${workflowName.replace(/\s+/g, '_')}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, [getWorkflowDefinition, workflowName]);
 
-  // Workflow persistence
-  const saveWorkflow = useCallback(async () => {
-    try {
-      const blob = new Blob([JSON.stringify(workflow, null, 2)], {
-        type: 'application/json'
-      });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${workflow.name.replace(/\s+/g, '_')}.json`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Failed to save workflow:', error);
-    }
-  }, [workflow]);
-
+  // Load workflow
   const loadWorkflow = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
         try {
-          const loadedWorkflow = JSON.parse(e.target?.result as string);
-          setWorkflow(loadedWorkflow);
+          const workflow = JSON.parse(e.target?.result as string);
+          setWorkflowName(workflow.name);
+          
+          // Convert workflow nodes to React Flow nodes
+          const flowNodes: Node<CustomNodeData>[] = Object.entries(workflow.nodes).map(([id, nodeData]: [string, any]) => ({
+            id,
+            type: 'custom',
+            position: nodeData.position,
+            data: {
+              label: nodeData.name,
+              nodeType: nodeData.type,
+              config: nodeData.config,
+              status: 'idle'
+            }
+          }));
+
+          // Convert connections to React Flow edges
+          const flowEdges: Edge[] = [];
+          Object.entries(workflow.nodes).forEach(([sourceId, nodeData]: [string, any]) => {
+            if (nodeData.connections) {
+              nodeData.connections.forEach((targetId: string) => {
+                flowEdges.push({
+                  id: `edge_${sourceId}_${targetId}`,
+                  source: sourceId,
+                  target: targetId,
+                  markerEnd: {
+                    type: MarkerType.ArrowClosed,
+                    width: 20,
+                    height: 20,
+                  },
+                  style: { strokeWidth: 2 },
+                });
+              });
+            }
+          });
+
+          setNodes(flowNodes);
+          setEdges(flowEdges);
         } catch (error) {
           console.error('Failed to load workflow:', error);
         }
       };
       reader.readAsText(file);
     }
-  }, []);
+  }, [setNodes, setEdges]);
+
+  // Delete selected nodes
+  const deleteSelectedNodes = useCallback(() => {
+    const selectedNodes = nodes.filter(node => node.selected);
+    const selectedNodeIds = selectedNodes.map(node => node.id);
+    
+    setNodes((nds) => nds.filter(node => !selectedNodeIds.includes(node.id)));
+    setEdges((eds) => eds.filter(edge => 
+      !selectedNodeIds.includes(edge.source) && !selectedNodeIds.includes(edge.target)
+    ));
+    
+    if (selectedNode && selectedNodeIds.includes(selectedNode.id)) {
+      setSelectedNode(null);
+    }
+  }, [nodes, selectedNode, setNodes, setEdges]);
+
+  // Keyboard shortcuts
+  const onKeyDown = useCallback((event: React.KeyboardEvent) => {
+    if (event.key === 'Delete' || event.key === 'Backspace') {
+      deleteSelectedNodes();
+    }
+  }, [deleteSelectedNodes]);
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col" onKeyDown={onKeyDown} tabIndex={0}>
       {/* Header */}
-      <div className="border-b bg-background p-4">
+      <div className="border-b bg-white p-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold">Workflow Designer</h1>
-            <p className="text-muted-foreground">{workflow.name}</p>
+            <h1 className="text-2xl font-bold text-gray-900">Workflow Designer</h1>
+            <p className="text-gray-600">{workflowName}</p>
           </div>
           
           <div className="flex items-center space-x-2">
             <button
               onClick={saveWorkflow}
-              className="flex items-center px-3 py-2 bg-secondary text-secondary-foreground rounded hover:bg-secondary/80"
+              className="flex items-center px-3 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
             >
               <Save className="w-4 h-4 mr-2" />
               Save
             </button>
             
-            <label className="flex items-center px-3 py-2 bg-secondary text-secondary-foreground rounded hover:bg-secondary/80 cursor-pointer">
+            <label className="flex items-center px-3 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 cursor-pointer">
               <Upload className="w-4 h-4 mr-2" />
               Load
               <input
@@ -252,7 +553,7 @@ export default function WorkflowDesigner() {
             <button
               onClick={executeWorkflow}
               disabled={isExecuting}
-              className="flex items-center px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90 disabled:opacity-50"
+              className="flex items-center px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
             >
               {isExecuting ? (
                 <>
@@ -270,7 +571,7 @@ export default function WorkflowDesigner() {
             {isExecuting && (
               <button
                 onClick={stopExecution}
-                className="flex items-center px-3 py-2 bg-destructive text-destructive-foreground rounded hover:bg-destructive/90"
+                className="flex items-center px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700"
               >
                 <Square className="w-4 h-4 mr-2" />
                 Stop
@@ -292,8 +593,8 @@ export default function WorkflowDesigner() {
               onClick={() => setActiveTab(tab.key as any)}
               className={`flex items-center px-3 py-2 rounded ${
                 activeTab === tab.key 
-                  ? 'bg-primary text-primary-foreground' 
-                  : 'text-muted-foreground hover:text-foreground'
+                  ? 'bg-blue-600 text-white' 
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
               }`}
             >
               <tab.icon className="w-4 h-4 mr-2" />
@@ -304,361 +605,256 @@ export default function WorkflowDesigner() {
       </div>
 
       <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar */}
-        <div className="w-64 border-r bg-background p-4">
-          {activeTab === 'design' && (
-            <div>
-              <h3 className="font-semibold mb-3">Node Library</h3>
-              
-              {['Control', 'Web', 'Data', 'Communication', 'Processing'].map(category => (
-                <div key={category} className="mb-4">
-                  <h4 className="text-sm font-medium text-muted-foreground mb-2">{category}</h4>
-                  <div className="space-y-1">
-                    {NODE_TYPES.filter(node => node.category === category).map(node => (
-                      <button
-                        key={node.type}
-                        onClick={() => addNode(node.type, { x: 200, y: 200 })}
-                        className="w-full flex items-center px-3 py-2 text-sm bg-secondary rounded hover:bg-secondary/80"
-                      >
-                        <node.icon className="w-4 h-4 mr-2" />
-                        {node.name}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {activeTab === 'execute' && (
-            <div>
-              <h3 className="font-semibold mb-3">Execution Status</h3>
-              
-              {execution && (
-                <div className="space-y-2">
-                  <div className="p-3 bg-secondary rounded">
-                    <div className="text-sm">
-                      <div className="flex justify-between">
-                        <span>Status:</span>
-                        <span className={`font-medium ${
-                          execution.status === 'completed' ? 'text-green-600' :
-                          execution.status === 'failed' ? 'text-red-600' :
-                          execution.status === 'running' ? 'text-blue-600' :
-                          'text-gray-600'
-                        }`}>
-                          {execution.status}
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Completed:</span>
-                        <span>{execution.completed_nodes}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Failed:</span>
-                        <span>{execution.failed_nodes}</span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {execution.current_nodes.length > 0 && (
-                    <div>
-                      <h4 className="text-sm font-medium mb-1">Current Nodes:</h4>
-                      {execution.current_nodes.map(nodeId => (
-                        <div key={nodeId} className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded mb-1">
-                          {nodeId}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-              
-              {!execution && !isExecuting && (
-                <p className="text-muted-foreground text-sm">
-                  No active execution. Click Execute to run the workflow.
-                </p>
-              )}
-            </div>
-          )}
-
-          {activeTab === 'debug' && (
-            <div>
-              <h3 className="font-semibold mb-3">Debug Tools</h3>
-              
-              <div className="space-y-2">
-                <button className="w-full px-3 py-2 bg-secondary rounded text-sm hover:bg-secondary/80">
-                  Set Breakpoint
-                </button>
-                <button className="w-full px-3 py-2 bg-secondary rounded text-sm hover:bg-secondary/80">
-                  Watch Variables
-                </button>
-                <button className="w-full px-3 py-2 bg-secondary rounded text-sm hover:bg-secondary/80">
-                  Step Through
-                </button>
-                <button className="w-full px-3 py-2 bg-secondary rounded text-sm hover:bg-secondary/80">
-                  Performance Profile
-                </button>
-              </div>
-              
-              <div className="mt-4 p-3 bg-secondary rounded">
-                <h4 className="text-sm font-medium mb-2">Debug Session</h4>
-                <p className="text-xs text-muted-foreground">
-                  No active debug session. Execute workflow with debugging enabled.
-                </p>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'security' && (
-            <div>
-              <h3 className="font-semibold mb-3">Security & Access</h3>
-              
-              <div className="space-y-2">
-                <button className="w-full flex items-center px-3 py-2 bg-secondary rounded text-sm hover:bg-secondary/80">
-                  <Users className="w-4 h-4 mr-2" />
-                  Users & Teams
-                </button>
-                <button className="w-full flex items-center px-3 py-2 bg-secondary rounded text-sm hover:bg-secondary/80">
-                  <Shield className="w-4 h-4 mr-2" />
-                  Permissions
-                </button>
-                <button className="w-full flex items-center px-3 py-2 bg-secondary rounded text-sm hover:bg-secondary/80">
-                  <FileText className="w-4 h-4 mr-2" />
-                  Activity Log
-                </button>
-                <button className="w-full flex items-center px-3 py-2 bg-secondary rounded text-sm hover:bg-secondary/80">
-                  <Download className="w-4 h-4 mr-2" />
-                  Export Data
-                </button>
-              </div>
-
-              <div className="mt-4 p-3 bg-secondary rounded">
-                <h4 className="text-sm font-medium mb-2">Current Access</h4>
-                <p className="text-xs text-muted-foreground">
-                  You can create and execute workflows. 
-                  Contact admin for user management access.
-                </p>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Main Canvas */}
-        <div className="flex-1 relative bg-grid-pattern overflow-auto">
-          <div className="absolute inset-0 p-8">
-            {activeTab === 'design' && (
-              <div className="relative h-full">
-                {/* Workflow Canvas */}
-                <div className="bg-background/50 rounded-lg border-2 border-dashed border-muted-foreground/30 h-full flex items-center justify-center">
-                  {Object.keys(workflow.nodes).length === 0 ? (
-                    <div className="text-center">
-                      <Zap className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                      <h3 className="text-lg font-semibold text-foreground mb-2">
-                        Start Building Your Workflow
-                      </h3>
-                      <p className="text-muted-foreground mb-4">
-                        Add nodes from the sidebar to begin creating your automation workflow
-                      </p>
-                      <button
-                        onClick={() => addNode('start', { x: 200, y: 150 })}
-                        className="px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90"
-                      >
-                        Add Start Node
-                      </button>
-                    </div>
-                  ) : (
-                    <div>
-                      {/* Render workflow nodes */}
-                      {Object.entries(workflow.nodes).map(([nodeId, node]) => (
-                        <div
-                          key={nodeId}
-                          style={{
-                            position: 'absolute',
-                            left: node.position.x,
-                            top: node.position.y,
-                          }}
-                          onClick={() => setSelectedNode(nodeId)}
-                          className={`bg-background border-2 rounded-lg p-3 cursor-pointer min-w-[120px] ${
-                            selectedNode === nodeId 
-                              ? 'border-primary shadow-lg' 
-                              : 'border-border hover:border-primary/50'
-                          }`}
-                        >
-                          <div className="flex items-center justify-between mb-2">
-                            {(() => {
-                              const nodeType = NODE_TYPES.find(n => n.type === node.type);
-                              const Icon = nodeType?.icon || Zap;
-                              return <Icon className="w-4 h-4" />;
-                            })()}
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                deleteNode(nodeId);
-                              }}
-                              className="text-muted-foreground hover:text-destructive text-xs"
-                            >
-                              ×
-                            </button>
-                          </div>
-                          <div className="text-sm font-medium">{node.name}</div>
-                          <div className="text-xs text-muted-foreground">{node.type}</div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
+        {/* Node Sidebar */}
+        {activeTab === 'design' && (
+          <NodeSidebar onDragStart={onDragStart} />
+        )}
+        
+        {/* Status Sidebar */}
+        {activeTab !== 'design' && (
+          <div className="w-64 border-r bg-white p-4">
 
             {activeTab === 'execute' && (
-              <div className="bg-background rounded-lg border p-6">
-                <h2 className="text-xl font-semibold mb-4">Execution Monitor</h2>
+              <div>
+                <h3 className="font-semibold mb-3 text-gray-900">Execution Status</h3>
                 
-                {execution ? (
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-3 gap-4">
-                      <div className="bg-secondary p-4 rounded">
-                        <h3 className="text-sm font-medium text-muted-foreground">Status</h3>
-                        <p className="text-2xl font-bold">{execution.status}</p>
-                      </div>
-                      <div className="bg-secondary p-4 rounded">
-                        <h3 className="text-sm font-medium text-muted-foreground">Progress</h3>
-                        <p className="text-2xl font-bold">
-                          {execution.completed_nodes}/{Object.keys(workflow.nodes).length}
-                        </p>
-                      </div>
-                      <div className="bg-secondary p-4 rounded">
-                        <h3 className="text-sm font-medium text-muted-foreground">Duration</h3>
-                        <p className="text-2xl font-bold">
-                          {execution.completed_at 
-                            ? Math.round((new Date(execution.completed_at).getTime() - new Date(execution.started_at).getTime()) / 1000) + 's'
-                            : Math.round((Date.now() - new Date(execution.started_at).getTime()) / 1000) + 's'
-                          }
-                        </p>
-                      </div>
-                    </div>
-
-                    <div>
-                      <h3 className="text-lg font-semibold mb-2">Variables</h3>
-                      <div className="bg-secondary p-4 rounded font-mono text-sm">
-                        <pre>{JSON.stringify(execution.variables, null, 2)}</pre>
+                {execution && (
+                  <div className="space-y-2">
+                    <div className="p-3 bg-gray-100 rounded">
+                      <div className="text-sm">
+                        <div className="flex justify-between">
+                          <span>Status:</span>
+                          <span className={`font-medium ${
+                            execution.status === 'completed' ? 'text-green-600' :
+                            execution.status === 'failed' ? 'text-red-600' :
+                            execution.status === 'running' ? 'text-blue-600' :
+                            'text-gray-600'
+                          }`}>
+                            {execution.status}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Completed:</span>
+                          <span>{execution.completed_nodes}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Failed:</span>
+                          <span>{execution.failed_nodes}</span>
+                        </div>
                       </div>
                     </div>
+                    
+                    {execution.current_nodes.length > 0 && (
+                      <div>
+                        <h4 className="text-sm font-medium mb-1">Current Nodes:</h4>
+                        {execution.current_nodes.map(nodeId => (
+                          <div key={nodeId} className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded mb-1">
+                            {nodeId}
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <Monitor className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">No Active Execution</h3>
-                    <p className="text-muted-foreground">
-                      Execute a workflow to see real-time monitoring data
-                    </p>
-                  </div>
+                )}
+                
+                {!execution && !isExecuting && (
+                  <p className="text-gray-500 text-sm">
+                    No active execution. Click Execute to run the workflow.
+                  </p>
                 )}
               </div>
             )}
 
-            {(activeTab === 'debug' || activeTab === 'security') && (
-              <div className="bg-background rounded-lg border p-6 text-center">
-                <div className="w-16 h-16 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-                  {activeTab === 'debug' ? (
-                    <Bug className="w-8 h-8 text-primary" />
-                  ) : (
-                    <Shield className="w-8 h-8 text-primary" />
-                  )}
+            {activeTab === 'debug' && (
+              <div>
+                <h3 className="font-semibold mb-3 text-gray-900">Debug Tools</h3>
+                
+                <div className="space-y-2">
+                  <button className="w-full px-3 py-2 bg-gray-100 rounded text-sm hover:bg-gray-200">
+                    Set Breakpoint
+                  </button>
+                  <button className="w-full px-3 py-2 bg-gray-100 rounded text-sm hover:bg-gray-200">
+                    Watch Variables
+                  </button>
+                  <button className="w-full px-3 py-2 bg-gray-100 rounded text-sm hover:bg-gray-200">
+                    Step Through
+                  </button>
+                  <button className="w-full px-3 py-2 bg-gray-100 rounded text-sm hover:bg-gray-200">
+                    Performance Profile
+                  </button>
                 </div>
-                <h3 className="text-lg font-semibold mb-2">
-                  {activeTab === 'debug' ? 'Workflow Debugging' : 'Security & Access Control'}
-                </h3>
-                <p className="text-muted-foreground mb-6">
-                  {activeTab === 'debug' 
-                    ? 'Debug workflows with breakpoints, variable inspection, and performance analysis'
-                    : 'User management, permissions, activity logging, and data export'
-                  }
-                </p>
-                <div className="flex justify-center space-x-2">
-                  <button className="px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90">
-                    {activeTab === 'debug' ? 'Start Debug Session' : 'Manage Users'}
+                
+                <div className="mt-4 p-3 bg-gray-100 rounded">
+                  <h4 className="text-sm font-medium mb-2">Debug Session</h4>
+                  <p className="text-xs text-gray-600">
+                    No active debug session. Execute workflow with debugging enabled.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'security' && (
+              <div>
+                <h3 className="font-semibold mb-3 text-gray-900">Security & Access</h3>
+                
+                <div className="space-y-2">
+                  <button className="w-full flex items-center px-3 py-2 bg-gray-100 rounded text-sm hover:bg-gray-200">
+                    <Users className="w-4 h-4 mr-2" />
+                    Users & Teams
                   </button>
-                  <button className="px-4 py-2 bg-secondary text-secondary-foreground rounded hover:bg-secondary/80">
-                    {activeTab === 'debug' ? 'View Performance' : 'View Activity Log'}
+                  <button className="w-full flex items-center px-3 py-2 bg-gray-100 rounded text-sm hover:bg-gray-200">
+                    <Shield className="w-4 h-4 mr-2" />
+                    Permissions
                   </button>
+                  <button className="w-full flex items-center px-3 py-2 bg-gray-100 rounded text-sm hover:bg-gray-200">
+                    <FileText className="w-4 h-4 mr-2" />
+                    Activity Log
+                  </button>
+                  <button className="w-full flex items-center px-3 py-2 bg-gray-100 rounded text-sm hover:bg-gray-200">
+                    <Download className="w-4 h-4 mr-2" />
+                    Export Data
+                  </button>
+                </div>
+
+                <div className="mt-4 p-3 bg-gray-100 rounded">
+                  <h4 className="text-sm font-medium mb-2">Current Access</h4>
+                  <p className="text-xs text-gray-600">
+                    You can create and execute workflows. 
+                    Contact admin for user management access.
+                  </p>
                 </div>
               </div>
             )}
           </div>
+        )}
+
+        {/* Main Canvas */}
+        <div className="flex-1 relative" ref={reactFlowWrapper}>
+          {activeTab === 'design' && (
+            <ReactFlow
+              nodes={nodes}
+              edges={edges}
+              onNodesChange={onNodesChange}
+              onEdgesChange={onEdgesChange}
+              onConnect={onConnect}
+              onInit={setReactFlowInstance}
+              onDrop={onDrop}
+              onDragOver={onDragOver}
+              onNodeClick={onNodeClick}
+              nodeTypes={nodeTypes}
+              isValidConnection={isValidConnection}
+              fitView
+              className="bg-gray-50"
+            >
+              <Controls />
+              <MiniMap
+                nodeColor={(node) => {
+                  switch (node.data.status) {
+                    case 'running': return '#3b82f6';
+                    case 'completed': return '#10b981';
+                    case 'failed': return '#ef4444';
+                    default: return '#6b7280';
+                  }
+                }}
+              />
+              <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
+            </ReactFlow>
+          )}
+
+          {activeTab === 'execute' && (
+            <div className="p-6 bg-white">
+              <h2 className="text-xl font-semibold mb-4 text-gray-900">Execution Monitor</h2>
+              
+              {execution ? (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="bg-gray-100 p-4 rounded">
+                      <h3 className="text-sm font-medium text-gray-600">Status</h3>
+                      <p className="text-2xl font-bold">{execution.status}</p>
+                    </div>
+                    <div className="bg-gray-100 p-4 rounded">
+                      <h3 className="text-sm font-medium text-gray-600">Progress</h3>
+                      <p className="text-2xl font-bold">
+                        {execution.completed_nodes}/{nodes.length}
+                      </p>
+                    </div>
+                    <div className="bg-gray-100 p-4 rounded">
+                      <h3 className="text-sm font-medium text-gray-600">Duration</h3>
+                      <p className="text-2xl font-bold">
+                        {execution.completed_at 
+                          ? Math.round((new Date(execution.completed_at).getTime() - new Date(execution.started_at).getTime()) / 1000) + 's'
+                          : Math.round((Date.now() - new Date(execution.started_at).getTime()) / 1000) + 's'
+                        }
+                      </p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2 text-gray-900">Variables</h3>
+                    <div className="bg-gray-100 p-4 rounded font-mono text-sm">
+                      <pre>{JSON.stringify(execution.variables, null, 2)}</pre>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <Monitor className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold mb-2 text-gray-900">No Active Execution</h3>
+                  <p className="text-gray-600">
+                    Execute a workflow to see real-time monitoring data
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {(activeTab === 'debug' || activeTab === 'security') && (
+            <div className="bg-white border p-6 text-center m-6 rounded-lg">
+              <div className="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                {activeTab === 'debug' ? (
+                  <Bug className="w-8 h-8 text-blue-600" />
+                ) : (
+                  <Shield className="w-8 h-8 text-blue-600" />
+                )}
+              </div>
+              <h3 className="text-lg font-semibold mb-2 text-gray-900">
+                {activeTab === 'debug' ? 'Workflow Debugging' : 'Security & Access Control'}
+              </h3>
+              <p className="text-gray-600 mb-6">
+                {activeTab === 'debug' 
+                  ? 'Debug workflows with breakpoints, variable inspection, and performance analysis'
+                  : 'User management, permissions, activity logging, and data export'
+                }
+              </p>
+              <div className="flex justify-center space-x-2">
+                <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                  {activeTab === 'debug' ? 'Start Debug Session' : 'Manage Users'}
+                </button>
+                <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200">
+                  {activeTab === 'debug' ? 'View Performance' : 'View Activity Log'}
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Properties Panel */}
         {selectedNode && activeTab === 'design' && (
-          <div className="w-80 border-l bg-background p-4">
-            <h3 className="font-semibold mb-3">Node Properties</h3>
-            
-            {(() => {
-              const node = workflow.nodes[selectedNode];
-              return (
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium">Name</label>
-                    <input
-                      type="text"
-                      value={node.name}
-                      onChange={(e) => updateNodeConfig(selectedNode, { name: e.target.value })}
-                      className="w-full mt-1 px-3 py-2 border rounded focus:ring-2 focus:ring-primary"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="text-sm font-medium">Type</label>
-                    <input
-                      type="text"
-                      value={node.type}
-                      disabled
-                      className="w-full mt-1 px-3 py-2 border rounded bg-secondary"
-                    />
-                  </div>
-                  
-                  {/* Node-specific configuration */}
-                  {node.type === 'browser_navigate' && (
-                    <div>
-                      <label className="text-sm font-medium">URL</label>
-                      <input
-                        type="text"
-                        value={node.config.url || ''}
-                        onChange={(e) => updateNodeConfig(selectedNode, { url: e.target.value })}
-                        placeholder="https://example.com"
-                        className="w-full mt-1 px-3 py-2 border rounded focus:ring-2 focus:ring-primary"
-                      />
-                    </div>
-                  )}
-                  
-                  {node.type === 'email_send' && (
-                    <>
-                      <div>
-                        <label className="text-sm font-medium">To</label>
-                        <input
-                          type="email"
-                          value={node.config.to || ''}
-                          onChange={(e) => updateNodeConfig(selectedNode, { to: e.target.value })}
-                          className="w-full mt-1 px-3 py-2 border rounded focus:ring-2 focus:ring-primary"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium">Subject</label>
-                        <input
-                          type="text"
-                          value={node.config.subject || ''}
-                          onChange={(e) => updateNodeConfig(selectedNode, { subject: e.target.value })}
-                          className="w-full mt-1 px-3 py-2 border rounded focus:ring-2 focus:ring-primary"
-                        />
-                      </div>
-                    </>
-                  )}
-                </div>
-              );
-            })()}
-          </div>
+          <PropertyPanel 
+            selectedNode={selectedNode}
+            onClose={() => setSelectedNode(null)}
+            onUpdateNode={onUpdateNode}
+          />
         )}
       </div>
     </div>
+  );
+}
+
+export default function WorkflowDesigner() {
+  return (
+    <ReactFlowProvider>
+      <WorkflowDesignerContent />
+    </ReactFlowProvider>
   );
 }
