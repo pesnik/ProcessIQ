@@ -32,7 +32,7 @@ interface ExecutionInfo {
   stoppedAt?: string;
 }
 
-export const N8nWorkflowDesigner: React.FC = () => {
+export const VisualWorkflowDesigner: React.FC = () => {
   const [isN8nRunning, setIsN8nRunning] = useState(false);
   const [workflows, setWorkflows] = useState<WorkflowInfo[]>([]);
   const [executions, setExecutions] = useState<ExecutionInfo[]>([]);
