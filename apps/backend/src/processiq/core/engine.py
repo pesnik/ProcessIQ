@@ -17,6 +17,8 @@ from .config import Settings, get_settings
 from .events import EventBus
 from .exceptions import ProcessIQError
 from .plugin_manager import PluginManager
+from .workflow_engine import WorkflowExecutor, create_workflow_executor
+from .security_features import SecurityFeatures, create_security_features
 
 
 class ProcessIQEngine:
@@ -34,6 +36,8 @@ class ProcessIQEngine:
         self.settings = settings or get_settings()
         self.event_bus = EventBus()
         self.plugin_manager = PluginManager(self.event_bus)
+        self.workflow_executor = create_workflow_executor(self.event_bus)
+        self.security_features = create_security_features(self.event_bus)
         
         self._initialized = False
         self._running = False
@@ -77,6 +81,9 @@ class ProcessIQEngine:
             
             # Initialize all plugins
             await self.plugin_manager.initialize_all_plugins()
+            
+            # Initialize security features
+            await self.security_features.initialize()
             
             # Start background tasks
             await self._start_background_tasks()
@@ -152,46 +159,55 @@ class ProcessIQEngine:
         """Get all plugins of a specific type"""
         return self.plugin_manager.get_plugins_by_type(plugin_type)
     
-    async def execute_workflow(self, workflow_config: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute_workflow(
+        self, 
+        workflow_definition: Dict[str, Any],
+        variables: Optional[Dict[str, Any]] = None,
+        triggered_by: Optional[str] = None
+    ) -> str:
         """
-        Execute a workflow
+        Execute a workflow using the professional workflow engine
         
         Args:
-            workflow_config: Workflow configuration dictionary
+            workflow_definition: Complete workflow definition
+            variables: Initial variables for workflow execution
+            triggered_by: Source that triggered the workflow
             
         Returns:
-            Execution results
+            Execution ID
         """
-        workflow_id = workflow_config.get("id", "unknown")
-        
         try:
-            await self.event_bus.emit("workflow.started", {
-                "workflow_id": workflow_id,
-                "config": workflow_config
-            })
+            execution_id = await self.workflow_executor.execute_workflow(
+                workflow_definition=workflow_definition,
+                variables=variables,
+                triggered_by=triggered_by
+            )
             
-            # Basic workflow execution logic
-            # In a full implementation, this would be much more sophisticated
-            results = {
-                "workflow_id": workflow_id,
-                "status": "completed",
-                "steps_executed": 0,
-                "data_processed": 0
-            }
-            
-            await self.event_bus.emit("workflow.completed", {
-                "workflow_id": workflow_id,
-                "results": results
-            })
-            
-            return results
+            return execution_id
             
         except Exception as e:
-            await self.event_bus.emit("workflow.failed", {
-                "workflow_id": workflow_id,
-                "error": str(e)
-            })
             raise ProcessIQError(f"Workflow execution failed: {e}")
+    
+    async def get_workflow_execution_state(self, execution_id: str):
+        """Get current state of workflow execution"""
+        return await self.workflow_executor.state_manager.get_execution_state(execution_id)
+    
+    async def get_active_workflows(self) -> List[Dict[str, Any]]:
+        """Get list of currently active workflow executions"""
+        active_executions = []
+        
+        for execution_id, execution_state in self.workflow_executor.state_manager.active_executions.items():
+            active_executions.append({
+                "execution_id": execution_id,
+                "workflow_id": execution_state.workflow_id,
+                "status": execution_state.status.value,
+                "started_at": execution_state.started_at.isoformat(),
+                "completed_nodes": len(execution_state.completed_nodes),
+                "failed_nodes": len(execution_state.failed_nodes),
+                "current_nodes": list(execution_state.current_nodes)
+            })
+        
+        return active_executions
     
     async def get_system_status(self) -> Dict[str, Any]:
         """Get current system status"""

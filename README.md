@@ -1,59 +1,65 @@
-# ProcessIQ
+# ProcessIQ Enterprise RPA Platform
 
-ProcessIQ is an **extensible RPA orchestration platform** that transforms automation by leveraging proven tools rather than building from scratch. We provide a **layered architecture** where traditional RPA works perfectly without AI, and intelligent features are optional extensions you can add as needed.
+ProcessIQ is an **enterprise-grade RPA platform** built on proven open-source automation frameworks. We combine **Microsoft Workflow Foundation architectural patterns** with modern automation tools like **TagUI** and **RPA Framework** to deliver professional-grade business process automation without vendor lock-in.
 
-> 📖 **[See Complete RPA Orchestration Overview](docs/RPA_ORCHESTRATION_OVERVIEW.md)** for detailed architecture, integrations, and capabilities.
+> 📖 **[See Complete RPA Platform Overview](docs/RPA_ORCHESTRATION_OVERVIEW.md)** for detailed architecture, integrations, and capabilities.
 
 ## 🎯 **Core Value Proposition**
 
-**Extensible Automation Platform:**
-- **Basic Users**: "I need web data in Excel" → Traditional RPA ✅ (No GPU/AI costs)
-- **Smart Users**: "I want AI to handle complex UI changes" → Add AI Extension 🧠 (Pay only when needed)
-- **Enterprise**: "I need agent orchestration and custom bots" → Full Stack 🚀 (Complete solution)
+**Professional RPA Platform:**
+- **Business Users**: "I need web data in Excel" → Visual workflow designer with real automation ✅
+- **IT Professionals**: "I want robust enterprise automation" → Professional toolkit with full control 🔧
+- **Enterprise**: "I need scalable automation with compliance" → Complete platform with audit trails 🏢
 
-**💰 Pay-as-you-grow pricing**: Start with traditional RPA, upgrade to AI/Agents only when you need them.
+**💰 Enterprise-Ready**: Professional automation platform with transparent pricing and no vendor dependencies.
 
 ## 🏗️ **Architecture Philosophy**
 
 ![ProcessIQ Complete Tech Stack Architecture](docs/architecture/processiq-architecture-v5-complete-stack.svg)
 
-> **🏆 Strategy**: Leverage n8n's battle-tested workflow engine + build custom RPA nodes = 80% less development time!
+> **🏆 Strategy**: Build custom ProcessIQ workflow engine on proven open-source automation frameworks = Complete control + Enterprise features!
 
-**🏗️ Workflow Engine Foundation Options**
+## 🌿 **Branch Strategy & Development Approach**
 
-ProcessIQ leverages **existing open-source workflow builders** instead of building from scratch:
+ProcessIQ development follows a **dual-track approach** to explore the best architectural foundation:
 
-### **🎯 Primary Options Analysis**
+### **📦 Current Branch Structure**
 
-| Solution | Pros | Cons | Best For |
-|----------|------|------|----------|
-| **n8n** | 400+ integrations, visual editor, self-hosted | May be opinionated, requires customization | **Recommended** - Full-featured platform |
-| **Node-RED** | Mature, extensive plugins, IBM-backed | Technical UI, older architecture | IoT/Industrial automation focus |
-| **React Flow** | Pure React, highly customizable, modern | No execution engine, build everything | Custom UI with full control |
-| **Blockly** | Visual programming, Google-backed | More for coding than workflows | Educational/visual programming |
+| Branch | Purpose | Status | Focus |
+|--------|---------|---------|-------|
+| **`main`** | Production Platform | ✅ **Active** | Enterprise-ready RPA platform with professional UI |
+| **`custom-rpa-platform`** | R&D Branch | 🔬 **Research** | Custom workflow engine built on TagUI + RPA Framework |
+| **`n8n-integration`** | Alternative Approach | 📋 **Planned** | n8n-based workflow engine exploration |
 
-### **🏆 Recommended: n8n Integration**
-- **Visual Flow Editor**: Professional drag & drop interface (embedded n8n)
-- **400+ Integrations**: APIs, databases, SaaS tools already built-in
-- **Self-Hosted**: Complete data control, no vendor lock-in
-- **Production-Ready**: Battle-tested by thousands of companies
+### **🎯 Custom RPA Platform Approach (Primary Focus)**
 
-**🔧 @processiq/n8n-rpa-nodes Package**
-- **Custom RPA Nodes**: Playwright, Robot Framework, TagUI nodes for n8n
-- **No AI/GPU Required**: Traditional automation works perfectly standalone
-- **Easy Extension**: n8n's node development framework is excellent
-- **TypeScript**: Professional development experience
+**Built on Microsoft Workflow Foundation Patterns:**
+- **Inspired by UiPath Architecture**: Visual workflow designer with enterprise execution engine
+- **Open Source Foundation**: TagUI + RPA Framework + Custom orchestration layer
+- **Complete Control**: No third-party branding or licensing constraints
+- **Enterprise Features**: Built-in compliance, audit trails, and role-based access
 
-**🚀 Multi-Modal Workflow Creation**
-- **n8n Visual Editor**: Traditional drag & drop workflow building
-- **Chat → n8n**: "Extract data from this website" → generates n8n workflow
-- **BRD → n8n**: Upload business requirements → auto-creates workflow templates
-- **Template Library**: Pre-built RPA workflow patterns
+**🔧 Core Technology Stack**
+- **Workflow Engine**: Custom React-based visual designer inspired by WF patterns
+- **Automation Layer**: TagUI for web automation, RPA Framework for desktop/enterprise systems
+- **Execution Runtime**: Python-based orchestration with state management
+- **Professional UI**: ProcessIQ-branded interface suitable for enterprise demonstrations
 
-**💡 Optional Extensions (Pay-as-you-grow)**
-- **AI Nodes**: Vision LLM, Smart Router, Learning nodes (optional n8n extensions)
-- **Agent Nodes**: Multi-agent orchestration nodes (optional n8n extensions)
-- **Advanced Analytics**: ML insights as additional workflow nodes
+### **🏗️ Workflow Engine Foundation Options**
+
+| Solution | ProcessIQ Assessment | Decision |
+|----------|---------------------|----------|
+| **Custom Engine** | Complete control, ProcessIQ branding, enterprise features | **🏆 Primary Focus** |
+| **n8n Integration** | Fast development, existing integrations, third-party branding | **📋 Research Alternative** |
+| **TagUI + RPA Framework** | Battle-tested automation, flexible integration | **✅ Core Automation Layer** |
+| **Microsoft WF Patterns** | Enterprise-proven architecture, scalable design | **✅ Architectural Foundation** |
+
+### **🚀 Custom ProcessIQ Platform Benefits**
+- **Pure Branding**: Complete ProcessIQ identity without third-party logos
+- **Enterprise Architecture**: Built specifically for professional demonstrations
+- **Flexible Integration**: Direct integration with TagUI, RPA Framework, and custom connectors
+- **Competitive Advantage**: Unique value proposition not constrained by existing platforms
+- **Professional Presentation**: Suitable for C-suite and enterprise sales demonstrations
 
 ## 🔧 **Complete Solution Stack**
 
@@ -158,10 +164,10 @@ ProcessIQ/
 
 ### **Desktop App (TypeScript)**
 - **Framework**: Electron + React 18 + TypeScript
-- **n8n Integration**: Embedded n8n editor via webview/iframe
-- **UI Components**: Radix UI + Tailwind CSS + Lucide Icons (for extensions)
-- **State Management**: Zustand + TanStack Query
-- **Workflow Engine**: n8n (embedded) + @processiq/n8n-rpa-nodes
+- **Workflow Engine**: Custom React Flow-based visual designer
+- **UI Components**: Radix UI + Tailwind CSS + Lucide Icons
+- **State Management**: Zustand + Immer for workflow state
+- **Visual Editor**: React Flow + Custom ProcessIQ nodes
 - **Build Tools**: Vite + Electron Builder
 
 ### **Infrastructure & DevOps**
@@ -216,104 +222,109 @@ ProcessIQ/
 ```
 **💰 Cost**: Custom pricing based on requirements
 
-## 🛣️ **Implementation Roadmap & Alternatives**
+## 🛣️ **Implementation Roadmap & Strategy**
 
-### **🎯 Implementation Strategy Options**
+### **🎯 Custom ProcessIQ Platform Development**
 
-#### **Option A: n8n Integration (Recommended)** 🏆
-**Timeline**: 12-20 weeks total
-```bash
-Phase 1 (2-4 weeks): n8n Integration
-├── npm install n8n
-├── Embed n8n editor in Electron app
-├── Create @processiq/n8n-rpa-nodes package structure
-└── Build first RPA node (Playwright)
-```
-
-#### **Option B: Node-RED Integration** 
-**Timeline**: 14-22 weeks total
-```bash
-Phase 1 (3-5 weeks): Node-RED Integration
-├── npm install node-red
-├── Embed Node-RED editor in Electron app
-├── Create ProcessIQ Node-RED nodes
-└── Build dashboard integration
-```
-
-#### **Option C: React Flow Custom** 
-**Timeline**: 20-30 weeks total
-```bash
-Phase 1 (6-10 weeks): Custom Workflow Engine
-├── npm install @xyflow/react
-├── Build workflow execution engine from scratch
-├── Create drag-drop node system
-└── Implement scheduling and error handling
-```
-
-#### **Option D: Blockly + Custom Engine** 
+#### **🏆 Primary Approach: Custom Workflow Engine** 
 **Timeline**: 16-24 weeks total
 ```bash
-Phase 1 (4-6 weeks): Blockly Integration
-├── npm install blockly
-├── Create RPA block definitions
-├── Build code generation system
-└── Implement execution runtime
+Phase 1 (4-6 weeks): Custom Workflow Designer
+├── React Flow visual editor with ProcessIQ branding
+├── Custom workflow definition format (JSON-based)
+├── Drag-drop interface with professional UI components
+└── Workflow validation and preview functionality
+
+Phase 2 (4-6 weeks): Automation Layer Integration  
+├── TagUI connector for web automation
+├── RPA Framework bridge for desktop/enterprise automation
+├── Custom action library for business processes
+└── Execution runtime with state management
+
+Phase 3 (4-6 weeks): Enterprise Features
+├── Role-based access control and user management
+├── Workflow scheduling and orchestration
+├── Audit trails and compliance reporting
+└── Performance monitoring and analytics
+
+Phase 4 (4-6 weeks): Professional Polish
+├── Advanced debugging and troubleshooting tools
+├── Template library and workflow marketplace
+├── Integration APIs and webhook support
+└── Documentation and training materials
 ```
 
-### **🏆 Why n8n is Recommended**
-- **Fastest Time-to-Market**: 12-20 weeks vs 16-30 weeks for alternatives
-- **Production-Ready**: Battle-tested with thousands of users
-- **Rich Ecosystem**: 400+ existing integrations to leverage
-- **Self-Hosted**: Perfect fit for desktop-first approach
-- **Excellent Documentation**: Node development guides and APIs
-- **Active Community**: Regular updates and community support
+### **📋 Research Alternatives (Parallel Development)**
 
-### **Phase 1: n8n Integration Foundation (2-4 weeks)** 🏆
+#### **Alternative: n8n Integration Study**
+**Timeline**: 8-12 weeks (research branch)
 ```bash
-# Core n8n Integration
-npm install n8n @n8n/n8n-nodes-base
-npm install @types/n8n
-
-# Electron Integration  
-npm install electron electron-builder
-# Embed n8n editor via iframe/webview in Electron
-
-# Basic Node Development Setup
-mkdir packages/n8n-rpa-nodes
-npm init @n8n/node-dev-template
-# Create first Playwright node for web automation
+Research Phase: n8n Evaluation
+├── Embed n8n editor and assess branding constraints
+├── Develop custom @processiq/n8n-rpa-nodes package
+├── Evaluate integration complexity and limitations
+└── Compare development effort vs custom approach
 ```
 
-### **Phase 2: Core RPA Nodes (4-6 weeks)**
+### **🏆 Why Custom Engine is Preferred**
+- **Complete Control**: ProcessIQ branding and user experience without constraints
+- **Enterprise Architecture**: Built specifically for professional business presentations
+- **Competitive Differentiation**: Unique value proposition not available in existing platforms
+- **Flexible Integration**: Direct control over TagUI and RPA Framework integration
+- **Professional Presentation**: Suitable for C-suite demonstrations and enterprise sales
+- **No Vendor Lock-in**: Complete independence from third-party platform decisions
+
+### **Phase 1: Custom Workflow Foundation (4-6 weeks)** 🏆
 ```bash
-# @processiq/n8n-rpa-nodes package with specific tools:
+# Core ProcessIQ Workflow Engine
+npm install @xyflow/react @xyflow/node-resizer
+npm install zustand immer
+npm install lucide-react @radix-ui/react-dialog
 
-# Web Automation
-npm install playwright puppeteer selenium-webdriver
-├── PlaywrightNode.ts    # Modern web automation
-├── SeleniumNode.ts      # Legacy web support
+# Visual Workflow Designer
+├── WorkflowDesigner.tsx     # Main visual editor component
+├── NodeLibrary.tsx          # Draggable node palette
+├── PropertyPanel.tsx        # Node configuration interface
+└── WorkflowValidation.tsx   # Flow validation and preview
 
-# RPA Frameworks  
+# Custom Workflow Definition Format
+├── workflow.schema.json     # JSON schema for workflow definition
+├── WorkflowEngine.ts        # Core execution engine
+├── NodeTypes.ts            # TypeScript definitions for all node types
+└── WorkflowSerializer.ts    # Save/load workflow configurations
+
+# ProcessIQ Professional UI Components
+├── ProcessIQTheme.tsx      # Custom design system
+├── EnterpriseLayout.tsx    # Professional application shell
+├── WorkflowToolbar.tsx     # Workflow management controls
+└── StatusIndicators.tsx    # Real-time execution feedback
+```
+
+### **Phase 2: Automation Layer Integration (4-6 weeks)**
+```bash
+# Core Automation Frameworks
+pip install tagui rpaframework
 pip install robotframework robotframework-seleniumlibrary
-npm install tagui-node
-├── RobotFrameworkNode.ts # Enterprise RPA workflows
-├── TagUINode.ts         # Natural language RPA
+npm install playwright puppeteer
 
-# Desktop Automation
-pip install pyautogui opencv-python pygetwindow
-├── DesktopNode.ts       # UI automation via Python bridge
+# ProcessIQ Custom Connectors
+├── TagUIConnector.py       # Web automation via TagUI
+├── RPAFrameworkBridge.py   # Desktop automation bridge
+├── PlaywrightConnector.py  # Modern web automation
+└── CustomActionLibrary.py  # Business-specific actions
 
-# File Processing
-npm install xlsx pdf-parse csv-parser
-├── ExcelNode.ts         # Excel read/write operations  
-├── PDFNode.ts          # PDF extraction and processing
-├── CSVNode.ts          # CSV data manipulation
+# Workflow Node Types
+├── WebAutomationNode.tsx   # Web scraping and interaction
+├── DesktopActionNode.tsx   # Desktop application control
+├── DataProcessingNode.tsx  # File and data manipulation
+├── DatabaseNode.tsx        # Database operations
+└── BusinessLogicNode.tsx   # Custom business rules
 
-# Database Connectors
-npm install pg mysql2 mongodb sqlite3
-├── PostgreSQLNode.ts    # Enterprise database
-├── MySQLNode.ts        # Popular database
-├── MongoDBNode.ts      # NoSQL database
+# Execution Runtime
+├── WorkflowExecutor.py     # Python-based execution engine
+├── StateManager.py         # Workflow state persistence
+├── ErrorHandler.py         # Comprehensive error handling
+└── SchedulingEngine.py     # Workflow scheduling and triggers
 ```
 
 ### **Phase 3: Multi-Modal Input (3-4 weeks)**
@@ -416,14 +427,17 @@ npm install jsonwebtoken bcryptjs
 git clone https://github.com/pesnik/ProcessIQ.git
 cd ProcessIQ
 
-# Install dependencies (Node.js + Python + n8n)
+# Switch to custom RPA platform branch
+git checkout custom-rpa-platform
+
+# Install dependencies (Node.js + Python + RPA frameworks)
 npm run setup
 
-# Start development servers (Backend + Desktop app + n8n)
+# Start development servers (Backend + Desktop app + Custom workflow engine)
 npm run dev
 
-# Access desktop application at http://localhost:3000
-# n8n editor embedded within the desktop app
+# Access ProcessIQ platform at http://localhost:3000
+# Custom workflow designer with ProcessIQ branding
 # Backend API available at http://localhost:8000
 ```
 
@@ -517,45 +531,41 @@ npm run clean
 - **🐛 Issues**: [GitHub Issues](https://github.com/pesnik/ProcessIQ/issues)
 - **📧 Contact**: [Create an issue](https://github.com/pesnik/ProcessIQ/issues) for questions
 
-### **🔌 Extensible Node/Plugin Ecosystem**
+### **🔌 Custom ProcessIQ Node Development**
 
-ProcessIQ supports multiple workflow engine integrations:
+ProcessIQ uses a custom workflow engine built specifically for enterprise RPA:
 
-#### **n8n Node Development (Recommended)**
-- **Custom RPA Nodes**: Use n8n's excellent node development framework
-- **TypeScript Support**: Modern development experience with full typing
-- **Rich APIs**: Well-documented node creation APIs
-- **Community**: Access to 400+ existing n8n nodes
-- **Documentation**: [n8n Node Development Guide](https://docs.n8n.io/integrations/creating-nodes/)
+#### **ProcessIQ Custom Nodes (Primary)**
+- **Complete Control**: Build nodes with full ProcessIQ branding and functionality
+- **TypeScript Support**: Modern development experience with enterprise-grade typing
+- **Automation Integration**: Direct integration with TagUI, RPA Framework, and Playwright
+- **Enterprise Features**: Built-in audit trails, error handling, and compliance features
+- **Documentation**: [ProcessIQ Node Development Guide](docs/development/custom-nodes.md)
 
-#### **Node-RED Node Development**
-- **Custom Nodes**: Use Node-RED's mature node development system
-- **JavaScript/HTML**: Traditional web development approach
-- **Extensive Ecosystem**: Thousands of existing nodes
-- **Documentation**: [Node-RED Node Development](https://nodered.org/docs/creating-nodes/)
+#### **Automation Framework Integration**
+- **TagUI Integration**: Natural language web automation with visual debugging
+- **RPA Framework**: Enterprise desktop automation with comprehensive reporting
+- **Playwright Connector**: Modern web automation with advanced capabilities
+- **Custom Actions**: Business-specific automation actions and workflows
 
-#### **React Flow Custom Components**
-- **Full Control**: Build completely custom workflow components
-- **React Ecosystem**: Leverage entire React component ecosystem
-- **Modern Development**: Latest React patterns and hooks
-- **Documentation**: [React Flow Docs](https://reactflow.dev/docs/)
+#### **Professional Development Experience**
+- **Visual Debugger**: Real-time workflow execution monitoring and debugging
+- **Template System**: Pre-built workflow templates for common business processes
+- **Version Control**: Git-based workflow version management and collaboration
+- **Testing Framework**: Automated testing and validation for workflow reliability
 
-#### **Blockly Custom Blocks**
-- **Visual Programming**: Create drag-drop code blocks
-- **Code Generation**: Generate workflow code from blocks
-- **Educational**: Great for non-technical users
-- **Documentation**: [Blockly Developer Guides](https://developers.google.com/blockly/guides/overview)
+### **🏆 ProcessIQ Platform Advantages**
 
-### **🏆 Development Benefits Comparison**
+| Feature | ProcessIQ Custom | Third-Party Integration |
+|---------|------------------|------------------------|
+| **Branding** | Complete ProcessIQ identity | Third-party logos and constraints |
+| **Enterprise Features** | Built-in compliance and audit | Add-on or missing features |
+| **Customization** | Unlimited flexibility | Limited by platform constraints |
+| **Professional Presentation** | C-suite ready interface | Generic workflow appearance |
+| **Automation Integration** | Direct TagUI/RPA Framework control | Limited to platform capabilities |
+| **Competitive Advantage** | Unique value proposition | Commodity workflow builder |
 
-| Approach | Dev Time | Learning Curve | Flexibility | Community |
-|----------|----------|----------------|-------------|-----------|
-| **n8n** | Fastest | Low | Medium | Large |
-| **Node-RED** | Fast | Medium | Medium | Very Large |
-| **React Flow** | Slowest | High | Highest | Medium |
-| **Blockly** | Medium | Low | Low | Small |
-
-**Recommendation**: Start with n8n for rapid development, consider React Flow for maximum customization needs.
+**Strategy**: Custom ProcessIQ platform provides complete control and professional presentation suitable for enterprise demonstrations and sales.
 
 ## 📄 **License**
 
@@ -570,9 +580,11 @@ MIT License - Built for the community and enterprise adoption.
 If ProcessIQ is helpful for your automation needs, please ⭐ **star the repository** on GitHub to show your support and help others discover it!
 
 **Key Technical Decisions:**
-- **n8n Integration**: Embed proven workflow engine instead of building from scratch
-- **Custom Node Development**: @processiq/n8n-rpa-nodes for specialized automation
-- **Extensible Architecture**: AI and Agent features as optional n8n node packages
-- **Desktop-First**: Electron app with embedded n8n for complete control
+- **Custom Workflow Engine**: Built specifically for ProcessIQ with complete branding control
+- **Microsoft WF Patterns**: Enterprise-proven architecture inspired by UiPath's success
+- **Open Source Foundation**: TagUI + RPA Framework for battle-tested automation capabilities
+- **Professional Presentation**: C-suite ready interface without third-party constraints
+- **React Flow Integration**: Modern visual workflow designer with unlimited customization
+- **Desktop-First**: Electron app with custom ProcessIQ workflow engine for enterprise demonstrations
 
 **🔗 Repository**: [https://github.com/pesnik/ProcessIQ](https://github.com/pesnik/ProcessIQ)
