@@ -523,23 +523,23 @@ function WorkflowDesignerContent() {
   return (
     <div className="h-full flex flex-col" onKeyDown={onKeyDown} tabIndex={0}>
       {/* Header */}
-      <div className="border-b bg-white p-4">
+      <div className="border-b bg-background p-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Workflow Designer</h1>
-            <p className="text-gray-600">{workflowName}</p>
+            <h1 className="text-2xl font-bold text-foreground">Workflow Designer</h1>
+            <p className="text-muted-foreground">{workflowName}</p>
           </div>
           
           <div className="flex items-center space-x-2">
             <button
               onClick={saveWorkflow}
-              className="flex items-center px-3 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
+              className="flex items-center px-3 py-2 bg-secondary text-secondary-foreground rounded hover:bg-secondary/80"
             >
               <Save className="w-4 h-4 mr-2" />
               Save
             </button>
             
-            <label className="flex items-center px-3 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 cursor-pointer">
+            <label className="flex items-center px-3 py-2 bg-secondary text-secondary-foreground rounded hover:bg-secondary/80 cursor-pointer">
               <Upload className="w-4 h-4 mr-2" />
               Load
               <input
@@ -553,7 +553,7 @@ function WorkflowDesignerContent() {
             <button
               onClick={executeWorkflow}
               disabled={isExecuting}
-              className="flex items-center px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+              className="flex items-center px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90 disabled:opacity-50"
             >
               {isExecuting ? (
                 <>
@@ -571,7 +571,7 @@ function WorkflowDesignerContent() {
             {isExecuting && (
               <button
                 onClick={stopExecution}
-                className="flex items-center px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                className="flex items-center px-3 py-2 bg-destructive text-destructive-foreground rounded hover:bg-destructive/90"
               >
                 <Square className="w-4 h-4 mr-2" />
                 Stop
@@ -593,8 +593,8 @@ function WorkflowDesignerContent() {
               onClick={() => setActiveTab(tab.key as any)}
               className={`flex items-center px-3 py-2 rounded ${
                 activeTab === tab.key 
-                  ? 'bg-blue-600 text-white' 
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                  ? 'bg-primary text-primary-foreground' 
+                  : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
               }`}
             >
               <tab.icon className="w-4 h-4 mr-2" />
@@ -612,15 +612,15 @@ function WorkflowDesignerContent() {
         
         {/* Status Sidebar */}
         {activeTab !== 'design' && (
-          <div className="w-64 border-r bg-white p-4">
+          <div className="w-64 border-r bg-background p-4">
 
             {activeTab === 'execute' && (
               <div>
-                <h3 className="font-semibold mb-3 text-gray-900">Execution Status</h3>
+                <h3 className="font-semibold mb-3 text-foreground">Execution Status</h3>
                 
                 {execution && (
                   <div className="space-y-2">
-                    <div className="p-3 bg-gray-100 rounded">
+                    <div className="p-3 bg-secondary rounded">
                       <div className="text-sm">
                         <div className="flex justify-between">
                           <span>Status:</span>
@@ -658,7 +658,7 @@ function WorkflowDesignerContent() {
                 )}
                 
                 {!execution && !isExecuting && (
-                  <p className="text-gray-500 text-sm">
+                  <p className="text-muted-foreground text-sm">
                     No active execution. Click Execute to run the workflow.
                   </p>
                 )}
@@ -667,26 +667,26 @@ function WorkflowDesignerContent() {
 
             {activeTab === 'debug' && (
               <div>
-                <h3 className="font-semibold mb-3 text-gray-900">Debug Tools</h3>
+                <h3 className="font-semibold mb-3 text-foreground">Debug Tools</h3>
                 
                 <div className="space-y-2">
-                  <button className="w-full px-3 py-2 bg-gray-100 rounded text-sm hover:bg-gray-200">
+                  <button className="w-full px-3 py-2 bg-secondary rounded text-sm hover:bg-secondary/80">
                     Set Breakpoint
                   </button>
-                  <button className="w-full px-3 py-2 bg-gray-100 rounded text-sm hover:bg-gray-200">
+                  <button className="w-full px-3 py-2 bg-secondary rounded text-sm hover:bg-secondary/80">
                     Watch Variables
                   </button>
-                  <button className="w-full px-3 py-2 bg-gray-100 rounded text-sm hover:bg-gray-200">
+                  <button className="w-full px-3 py-2 bg-secondary rounded text-sm hover:bg-secondary/80">
                     Step Through
                   </button>
-                  <button className="w-full px-3 py-2 bg-gray-100 rounded text-sm hover:bg-gray-200">
+                  <button className="w-full px-3 py-2 bg-secondary rounded text-sm hover:bg-secondary/80">
                     Performance Profile
                   </button>
                 </div>
                 
-                <div className="mt-4 p-3 bg-gray-100 rounded">
+                <div className="mt-4 p-3 bg-secondary rounded">
                   <h4 className="text-sm font-medium mb-2">Debug Session</h4>
-                  <p className="text-xs text-gray-600">
+                  <p className="text-xs text-muted-foreground">
                     No active debug session. Execute workflow with debugging enabled.
                   </p>
                 </div>
@@ -695,30 +695,30 @@ function WorkflowDesignerContent() {
 
             {activeTab === 'security' && (
               <div>
-                <h3 className="font-semibold mb-3 text-gray-900">Security & Access</h3>
+                <h3 className="font-semibold mb-3 text-foreground">Security & Access</h3>
                 
                 <div className="space-y-2">
-                  <button className="w-full flex items-center px-3 py-2 bg-gray-100 rounded text-sm hover:bg-gray-200">
+                  <button className="w-full flex items-center px-3 py-2 bg-secondary rounded text-sm hover:bg-secondary/80">
                     <Users className="w-4 h-4 mr-2" />
                     Users & Teams
                   </button>
-                  <button className="w-full flex items-center px-3 py-2 bg-gray-100 rounded text-sm hover:bg-gray-200">
+                  <button className="w-full flex items-center px-3 py-2 bg-secondary rounded text-sm hover:bg-secondary/80">
                     <Shield className="w-4 h-4 mr-2" />
                     Permissions
                   </button>
-                  <button className="w-full flex items-center px-3 py-2 bg-gray-100 rounded text-sm hover:bg-gray-200">
+                  <button className="w-full flex items-center px-3 py-2 bg-secondary rounded text-sm hover:bg-secondary/80">
                     <FileText className="w-4 h-4 mr-2" />
                     Activity Log
                   </button>
-                  <button className="w-full flex items-center px-3 py-2 bg-gray-100 rounded text-sm hover:bg-gray-200">
+                  <button className="w-full flex items-center px-3 py-2 bg-secondary rounded text-sm hover:bg-secondary/80">
                     <Download className="w-4 h-4 mr-2" />
                     Export Data
                   </button>
                 </div>
 
-                <div className="mt-4 p-3 bg-gray-100 rounded">
+                <div className="mt-4 p-3 bg-secondary rounded">
                   <h4 className="text-sm font-medium mb-2">Current Access</h4>
-                  <p className="text-xs text-gray-600">
+                  <p className="text-xs text-muted-foreground">
                     You can create and execute workflows. 
                     Contact admin for user management access.
                   </p>
@@ -744,7 +744,7 @@ function WorkflowDesignerContent() {
               nodeTypes={nodeTypes}
               isValidConnection={isValidConnection}
               fitView
-              className="bg-gray-50"
+              className="bg-muted/30"
             >
               <Controls />
               <MiniMap
@@ -762,24 +762,24 @@ function WorkflowDesignerContent() {
           )}
 
           {activeTab === 'execute' && (
-            <div className="p-6 bg-white">
-              <h2 className="text-xl font-semibold mb-4 text-gray-900">Execution Monitor</h2>
+            <div className="p-6 bg-background">
+              <h2 className="text-xl font-semibold mb-4 text-foreground">Execution Monitor</h2>
               
               {execution ? (
                 <div className="space-y-4">
                   <div className="grid grid-cols-3 gap-4">
-                    <div className="bg-gray-100 p-4 rounded">
-                      <h3 className="text-sm font-medium text-gray-600">Status</h3>
+                    <div className="bg-secondary p-4 rounded">
+                      <h3 className="text-sm font-medium text-muted-foreground">Status</h3>
                       <p className="text-2xl font-bold">{execution.status}</p>
                     </div>
-                    <div className="bg-gray-100 p-4 rounded">
-                      <h3 className="text-sm font-medium text-gray-600">Progress</h3>
+                    <div className="bg-secondary p-4 rounded">
+                      <h3 className="text-sm font-medium text-muted-foreground">Progress</h3>
                       <p className="text-2xl font-bold">
                         {execution.completed_nodes}/{nodes.length}
                       </p>
                     </div>
-                    <div className="bg-gray-100 p-4 rounded">
-                      <h3 className="text-sm font-medium text-gray-600">Duration</h3>
+                    <div className="bg-secondary p-4 rounded">
+                      <h3 className="text-sm font-medium text-muted-foreground">Duration</h3>
                       <p className="text-2xl font-bold">
                         {execution.completed_at 
                           ? Math.round((new Date(execution.completed_at).getTime() - new Date(execution.started_at).getTime()) / 1000) + 's'
@@ -790,17 +790,17 @@ function WorkflowDesignerContent() {
                   </div>
 
                   <div>
-                    <h3 className="text-lg font-semibold mb-2 text-gray-900">Variables</h3>
-                    <div className="bg-gray-100 p-4 rounded font-mono text-sm">
+                    <h3 className="text-lg font-semibold mb-2 text-foreground">Variables</h3>
+                    <div className="bg-secondary p-4 rounded font-mono text-sm">
                       <pre>{JSON.stringify(execution.variables, null, 2)}</pre>
                     </div>
                   </div>
                 </div>
               ) : (
                 <div className="text-center py-8">
-                  <Monitor className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold mb-2 text-gray-900">No Active Execution</h3>
-                  <p className="text-gray-600">
+                  <Monitor className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold mb-2 text-foreground">No Active Execution</h3>
+                  <p className="text-muted-foreground">
                     Execute a workflow to see real-time monitoring data
                   </p>
                 </div>
@@ -809,28 +809,28 @@ function WorkflowDesignerContent() {
           )}
 
           {(activeTab === 'debug' || activeTab === 'security') && (
-            <div className="bg-white border p-6 text-center m-6 rounded-lg">
-              <div className="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+            <div className="bg-background border p-6 text-center m-6 rounded-lg">
+              <div className="w-16 h-16 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
                 {activeTab === 'debug' ? (
-                  <Bug className="w-8 h-8 text-blue-600" />
+                  <Bug className="w-8 h-8 text-primary" />
                 ) : (
-                  <Shield className="w-8 h-8 text-blue-600" />
+                  <Shield className="w-8 h-8 text-primary" />
                 )}
               </div>
-              <h3 className="text-lg font-semibold mb-2 text-gray-900">
+              <h3 className="text-lg font-semibold mb-2 text-foreground">
                 {activeTab === 'debug' ? 'Workflow Debugging' : 'Security & Access Control'}
               </h3>
-              <p className="text-gray-600 mb-6">
+              <p className="text-muted-foreground mb-6">
                 {activeTab === 'debug' 
                   ? 'Debug workflows with breakpoints, variable inspection, and performance analysis'
                   : 'User management, permissions, activity logging, and data export'
                 }
               </p>
               <div className="flex justify-center space-x-2">
-                <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                <button className="px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90">
                   {activeTab === 'debug' ? 'Start Debug Session' : 'Manage Users'}
                 </button>
-                <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200">
+                <button className="px-4 py-2 bg-secondary text-secondary-foreground rounded hover:bg-secondary/80">
                   {activeTab === 'debug' ? 'View Performance' : 'View Activity Log'}
                 </button>
               </div>

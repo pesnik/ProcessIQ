@@ -49,10 +49,10 @@ const NODE_ICONS: Record<string, React.ComponentType<any>> = {
 };
 
 const STATUS_COLORS = {
-  idle: 'border-gray-300 bg-white',
-  running: 'border-blue-500 bg-blue-50',
-  completed: 'border-green-500 bg-green-50',
-  failed: 'border-red-500 bg-red-50'
+  idle: 'border-border bg-background',
+  running: 'border-blue-500 bg-blue-50 dark:bg-blue-950',
+  completed: 'border-green-500 bg-green-50 dark:bg-green-950',
+  failed: 'border-red-500 bg-red-50 dark:bg-red-950'
 };
 
 const STATUS_ICONS = {
@@ -89,32 +89,32 @@ export function CustomNode({ data, selected, id }: NodeProps<CustomNodeData>) {
       {/* Node content */}
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center">
-          <Icon className="w-4 h-4 text-gray-600 mr-2" />
+          <Icon className="w-4 h-4 text-muted-foreground mr-2" />
           {StatusIcon && (
             <StatusIcon 
               className={`w-4 h-4 mr-1 ${
                 data.status === 'running' ? 'text-blue-600 animate-spin' :
                 data.status === 'completed' ? 'text-green-600' :
                 data.status === 'failed' ? 'text-red-600' :
-                'text-gray-400'
+                'text-muted-foreground'
               }`}
             />
           )}
         </div>
       </div>
 
-      <div className="text-sm font-medium text-gray-900 mb-1">
+      <div className="text-sm font-medium text-foreground mb-1">
         {data.label}
       </div>
       
-      <div className="text-xs text-gray-500">
+      <div className="text-xs text-muted-foreground">
         {data.nodeType.replace(/_/g, ' ')}
       </div>
 
       {/* Configuration preview */}
       {Object.keys(data.config).length > 0 && (
-        <div className="mt-2 pt-2 border-t border-gray-200">
-          <div className="text-xs text-gray-600">
+        <div className="mt-2 pt-2 border-t border-border">
+          <div className="text-xs text-muted-foreground">
             {data.nodeType === 'browser_navigate' && data.config.url && (
               <div className="truncate" title={data.config.url}>
                 URL: {data.config.url}
@@ -139,8 +139,8 @@ export function CustomNode({ data, selected, id }: NodeProps<CustomNodeData>) {
 
       {/* Error message */}
       {data.error && (
-        <div className="mt-2 pt-2 border-t border-red-200">
-          <div className="text-xs text-red-600" title={data.error}>
+        <div className="mt-2 pt-2 border-t border-red-200 dark:border-red-800">
+          <div className="text-xs text-red-600 dark:text-red-400" title={data.error}>
             Error: {data.error.substring(0, 40)}...
           </div>
         </div>

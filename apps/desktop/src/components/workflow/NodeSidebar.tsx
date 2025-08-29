@@ -168,17 +168,17 @@ export function NodeSidebar({ onDragStart }: NodeSidebarProps) {
   const categories = Array.from(new Set(NODE_TYPES.map(node => node.category)));
 
   return (
-    <div className="w-64 bg-white border-r border-gray-200 p-4 overflow-y-auto">
-      <h3 className="font-semibold text-gray-900 mb-4">Node Library</h3>
+    <div className="w-64 bg-background border-r border-border p-4 overflow-y-auto">
+      <h3 className="font-semibold text-foreground mb-4">Node Library</h3>
       
       {categories.map(category => (
         <div key={category} className="mb-6">
-          <h4 className="text-sm font-medium text-gray-700 mb-3">{category}</h4>
+          <h4 className="text-sm font-medium text-muted-foreground mb-3">{category}</h4>
           <div className="space-y-2">
             {NODE_TYPES.filter(node => node.category === category).map(node => (
               <div
                 key={node.type}
-                className="flex items-center p-3 border border-gray-200 rounded-lg cursor-grab active:cursor-grabbing hover:shadow-md transition-shadow"
+                className="flex items-center p-3 border border-border rounded-lg cursor-grab active:cursor-grabbing hover:shadow-md transition-shadow bg-card hover:bg-accent/50"
                 draggable
                 onDragStart={(event) => onDragStart(event, node.type)}
                 title={node.description}
@@ -187,8 +187,8 @@ export function NodeSidebar({ onDragStart }: NodeSidebarProps) {
                   <node.icon className="w-4 h-4" />
                 </div>
                 <div className="flex-1">
-                  <div className="text-sm font-medium text-gray-900">{node.name}</div>
-                  <div className="text-xs text-gray-500">{node.description}</div>
+                  <div className="text-sm font-medium text-foreground">{node.name}</div>
+                  <div className="text-xs text-muted-foreground">{node.description}</div>
                 </div>
               </div>
             ))}

@@ -180,12 +180,12 @@ export function PropertyPanel({ selectedNode, onClose, onUpdateNode }: PropertyP
             </div>
             {nodeType === 'excel_read' && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Variable Name
                 </label>
                 <input
                   type="text"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
                   placeholder="excel_data"
                   value={config.variable_name || ''}
                   onChange={(e) => handleConfigChange('variable_name', e.target.value)}
@@ -194,12 +194,12 @@ export function PropertyPanel({ selectedNode, onClose, onUpdateNode }: PropertyP
             )}
             {nodeType === 'excel_write' && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Data Source
                 </label>
                 <input
                   type="text"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
                   placeholder="data_variable"
                   value={config.data_source || ''}
                   onChange={(e) => handleConfigChange('data_source', e.target.value)}
@@ -370,16 +370,16 @@ import pandas as pd
   };
 
   return (
-    <div className="w-80 bg-white border-l border-gray-200 flex flex-col">
+    <div className="w-80 bg-background border-l border-border flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200">
+      <div className="flex items-center justify-between p-4 border-b border-border">
         <div className="flex items-center">
-          <Settings className="w-5 h-5 text-gray-500 mr-2" />
-          <h3 className="font-semibold text-gray-900">Node Properties</h3>
+          <Settings className="w-5 h-5 text-muted-foreground mr-2" />
+          <h3 className="font-semibold text-foreground">Node Properties</h3>
         </div>
         <button
           onClick={onClose}
-          className="text-gray-400 hover:text-gray-600"
+          className="text-muted-foreground hover:text-foreground"
         >
           <X className="w-5 h-5" />
         </button>
@@ -390,26 +390,26 @@ import pandas as pd
         <div className="space-y-6">
           {/* Basic Properties */}
           <div>
-            <h4 className="text-sm font-medium text-gray-900 mb-3">Basic Properties</h4>
+            <h4 className="text-sm font-medium text-foreground mb-3">Basic Properties</h4>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Node Name
                 </label>
                 <input
                   type="text"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
                   value={selectedNode.data.label}
                   onChange={(e) => handleLabelChange(e.target.value)}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Type
                 </label>
                 <input
                   type="text"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50"
+                  className="w-full px-3 py-2 border border-border rounded-md bg-muted"
                   value={selectedNode.data.nodeType}
                   disabled
                 />
@@ -419,25 +419,25 @@ import pandas as pd
 
           {/* Node-specific Configuration */}
           <div>
-            <h4 className="text-sm font-medium text-gray-900 mb-3">Configuration</h4>
+            <h4 className="text-sm font-medium text-foreground mb-3">Configuration</h4>
             {renderNodeSpecificFields()}
           </div>
 
           {/* Status Information */}
           {selectedNode.data.status && (
             <div>
-              <h4 className="text-sm font-medium text-gray-900 mb-3">Status</h4>
+              <h4 className="text-sm font-medium text-foreground mb-3">Status</h4>
               <div className={`p-3 rounded-md ${
-                selectedNode.data.status === 'completed' ? 'bg-green-50 border border-green-200' :
-                selectedNode.data.status === 'failed' ? 'bg-red-50 border border-red-200' :
-                selectedNode.data.status === 'running' ? 'bg-blue-50 border border-blue-200' :
-                'bg-gray-50 border border-gray-200'
+                selectedNode.data.status === 'completed' ? 'bg-green-50 border border-green-200 dark:bg-green-950 dark:border-green-800' :
+                selectedNode.data.status === 'failed' ? 'bg-red-50 border border-red-200 dark:bg-red-950 dark:border-red-800' :
+                selectedNode.data.status === 'running' ? 'bg-blue-50 border border-blue-200 dark:bg-blue-950 dark:border-blue-800' :
+                'bg-muted border border-border'
               }`}>
                 <div className="text-sm font-medium capitalize">
                   {selectedNode.data.status}
                 </div>
                 {selectedNode.data.error && (
-                  <div className="text-sm text-red-600 mt-1">
+                  <div className="text-sm text-red-600 dark:text-red-400 mt-1">
                     {selectedNode.data.error}
                   </div>
                 )}
