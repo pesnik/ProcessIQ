@@ -76,7 +76,7 @@ export const N8nWorkflowDesigner: React.FC = () => {
     setLoading(true);
     
     try {
-      const success = await n8nService.startN8nServer();
+      const success = await n8nService.startWorkflowEngine();
       if (success) {
         // Wait a moment for server to fully initialize
         setTimeout(async () => {
@@ -143,7 +143,7 @@ export const N8nWorkflowDesigner: React.FC = () => {
         <div className="text-center">
           <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4" />
           <p className="text-muted-foreground">
-            {startingN8n ? 'Starting n8n server...' : 'Loading n8n status...'}
+            {startingN8n ? 'Starting workflow engine...' : 'Loading workflow engine status...'}
           </p>
         </div>
       </div>
@@ -155,9 +155,9 @@ export const N8nWorkflowDesigner: React.FC = () => {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">n8n Workflow Designer</h1>
+            <h1 className="text-3xl font-bold tracking-tight">Visual Workflow Designer</h1>
             <p className="text-muted-foreground">
-              Visual workflow automation powered by n8n
+              Design and orchestrate automated business processes
             </p>
           </div>
         </div>
@@ -167,9 +167,9 @@ export const N8nWorkflowDesigner: React.FC = () => {
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-orange-100">
               <Workflow className="h-8 w-8 text-orange-600" />
             </div>
-            <CardTitle>n8n Server Not Running</CardTitle>
+            <CardTitle>Workflow Engine Not Running</CardTitle>
             <CardDescription>
-              Start the embedded n8n server to begin creating and managing workflows
+              Start the workflow engine to begin creating and managing automated processes
             </CardDescription>
           </CardHeader>
           <CardContent className="text-center">
@@ -182,7 +182,7 @@ export const N8nWorkflowDesigner: React.FC = () => {
               ) : (
                 <>
                   <Play className="mr-2 h-4 w-4" />
-                  Start n8n Server
+                  Start Workflow Engine
                 </>
               )}
             </Button>
@@ -196,7 +196,7 @@ export const N8nWorkflowDesigner: React.FC = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">n8n Workflow Designer</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Visual Workflow Designer</h1>
           <p className="text-muted-foreground">
             Create, manage, and execute automated workflows
           </p>
@@ -204,7 +204,7 @@ export const N8nWorkflowDesigner: React.FC = () => {
         <div className="flex items-center space-x-2">
           <Badge variant="secondary" className="bg-green-100 text-green-800">
             <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-            n8n Running
+            Engine Running
           </Badge>
           <Button variant="outline" onClick={openN8nInBrowser} size="sm">
             <ExternalLink className="h-4 w-4 mr-2" />
@@ -303,9 +303,9 @@ export const N8nWorkflowDesigner: React.FC = () => {
       {/* Embedded n8n Editor */}
       <Card className="min-h-[600px]">
         <CardHeader>
-          <CardTitle>n8n Editor</CardTitle>
+          <CardTitle>Workflow Editor</CardTitle>
           <CardDescription>
-            Design your workflows using the embedded n8n editor
+            Design your automated processes using the visual workflow editor
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -314,7 +314,7 @@ export const N8nWorkflowDesigner: React.FC = () => {
               ref={iframeRef}
               src={n8nService.getEditorUrl()}
               className="w-full h-[600px] border-0"
-              title="n8n Workflow Editor"
+              title="ProcessIQ Workflow Editor"
               sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
             />
           </div>

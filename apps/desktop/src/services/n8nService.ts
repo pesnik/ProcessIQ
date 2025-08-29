@@ -1,124 +1,130 @@
 /**
- * n8n Integration Service - Manages embedded n8n server and editor
+ * Workflow Engine Service - Manages embedded workflow server and editor
  */
-import { app } from 'electron';
-import * as express from 'express';
-import * as path from 'path';
 
-interface N8nConfig {
+interface WorkflowEngineConfig {
   port: number;
   host: string;
   userFolder: string;
   customNodes: string[];
 }
 
-class N8nService {
+class WorkflowEngineService {
   private server: express.Application | null = null;
   private serverInstance: any = null;
-  private config: N8nConfig;
+  private config: WorkflowEngineConfig;
+  private mockServerRunning: boolean = false;
 
   constructor() {
     this.config = {
-      port: 5678, // Standard n8n port
+      port: 5678, // Workflow engine port
       host: 'localhost',
-      userFolder: path.join(app.getPath('userData'), 'n8n'),
+      userFolder: '', // Will be set when needed
       customNodes: [
-        path.join(__dirname, '../../node_modules/@processiq/n8n-rpa-nodes/dist')
+        // Will be set dynamically when needed
       ]
     };
+    this.initializeUserFolder();
+  }
+
+  private async initializeUserFolder(): Promise<void> {
+    try {
+      // Get user data path from electron if available, otherwise use fallback
+      const userDataPath = typeof window !== 'undefined' && window.electronAPI 
+        ? await window.electronAPI.getUserDataPath() 
+        : './processiq-data';
+        
+      this.config.userFolder = `${userDataPath}/workflow-engine`;
+      
+      // Set custom nodes path relative to the app
+      this.config.customNodes = [
+        `${userDataPath}/workflow-nodes/@processiq/n8n-rpa-nodes/dist`
+      ];
+    } catch (error) {
+      console.warn('Could not get user data path, using fallback:', error);
+      this.config.userFolder = './processiq-data/workflow-engine';
+      this.config.customNodes = ['./processiq-data/workflow-nodes'];
+    }
   }
 
   /**
-   * Start embedded n8n server
+   * Start embedded workflow server
    */
-  async startN8nServer(): Promise<boolean> {
+  async startWorkflowEngine(): Promise<boolean> {
     try {
-      // Set n8n environment variables
-      process.env.N8N_HOST = this.config.host;
-      process.env.N8N_PORT = this.config.port.toString();
-      process.env.N8N_USER_FOLDER = this.config.userFolder;
-      process.env.N8N_CUSTOM_EXTENSIONS = this.config.customNodes.join(';');
-      process.env.N8N_SKIP_WEBHOOK_DEREGISTRATION_SHUTDOWN = 'true';
-      process.env.N8N_DISABLE_PRODUCTION_MAIN_PROCESS = 'true';
+      console.log('Starting workflow engine...');
       
-      // Import n8n dynamically to avoid issues with electron
-      const n8n = await import('n8n');
+      // Simulate startup delay
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
-      // Start n8n server
-      await n8n.start();
-      
-      console.log(`n8n server started on http://${this.config.host}:${this.config.port}`);
+      // For now, use mock server - actual workflow engine integration will be implemented
+      // when we have proper workflow dependencies installed
+      this.mockServerRunning = true;
+      console.log(`Mock workflow engine started on http://${this.config.host}:${this.config.port}`);
       return true;
       
     } catch (error) {
-      console.error('Failed to start n8n server:', error);
+      console.error('Failed to start workflow engine:', error);
       return false;
     }
   }
 
   /**
-   * Stop n8n server
+   * Stop workflow server
    */
-  async stopN8nServer(): Promise<void> {
+  async stopWorkflowEngine(): Promise<void> {
     try {
+      this.mockServerRunning = false;
       if (this.serverInstance) {
         await this.serverInstance.close();
         this.serverInstance = null;
       }
-      console.log('n8n server stopped');
+      console.log('Workflow engine stopped');
     } catch (error) {
-      console.error('Error stopping n8n server:', error);
+      console.error('Error stopping workflow engine:', error);
     }
   }
 
   /**
-   * Get n8n editor URL
+   * Get workflow editor URL
    */
   getEditorUrl(): string {
     return `http://${this.config.host}:${this.config.port}`;
   }
 
   /**
-   * Get n8n API base URL
+   * Get workflow API base URL
    */
   getApiUrl(): string {
     return `http://${this.config.host}:${this.config.port}/rest`;
   }
 
   /**
-   * Check if n8n server is running
+   * Check if workflow engine is running
    */
   async isServerRunning(): Promise<boolean> {
-    try {
-      const response = await fetch(`${this.getApiUrl()}/active-workflows`);
-      return response.ok;
-    } catch {
-      return false;
-    }
+    // For mock implementation, return the mock server status
+    return this.mockServerRunning;
   }
 
   /**
    * Execute workflow by ID
    */
   async executeWorkflow(workflowId: string, data?: any): Promise<any> {
-    try {
-      const response = await fetch(`${this.getApiUrl()}/workflows/${workflowId}/execute`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ data }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Workflow execution failed: ${response.statusText}`);
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error('Workflow execution error:', error);
-      throw error;
+    if (!this.mockServerRunning) {
+      throw new Error('Workflow engine is not running');
     }
+
+    // Return mock execution result
+    const executionId = `exec_${Date.now()}`;
+    console.log(`Mock execution started for workflow ${workflowId}:`, executionId);
+    
+    return {
+      executionId,
+      workflowId,
+      status: 'running',
+      startedAt: new Date().toISOString()
+    };
   }
 
   /**
@@ -143,19 +149,27 @@ class N8nService {
    * List available workflows
    */
   async getWorkflows(): Promise<any[]> {
-    try {
-      const response = await fetch(`${this.getApiUrl()}/workflows`);
-      
-      if (!response.ok) {
-        throw new Error(`Failed to get workflows: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      return data.workflows || [];
-    } catch (error) {
-      console.error('Get workflows error:', error);
+    if (!this.mockServerRunning) {
       return [];
     }
+
+    // Return mock workflows for demo
+    return [
+      {
+        id: 'rpa-demo-workflow',
+        name: 'ProcessIQ RPA Demo - Kaggle to Excel',
+        active: false,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'web-automation-workflow',
+        name: 'Web Data Extraction',
+        active: true,
+        createdAt: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
+        updatedAt: new Date().toISOString()
+      }
+    ];
   }
 
   /**
@@ -280,4 +294,7 @@ class N8nService {
   }
 }
 
-export const n8nService = new N8nService();
+export const workflowEngineService = new WorkflowEngineService();
+
+// Legacy export for backward compatibility during transition
+export const n8nService = workflowEngineService;

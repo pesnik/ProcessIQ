@@ -26,6 +26,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // App info
   getVersion: () => process.env.npm_package_version || '0.1.0',
   getPlatform: () => process.platform,
+  getUserDataPath: () => ipcRenderer.invoke('get-user-data-path'),
 
   // Window controls (for custom title bar if needed)
   minimize: () => ipcRenderer.invoke('window-minimize'),
@@ -50,6 +51,7 @@ declare global {
       onMenuAction: (callback: (action: string) => void) => void;
       getVersion: () => string;
       getPlatform: () => string;
+      getUserDataPath: () => Promise<string>;
       minimize: () => Promise<void>;
       maximize: () => Promise<void>;
       close: () => Promise<void>;

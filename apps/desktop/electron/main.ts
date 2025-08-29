@@ -117,6 +117,11 @@ class ProcessIQApp {
     ipcMain.handle('open-external', async (_, url: string) => {
       shell.openExternal(url);
     });
+
+    // App data path
+    ipcMain.handle('get-user-data-path', async () => {
+      return app.getPath('userData');
+    });
   }
 
   private createWindow(): void {
