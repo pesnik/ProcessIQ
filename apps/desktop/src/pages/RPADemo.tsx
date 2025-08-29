@@ -36,29 +36,29 @@ export default function RPADemo() {
   const workflowSteps: WorkflowStep[] = [
     {
       id: 'web_scraping',
-      name: 'Web Data Collection',
-      description: 'Scrape sales data from web sources using Playwright',
+      name: 'Kaggle Dataset Download',
+      description: 'Download real customer segmentation dataset from Kaggle using browser automation',
       status: 'pending',
       icon: <Eye className="w-5 h-5" />
     },
     {
       id: 'data_processing',
-      name: 'Data Processing',
-      description: 'Clean and analyze data using Pandas',
+      name: 'Data Processing & Analytics',
+      description: 'Clean, segment, and analyze customer data using Pandas with business intelligence',
       status: 'pending',
       icon: <Database className="w-5 h-5" />
     },
     {
       id: 'excel_generation',
-      name: 'Excel Report Creation',
-      description: 'Generate professional Excel reports with charts',
+      name: 'Excel Automation with Macros',
+      description: 'Generate professional Excel reports with charts, formulas, and business calculations',
       status: 'pending',
       icon: <FileSpreadsheet className="w-5 h-5" />
     },
     {
       id: 'analysis_report',
-      name: 'Business Analysis',
-      description: 'Create executive summary and insights',
+      name: 'Executive Business Analysis',
+      description: 'Generate strategic insights, trends analysis, and actionable business recommendations',
       status: 'pending',
       icon: <BarChart3 className="w-5 h-5" />
     }
@@ -322,8 +322,8 @@ export default function RPADemo() {
   };
 
   return (
-    <div className="h-full bg-background p-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="h-full bg-background overflow-y-auto">
+      <div className="max-w-7xl mx-auto p-6 min-h-full">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
@@ -333,7 +333,7 @@ export default function RPADemo() {
                 ProcessIQ RPA Demo
               </h1>
               <p className="text-muted-foreground mt-2">
-                Interactive demonstration of RPA workflow orchestration
+                Professional RPA Demo: Kaggle → Data Processing → Excel Automation → Business Intelligence
               </p>
               {executionId && (
                 <div className="mt-2 text-xs text-blue-600 font-mono">
@@ -455,13 +455,17 @@ export default function RPADemo() {
                         </p>
                         
                         {step.output && (
-                          <div className="mt-3 p-3 bg-background rounded border">
+                          <div className="mt-3 p-3 bg-background rounded border overflow-hidden">
                             <div className="text-xs text-muted-foreground mb-1">Output:</div>
-                            <div className="text-sm font-mono max-h-32 overflow-y-auto">
+                            <div className="text-sm font-mono max-h-32 overflow-y-auto overflow-x-hidden">
                               {Object.entries(step.output).map(([key, value]) => (
-                                <div key={key} className="flex justify-between gap-2 mb-1">
-                                  <span className="flex-shrink-0">{key}:</span>
-                                  <span className="text-primary text-right break-words">{String(value)}</span>
+                                <div key={key} className="mb-1 w-full">
+                                  <div className="w-full">
+                                    <div className="text-xs font-semibold text-gray-600 mb-1">{key}:</div>
+                                    <div className="text-primary text-xs break-all whitespace-pre-wrap word-break-break-all pl-2 pr-2 max-w-full overflow-hidden">
+                                      {String(value)}
+                                    </div>
+                                  </div>
                                 </div>
                               ))}
                             </div>
@@ -476,10 +480,9 @@ export default function RPADemo() {
             
             {/* Results Summary */}
             {results.length > 0 && (
-              <div className="bg-card p-6 rounded-lg border max-h-[400px] flex flex-col">
+              <div className="bg-card p-6 rounded-lg border">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-xl font-semibold text-foreground">Execution Results</h2>
-                  <div className="text-xs text-muted-foreground">↕️ Scrollable</div>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4 mb-4">
@@ -498,13 +501,13 @@ export default function RPADemo() {
                   </div>
                 </div>
                 
-                <div className="overflow-y-auto flex-1 scroll-smooth">
+                <div>
                   {!isRunning && results.length > 0 && (
                     <>
                       {artifacts.length > 0 && (
                         <div className="mt-4">
                           <h3 className="text-sm font-medium text-foreground mb-2">Generated Artifacts:</h3>
-                          <div className="space-y-1 max-h-32 overflow-y-auto">
+                          <div className="space-y-1">
                           {artifacts.map((artifact, index) => (
                             <button
                               key={index}
@@ -594,14 +597,14 @@ export default function RPADemo() {
             🎯 What This Demo Shows
           </h3>
           <ul className="text-blue-800 space-y-1">
-            <li>• <strong>Multi-tool RPA Orchestration</strong>: Playwright + Pandas + OpenPyXL working together</li>
-            <li>• <strong>Real-time Progress Monitoring</strong>: Live status updates and execution metrics</li>
-            <li>• <strong>{!headlessMode ? 'Visible Browser Automation' : 'Headless Browser Automation'}</strong>: 
-                {!headlessMode ? ' Watch browser actions in real-time for transparency' : ' Fast background execution without UI'}
+            <li>• <strong>Real Dataset Processing</strong>: Downloads actual customer segmentation data from Kaggle</li>
+            <li>• <strong>Professional Excel Automation</strong>: Creates multi-sheet workbooks with charts, formulas & business calculations</li>
+            <li>• <strong>Advanced Data Analytics</strong>: Customer segmentation, trend analysis, and business intelligence</li>
+            <li>• <strong>{!headlessMode ? 'Visual Browser Mode' : 'Headless Automation'}</strong>: 
+                {!headlessMode ? ' Watch real browser automation for full transparency' : ' Fast background processing with detailed logs'}
             </li>
-            <li>• <strong>Professional Error Handling</strong>: Graceful failures with detailed logging</li>
-            <li>• <strong>Interactive User Experience</strong>: Desktop-class workflow management</li>
-            <li>• <strong>Production-Ready Architecture</strong>: Enterprise-grade monitoring and reporting</li>
+            <li>• <strong>Executive-Level Reporting</strong>: Generates strategic insights and actionable recommendations</li>
+            <li>• <strong>Production-Ready RPA Stack</strong>: Playwright + Pandas + OpenPyXL + Business Analytics</li>
           </ul>
         </div>
 
@@ -613,13 +616,13 @@ export default function RPADemo() {
               <div>
                 <h4 className="text-sm font-semibold text-green-900">Browser Visibility Mode</h4>
                 <p className="text-xs text-green-700 mt-1">
-                  <strong>Visible Browser Mode Enabled:</strong> When supported by your environment, 
-                  a browser window will open showing real-time web automation. This builds trust by 
-                  demonstrating exactly what ProcessIQ is doing during web scraping steps.
+                  <strong>Visual Browser Mode Enabled:</strong> Watch ProcessIQ navigate to Kaggle, 
+                  extract dataset information, and download real customer data in real-time. 
+                  This transparency demonstrates exactly how the RPA system accesses external data sources.
                 </p>
                 <p className="text-xs text-green-600 mt-1 italic">
-                  Note: In WSL2/SSH environments, the system will automatically fall back to optimized headless mode 
-                  while still providing full transparency through detailed execution logs and screenshots.
+                  Professional Note: The system automatically detects your environment (WSL2/SSH/macOS) 
+                  and optimizes browser visibility accordingly while maintaining full audit trails.
                 </p>
               </div>
             </div>
@@ -633,9 +636,9 @@ export default function RPADemo() {
               <div>
                 <h4 className="text-sm font-semibold text-blue-900">Headless Mode (Fast & Silent)</h4>
                 <p className="text-xs text-blue-700 mt-1">
-                  Browser automation runs in the background without opening windows. 
-                  This mode is faster and uses less resources, perfect for production automation.
-                  You'll still get detailed logs and screenshots for transparency.
+                  All automation runs in optimized background mode for maximum performance. 
+                  Still downloads real Kaggle data, processes with Pandas, generates Excel with charts/macros, 
+                  and creates business intelligence reports. Full audit trails and screenshots provided.
                 </p>
               </div>
             </div>
