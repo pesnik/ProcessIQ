@@ -490,6 +490,17 @@ function WorkflowDesignerContent() {
 
           setNodes(flowNodes);
           setEdges(flowEdges);
+          
+          // Fit view to loaded workflow after a small delay
+          setTimeout(() => {
+            if (reactFlowInstance) {
+              reactFlowInstance.fitView({ 
+                padding: 100, 
+                maxZoom: 1.0,
+                duration: 500 
+              });
+            }
+          }, 100);
         } catch (error) {
           console.error('Failed to load workflow:', error);
         }
@@ -743,10 +754,23 @@ function WorkflowDesignerContent() {
               onNodeClick={onNodeClick}
               nodeTypes={nodeTypes}
               isValidConnection={isValidConnection}
-              fitView
+              defaultViewport={{ x: 50, y: 50, zoom: 0.75 }}
+              fitViewOptions={{ 
+                padding: 100, 
+                maxZoom: 1.2,
+                minZoom: 0.3 
+              }}
               className="bg-muted/30"
             >
-              <Controls />
+              <Controls 
+                showInteractive={false}
+                showFitView={true}
+                showZoom={true}
+                fitViewOptions={{ 
+                  padding: 100, 
+                  maxZoom: 1.0 
+                }}
+              />
               <MiniMap
                 nodeColor={(node) => {
                   switch (node.data.status) {
@@ -756,6 +780,14 @@ function WorkflowDesignerContent() {
                     default: return '#6b7280';
                   }
                 }}
+                style={{
+                  height: 120,
+                  width: 200,
+                  backgroundColor: 'var(--background)',
+                  border: '1px solid var(--border)',
+                  borderRadius: '6px'
+                }}
+                maskColor="rgba(0, 0, 0, 0.1)"
               />
               <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
             </ReactFlow>
