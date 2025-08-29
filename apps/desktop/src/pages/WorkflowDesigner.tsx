@@ -68,7 +68,7 @@ function WorkflowDesignerContent() {
   const [selectedNode, setSelectedNode] = useState<Node<CustomNodeData> | null>(null);
   const [execution, setExecution] = useState<WorkflowExecution | null>(null);
   const [isExecuting, setIsExecuting] = useState(false);
-  const [activeTab, setActiveTab] = useState<'design' | 'execute' | 'debug' | 'security'>('design');
+  const [activeTab, setActiveTab] = useState<'design' | 'execute' | 'debug'>('design');
   const [workflowName, setWorkflowName] = useState('New Workflow');
   
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
@@ -509,27 +509,39 @@ function WorkflowDesignerContent() {
     }
   }, [setNodes, setEdges]);
 
-  // Delete selected nodes
-  const deleteSelectedNodes = useCallback(() => {
+  // Delete selected nodes and edges
+  const deleteSelectedElements = useCallback(() => {
     const selectedNodes = nodes.filter(node => node.selected);
+    const selectedEdges = edges.filter(edge => edge.selected);
     const selectedNodeIds = selectedNodes.map(node => node.id);
+    const selectedEdgeIds = selectedEdges.map(edge => edge.id);
     
-    setNodes((nds) => nds.filter(node => !selectedNodeIds.includes(node.id)));
-    setEdges((eds) => eds.filter(edge => 
-      !selectedNodeIds.includes(edge.source) && !selectedNodeIds.includes(edge.target)
-    ));
-    
-    if (selectedNode && selectedNodeIds.includes(selectedNode.id)) {
-      setSelectedNode(null);
+    // Remove selected nodes
+    if (selectedNodeIds.length > 0) {
+      setNodes((nds) => nds.filter(node => !selectedNodeIds.includes(node.id)));
+      // Also remove edges connected to deleted nodes
+      setEdges((eds) => eds.filter(edge => 
+        !selectedNodeIds.includes(edge.source) && !selectedNodeIds.includes(edge.target)
+      ));
+      
+      if (selectedNode && selectedNodeIds.includes(selectedNode.id)) {
+        setSelectedNode(null);
+      }
     }
-  }, [nodes, selectedNode, setNodes, setEdges]);
+    
+    // Remove selected edges
+    if (selectedEdgeIds.length > 0) {
+      setEdges((eds) => eds.filter(edge => !selectedEdgeIds.includes(edge.id)));
+    }
+  }, [nodes, edges, selectedNode, setNodes, setEdges]);
 
   // Keyboard shortcuts
   const onKeyDown = useCallback((event: React.KeyboardEvent) => {
     if (event.key === 'Delete' || event.key === 'Backspace') {
-      deleteSelectedNodes();
+      event.preventDefault();
+      deleteSelectedElements();
     }
-  }, [deleteSelectedNodes]);
+  }, [deleteSelectedElements]);
 
   return (
     <div className="h-full flex flex-col" onKeyDown={onKeyDown} tabIndex={0}>
@@ -596,8 +608,7 @@ function WorkflowDesignerContent() {
           {[
             { key: 'design', label: 'Design', icon: Settings },
             { key: 'execute', label: 'Execute', icon: Monitor },
-            { key: 'debug', label: 'Debug', icon: Bug },
-            { key: 'security', label: 'Security', icon: Shield }
+            { key: 'debug', label: 'Debug', icon: Bug }
           ].map(tab => (
             <button
               key={tab.key}
@@ -704,38 +715,6 @@ function WorkflowDesignerContent() {
               </div>
             )}
 
-            {activeTab === 'security' && (
-              <div>
-                <h3 className="font-semibold mb-3 text-foreground">Security & Access</h3>
-                
-                <div className="space-y-2">
-                  <button className="w-full flex items-center px-3 py-2 bg-secondary rounded text-sm hover:bg-secondary/80">
-                    <Users className="w-4 h-4 mr-2" />
-                    Users & Teams
-                  </button>
-                  <button className="w-full flex items-center px-3 py-2 bg-secondary rounded text-sm hover:bg-secondary/80">
-                    <Shield className="w-4 h-4 mr-2" />
-                    Permissions
-                  </button>
-                  <button className="w-full flex items-center px-3 py-2 bg-secondary rounded text-sm hover:bg-secondary/80">
-                    <FileText className="w-4 h-4 mr-2" />
-                    Activity Log
-                  </button>
-                  <button className="w-full flex items-center px-3 py-2 bg-secondary rounded text-sm hover:bg-secondary/80">
-                    <Download className="w-4 h-4 mr-2" />
-                    Export Data
-                  </button>
-                </div>
-
-                <div className="mt-4 p-3 bg-secondary rounded">
-                  <h4 className="text-sm font-medium mb-2">Current Access</h4>
-                  <p className="text-xs text-muted-foreground">
-                    You can create and execute workflows. 
-                    Contact admin for user management access.
-                  </p>
-                </div>
-              </div>
-            )}
           </div>
         )}
 
@@ -747,6 +726,16 @@ function WorkflowDesignerContent() {
               edges={edges}
               onNodesChange={onNodesChange}
               onEdgesChange={onEdgesChange}
+              onNodesDelete={(nodesToDelete) => {
+                const nodeIds = nodesToDelete.map(node => node.id);
+                setEdges((eds) => eds.filter(edge => 
+                  !nodeIds.includes(edge.source) && !nodeIds.includes(edge.target)
+                ));
+                if (selectedNode && nodeIds.includes(selectedNode.id)) {
+                  setSelectedNode(null);
+                }
+              }}
+              onEdgesDelete={() => {}}
               onConnect={onConnect}
               onInit={setReactFlowInstance}
               onDrop={onDrop}
@@ -754,6 +743,8 @@ function WorkflowDesignerContent() {
               onNodeClick={onNodeClick}
               nodeTypes={nodeTypes}
               isValidConnection={isValidConnection}
+              deleteKeyCode={['Delete', 'Backspace']}
+              multiSelectionKeyCode="Shift"
               defaultViewport={{ x: 50, y: 50, zoom: 0.75 }}
               fitViewOptions={{ 
                 padding: 100, 
@@ -840,30 +831,23 @@ function WorkflowDesignerContent() {
             </div>
           )}
 
-          {(activeTab === 'debug' || activeTab === 'security') && (
+          {activeTab === 'debug' && (
             <div className="bg-background border p-6 text-center m-6 rounded-lg">
               <div className="w-16 h-16 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-                {activeTab === 'debug' ? (
-                  <Bug className="w-8 h-8 text-primary" />
-                ) : (
-                  <Shield className="w-8 h-8 text-primary" />
-                )}
+                <Bug className="w-8 h-8 text-primary" />
               </div>
               <h3 className="text-lg font-semibold mb-2 text-foreground">
-                {activeTab === 'debug' ? 'Workflow Debugging' : 'Security & Access Control'}
+                Workflow Debugging
               </h3>
               <p className="text-muted-foreground mb-6">
-                {activeTab === 'debug' 
-                  ? 'Debug workflows with breakpoints, variable inspection, and performance analysis'
-                  : 'User management, permissions, activity logging, and data export'
-                }
+                Debug workflows with breakpoints, variable inspection, and performance analysis
               </p>
               <div className="flex justify-center space-x-2">
                 <button className="px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90">
-                  {activeTab === 'debug' ? 'Start Debug Session' : 'Manage Users'}
+                  Start Debug Session
                 </button>
                 <button className="px-4 py-2 bg-secondary text-secondary-foreground rounded hover:bg-secondary/80">
-                  {activeTab === 'debug' ? 'View Performance' : 'View Activity Log'}
+                  View Performance
                 </button>
               </div>
             </div>
