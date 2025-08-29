@@ -137,43 +137,86 @@ async def stream_demo_progress(execution_id: str):
 @router.get("/artifacts")
 async def get_available_artifacts():
     """Get list of available artifacts from recent demo runs"""
-    # Mock artifact list for demo purposes
-    artifacts = [
-        "sales_analysis_20250828_123456.xlsx",
-        "demo_summary_20250828_123456.json",
-        "screenshot_step1.png",
-        "screenshot_step2.png"
-    ]
+    import os
+    
+    output_dir = "/tmp/processiq_demo"
+    artifacts = []
+    
+    if os.path.exists(output_dir):
+        # Get all files from the demo output directory
+        for file in os.listdir(output_dir):
+            if file.endswith(('.xlsx', '.json', '.png', '.csv')):
+                artifacts.append(file)
+    
+    # If no artifacts found, return empty list
     return {"artifacts": artifacts}
 
 @router.get("/artifacts/{filename}")
 async def download_artifact(filename: str):
     """Download a specific artifact file"""
-    # For demo purposes, return mock file content
+    import os
+    from pathlib import Path
+    
+    # Look for the file in the demo output directory
+    output_dir = "/tmp/processiq_demo"
+    file_path = os.path.join(output_dir, filename)
+    
+    # If file doesn't exist, try alternative names/locations
+    if not os.path.exists(file_path):
+        # Check for common file patterns
+        potential_files = []
+        if filename.endswith('.xlsx'):
+            potential_files = [
+                "customer_analysis_report.xlsx",
+                "mall_customers_analysis.xlsx"
+            ]
+        elif filename.endswith('.json'):
+            potential_files = [
+                "business_analysis_report.json",
+                "demo_summary.json"
+            ]
+        elif filename.endswith('.png'):
+            potential_files = [
+                "kaggle_dataset_page.png",
+                "demo_screenshot.png"
+            ]
+            # Also check for screenshot files with timestamps
+            if os.path.exists(output_dir):
+                for file in os.listdir(output_dir):
+                    if file.endswith('.png') and ('screenshot' in file or 'kaggle' in file):
+                        potential_files.append(file)
+        
+        # Try to find the actual file
+        for potential_file in potential_files:
+            potential_path = os.path.join(output_dir, potential_file)
+            if os.path.exists(potential_path):
+                file_path = potential_path
+                break
+    
+    # If still not found, return error
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail=f"File '{filename}' not found. Available files: {os.listdir(output_dir) if os.path.exists(output_dir) else 'No files'}")
+    
+    # Determine media type based on file extension
     if filename.endswith('.json'):
-        mock_content = {
-            "demo_id": "demo_20250828_123456",
-            "execution_time": datetime.now().isoformat(),
-            "success": True,
-            "steps_completed": 4,
-            "total_execution_time_ms": 3450,
-            "artifacts_generated": ["excel_file", "screenshots"]
-        }
-        content = json.dumps(mock_content, indent=2).encode()
         media_type = "application/json"
     elif filename.endswith('.xlsx'):
-        # Return a small mock Excel file (just headers for demo)
-        content = b"Mock Excel content - would be actual XLSX binary data"
         media_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     elif filename.endswith('.png'):
-        # Return a small mock PNG (just headers for demo)
-        content = b"Mock PNG content - would be actual PNG binary data"
         media_type = "image/png"
+    elif filename.endswith('.csv'):
+        media_type = "text/csv"
     else:
-        raise HTTPException(status_code=404, detail="File not found")
+        media_type = "application/octet-stream"
+    
+    # Read and return the actual file
+    def file_generator():
+        with open(file_path, 'rb') as file:
+            while chunk := file.read(8192):
+                yield chunk
     
     return StreamingResponse(
-        iter([content]),
+        file_generator(),
         media_type=media_type,
         headers={"Content-Disposition": f"attachment; filename={filename}"}
     )
@@ -240,11 +283,28 @@ async def execute_demo_workflow(execution_id: str, request: RPAExecutionRequest)
         # Mark as completed
         execution["status"] = "completed"
         execution["end_time"] = datetime.now()  # Track completion time
-        execution["artifacts"] = {
-            "excel_file": f"sales_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx",
-            "summary_report": f"demo_summary_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json",
-            "screenshots": [f"screenshot_step{i+1}.png" for i in range(len(request.steps))]
-        }
+        
+        # Collect actual generated artifacts
+        import os
+        output_dir = "/tmp/processiq_demo"
+        actual_artifacts = {}
+        
+        # Look for Excel file
+        excel_files = [f for f in os.listdir(output_dir) if f.endswith('.xlsx')] if os.path.exists(output_dir) else []
+        if excel_files:
+            actual_artifacts["excel_file"] = excel_files[0]
+        
+        # Look for analysis report
+        json_files = [f for f in os.listdir(output_dir) if f.endswith('.json')] if os.path.exists(output_dir) else []
+        if json_files:
+            actual_artifacts["summary_report"] = json_files[0]
+        
+        # Look for screenshots
+        screenshot_files = [f for f in os.listdir(output_dir) if f.endswith('.png')] if os.path.exists(output_dir) else []
+        if screenshot_files:
+            actual_artifacts["screenshots"] = screenshot_files
+        
+        execution["artifacts"] = actual_artifacts
         
         
     except Exception as e:
@@ -275,8 +335,8 @@ async def execute_browser_step(step_id: str, headless: bool = False) -> Dict[str
         # Force headless mode only if no display available or SSH (but allow WSLg and macOS)
         effective_headless = headless or is_ssh or (not is_macos and not has_display and not has_wslg)
         
-        # Create demo output directory
-        output_dir = "./demo_output"
+        # Create demo output directory in /tmp
+        output_dir = "/tmp/processiq_demo"
         os.makedirs(output_dir, exist_ok=True)
         
         async with async_playwright() as p:
@@ -474,7 +534,7 @@ async def execute_data_processing_step(step_id: str) -> Dict[str, Any]:
         import numpy as np
         import os
         
-        output_dir = "./demo_output"
+        output_dir = "/tmp/processiq_demo"
         os.makedirs(output_dir, exist_ok=True)
         
         # Look for the dataset from previous step
@@ -606,7 +666,7 @@ async def execute_excel_generation_step(step_id: str) -> Dict[str, Any]:
         from openpyxl.utils.dataframe import dataframe_to_rows
         import os
         
-        output_dir = "./demo_output"
+        output_dir = "/tmp/processiq_demo"
         os.makedirs(output_dir, exist_ok=True)
         
         # Load processed data
@@ -790,7 +850,7 @@ async def execute_analysis_report_step(step_id: str) -> Dict[str, Any]:
         import os
         from datetime import datetime
         
-        output_dir = "./demo_output"
+        output_dir = "/tmp/processiq_demo"
         os.makedirs(output_dir, exist_ok=True)
         
         # Load processed data
