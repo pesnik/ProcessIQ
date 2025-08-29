@@ -152,7 +152,7 @@ export const VisualWorkflowDesigner: React.FC = () => {
 
   if (!isN8nRunning) {
     return (
-      <div className="space-y-6">
+      <div className="h-full overflow-y-auto p-6 space-y-6">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Workflow Designer</h1>
@@ -193,7 +193,7 @@ export const VisualWorkflowDesigner: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="h-full overflow-y-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Workflow Designer</h1>
@@ -301,7 +301,7 @@ export const VisualWorkflowDesigner: React.FC = () => {
       <Separator />
 
       {/* Embedded n8n Editor */}
-      <Card className="min-h-[600px]">
+      <Card className="min-h-[800px]">
         <CardHeader>
           <CardTitle>Workflow Editor</CardTitle>
           <CardDescription>

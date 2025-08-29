@@ -322,7 +322,7 @@ export default function RPADemo() {
   };
 
   return (
-    <div className="h-full bg-background p-6">
+    <div className="h-full overflow-y-auto bg-background p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
