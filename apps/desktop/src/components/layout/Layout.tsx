@@ -29,6 +29,9 @@ export function Layout({ children, backendStatus }: LayoutProps) {
             <a href="/designer" className="block px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground">
               Workflow Designer
             </a>
+            <a href="/n8n-designer" className="block px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground">
+              n8n Designer (v5)
+            </a>
             <a href="/connectors" className="block px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground">
               Connectors
             </a>

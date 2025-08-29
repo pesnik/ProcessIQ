@@ -24,6 +24,7 @@
   "dependencies": {
     "@electron/remote": "^2.1.1",
     "@hookform/resolvers": "^3.3.2",
+    "@processiq/n8n-rpa-nodes": "workspace:*",
     "@radix-ui/react-accordion": "^1.1.2",
     "@radix-ui/react-alert-dialog": "^1.0.5",
     "@radix-ui/react-dialog": "^1.0.5",
@@ -47,7 +48,9 @@
     "electron-log": "^5.0.1",
     "electron-store": "^8.1.0",
     "electron-updater": "^6.1.7",
+    "express": "^4.18.2",
     "lucide-react": "^0.294.0",
+    "n8n": "^1.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.48.2",

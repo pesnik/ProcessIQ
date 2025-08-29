@@ -1,0 +1,71 @@
+{
+  "name": "@processiq/n8n-rpa-nodes",
+  "version": "0.1.0",
+  "description": "ProcessIQ RPA automation nodes for n8n",
+  "license": "MIT",
+  "homepage": "https://github.com/processiq/processiq",
+  "author": {
+    "name": "ProcessIQ Team",
+    "email": "team@processiq.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/processiq/processiq.git"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc && npm run copy-assets",
+    "copy-assets": "copyfiles -u 1 \"src/**/*.{json,png,svg}\" dist/",
+    "dev": "tsc --watch",
+    "format": "prettier src --write",
+    "lint": "tslint -p tsconfig.json -c tslint.json",
+    "package": "npm run build && npm pack",
+    "test": "jest"
+  },
+  "files": [
+    "dist"
+  ],
+  "n8n": {
+    "n8nNodesApiVersion": 1,
+    "credentials": [
+      "dist/credentials/ProcessIQApi.credentials.js"
+    ],
+    "nodes": [
+      "dist/nodes/PlaywrightNode/PlaywrightNode.node.js",
+      "dist/nodes/ExcelNode/ExcelNode.node.js",
+      "dist/nodes/RobotFrameworkNode/RobotFrameworkNode.node.js"
+    ]
+  },
+  "keywords": [
+    "n8n",
+    "n8n-nodes",
+    "rpa",
+    "automation",
+    "playwright",
+    "excel",
+    "robot-framework",
+    "web-automation",
+    "desktop-automation"
+  ],
+  "dependencies": {
+    "n8n-workflow": "~1.0.0",
+    "playwright": "^1.40.0",
+    "xlsx": "^0.18.5",
+    "robotframework": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.0",
+    "@types/node": "^20.0.0",
+    "copyfiles": "^2.4.1",
+    "jest": "^29.5.0",
+    "prettier": "^3.0.0",
+    "ts-jest": "^29.1.0",
+    "tslint": "^6.1.3",
+    "typescript": "^5.0.0"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node"
+  }
+}

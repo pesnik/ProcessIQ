@@ -9,6 +9,7 @@ import { useElectronMenuHandler } from '@/hooks/useElectronMenuHandler';
 // Pages
 import Dashboard from '@/pages/Dashboard';
 import WorkflowDesigner from '@/pages/WorkflowDesigner';
+import { N8nWorkflowDesigner } from '@/pages/N8nWorkflowDesigner';
 import Connectors from '@/pages/Connectors';
 import Logs from '@/pages/Logs';
 import Settings from '@/pages/Settings';
@@ -60,6 +61,7 @@ function App() {
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/designer" element={<WorkflowDesigner />} />
+            <Route path="/n8n-designer" element={<N8nWorkflowDesigner />} />
             <Route path="/connectors" element={<Connectors />} />
             <Route path="/plugins" element={<PluginManager />} />
             <Route path="/rpa-demo" element={<RPADemo />} />
