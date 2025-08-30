@@ -10,6 +10,18 @@ from .core.engine import ProcessIQEngine
 from .core.events import event_bus
 from .api import router as api_router
 
+# Import WebSocket broadcasts
+from .api.websockets import (
+    broadcast_workflow_started,
+    broadcast_workflow_completed, 
+    broadcast_workflow_failed,
+    broadcast_node_started,
+    broadcast_node_completed,
+    broadcast_node_failed,
+    broadcast_execution_progress
+)
+from .core.workflow_engine import set_websocket_broadcasts
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -24,9 +36,35 @@ async def lifespan(app: FastAPI):
     # Start the event bus
     await event_bus.start()
     
+    # Set up WebSocket broadcasts
+    set_websocket_broadcasts(
+        workflow_started=broadcast_workflow_started,
+        workflow_completed=broadcast_workflow_completed,
+        workflow_failed=broadcast_workflow_failed,
+        node_started=broadcast_node_started,
+        node_completed=broadcast_node_completed,
+        node_failed=broadcast_node_failed,
+        execution_progress=broadcast_execution_progress
+    )
+    
+    # Start the scheduler daemon
+    try:
+        from .core.scheduler_daemon import start_scheduler_daemon
+        await start_scheduler_daemon()
+        print("🕐 Scheduler daemon started successfully")
+    except Exception as e:
+        print(f"⚠️  Failed to start scheduler daemon: {e}")
+    
     yield
     
     # Cleanup
+    try:
+        from .core.scheduler_daemon import stop_scheduler_daemon
+        await stop_scheduler_daemon()
+        print("🕐 Scheduler daemon stopped")
+    except Exception as e:
+        print(f"⚠️  Error stopping scheduler daemon: {e}")
+        
     await event_bus.stop()
     await engine.cleanup()
 
@@ -44,7 +82,7 @@ app = FastAPI(
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:5174", "http://127.0.0.1:5173", "http://127.0.0.1:5174"],
+    allow_origins=["http://localhost:5173", "http://localhost:5174", "http://localhost:5175", "http://127.0.0.1:5173", "http://127.0.0.1:5174", "http://127.0.0.1:5175"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

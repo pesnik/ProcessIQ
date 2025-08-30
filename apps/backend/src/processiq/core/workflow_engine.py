@@ -17,6 +17,21 @@ from .events import EventBus
 from .exceptions import ProcessIQError
 from .workflow_debugger import WorkflowDebugger, create_workflow_debugger
 
+# WebSocket broadcasting functions (will be set by main app)
+_websocket_broadcasts = {
+    'workflow_started': None,
+    'workflow_completed': None,
+    'workflow_failed': None,
+    'node_started': None,
+    'node_completed': None,
+    'node_failed': None,
+    'execution_progress': None
+}
+
+def set_websocket_broadcasts(**broadcasts):
+    """Set WebSocket broadcast functions"""
+    _websocket_broadcasts.update(broadcasts)
+
 
 class NodeStatus(Enum):
     """Node execution status"""
@@ -198,9 +213,19 @@ class WorkflowExecutor:
         variables: Optional[Dict[str, Any]] = None,
         triggered_by: Optional[str] = None
     ) -> str:
-        """Execute a complete workflow"""
+        """Execute a complete workflow with comprehensive logging"""
         
         workflow_id = workflow_definition.get('id', 'unknown')
+        workflow_name = workflow_definition.get('name', f'Workflow {workflow_id}')
+        nodes_count = len(workflow_definition.get('nodes', {}))
+        start_time = time.time()
+        
+        print(f"\n🎬 Starting workflow execution: {workflow_name}")
+        print(f"   📋 Workflow ID: {workflow_id}")
+        print(f"   🔢 Total nodes: {nodes_count}")
+        print(f"   🚀 Triggered by: {triggered_by or 'manual'}")
+        if variables:
+            print(f"   📝 Input variables: {list(variables.keys())}")
         
         # Create execution state
         execution_id = await self.state_manager.create_execution(
@@ -209,12 +234,27 @@ class WorkflowExecutor:
             triggered_by=triggered_by
         )
         
+        print(f"   🆔 Execution ID: {execution_id}")
+        
         try:
             await self.event_bus.emit("workflow.execution.started", {
                 "execution_id": execution_id,
                 "workflow_id": workflow_id,
-                "triggered_by": triggered_by
+                "workflow_name": workflow_name,
+                "nodes_count": nodes_count,
+                "triggered_by": triggered_by,
+                "timestamp": datetime.now().isoformat()
             })
+            
+            # WebSocket broadcast
+            if _websocket_broadcasts['workflow_started']:
+                try:
+                    print(f"🔔 Broadcasting workflow_started for {execution_id}")
+                    await _websocket_broadcasts['workflow_started'](execution_id, workflow_id)
+                except Exception as e:
+                    print(f"❌ WebSocket broadcast error: {e}")
+            else:
+                print(f"⚠️ No WebSocket broadcast function for workflow_started")
             
             # Update status to running
             await self.state_manager.update_execution_status(execution_id, WorkflowStatus.RUNNING)
@@ -226,19 +266,53 @@ class WorkflowExecutor:
             # Mark as completed
             await self.state_manager.update_execution_status(execution_id, WorkflowStatus.COMPLETED)
             
+            execution_time = (time.time() - start_time) * 1000
+            print(f"\n🎉 Workflow completed successfully: {workflow_name}")
+            print(f"   ⏱️  Total execution time: {execution_time:.1f}ms")
+            print(f"   ✅ Completed nodes: {len(execution_state.completed_nodes)}")
+            if execution_state.variables:
+                print(f"   📤 Final variables: {list(execution_state.variables.keys())}")
+            
             await self.event_bus.emit("workflow.execution.completed", {
                 "execution_id": execution_id,
-                "workflow_id": workflow_id
+                "workflow_id": workflow_id,
+                "workflow_name": workflow_name,
+                "execution_time_ms": round(execution_time, 2),
+                "completed_nodes": len(execution_state.completed_nodes),
+                "variables": list(execution_state.variables.keys()),
+                "timestamp": datetime.now().isoformat()
             })
             
+            # WebSocket broadcast
+            if _websocket_broadcasts['workflow_completed']:
+                try:
+                    await _websocket_broadcasts['workflow_completed'](execution_id, workflow_id)
+                except Exception as e:
+                    print(f"❌ WebSocket broadcast error: {e}")
+            
         except Exception as e:
+            execution_time = (time.time() - start_time) * 1000
+            print(f"\n💥 Workflow execution failed: {workflow_name}")
+            print(f"   ⏱️  Execution time before failure: {execution_time:.1f}ms")
+            print(f"   ❌ Error: {str(e)}")
+            
             await self.state_manager.update_execution_status(execution_id, WorkflowStatus.FAILED)
             
             await self.event_bus.emit("workflow.execution.failed", {
                 "execution_id": execution_id,
                 "workflow_id": workflow_id,
-                "error": str(e)
+                "workflow_name": workflow_name,
+                "error": str(e),
+                "execution_time_ms": round(execution_time, 2),
+                "timestamp": datetime.now().isoformat()
             })
+            
+            # WebSocket broadcast
+            if _websocket_broadcasts['workflow_failed']:
+                try:
+                    await _websocket_broadcasts['workflow_failed'](execution_id, workflow_id, str(e))
+                except Exception as e:
+                    print(f"❌ WebSocket broadcast error: {e}")
             
             raise ProcessIQError(f"Workflow execution failed: {e}")
         
@@ -286,15 +360,36 @@ class WorkflowExecutor:
             node_queue.extend(connections)
     
     async def _execute_single_node(self, node_id: str, node_config: Dict[str, Any], execution_state):
-        """Execute a single workflow node"""
+        """Execute a single workflow node with detailed logging"""
         
         node_type = node_config.get('type')
+        node_name = node_config.get('name', f'{node_type}_{node_id}')
+        start_time = time.time()
+        
+        print(f"🚀 Starting node execution: {node_name} ({node_type}) [ID: {node_id}]")
         
         await self.event_bus.emit("workflow.node.started", {
             "execution_id": execution_state.execution_id,
             "node_id": node_id,
-            "node_type": node_type
+            "node_type": node_type,
+            "node_name": node_name,
+            "timestamp": datetime.now().isoformat()
         })
+        
+        # WebSocket broadcast
+        if _websocket_broadcasts['node_started']:
+            try:
+                print(f"🔔 Broadcasting node_started for {node_id} ({node_type})")
+                await _websocket_broadcasts['node_started'](
+                    execution_state.execution_id, 
+                    node_id, 
+                    node_type, 
+                    node_name=node_name
+                )
+            except Exception as e:
+                print(f"❌ WebSocket broadcast error: {e}")
+        else:
+            print(f"⚠️ No WebSocket broadcast function for node_started")
         
         # Update node status to running
         await self.state_manager.update_node_status(execution_state.execution_id, node_id, NodeStatus.RUNNING)
@@ -303,8 +398,22 @@ class WorkflowExecutor:
             # Execute node based on type
             handler = self.node_handlers.get(node_type)
             if handler:
+                print(f"⚡ Executing {node_type} handler for {node_name}")
                 result = await handler(node_id, node_config, execution_state)
                 await self.state_manager.set_node_result(execution_state.execution_id, node_id, result)
+                
+                execution_time = (time.time() - start_time) * 1000
+                print(f"✅ Node completed: {node_name} (took {execution_time:.1f}ms)")
+                
+                # Log detailed result for python scripts
+                if node_type == 'python_script' and isinstance(result, dict):
+                    if result.get('output'):
+                        print(f"📄 Python script output:\n{result['output']}")
+                    if result.get('updated_variables'):
+                        print(f"🔄 Updated variables: {result['updated_variables']}")
+                    if result.get('error'):
+                        print(f"❌ Python script error: {result['error']}")
+                        
             else:
                 raise ProcessIQError(f"Unknown node type: {node_type}")
             
@@ -314,18 +423,57 @@ class WorkflowExecutor:
             await self.event_bus.emit("workflow.node.completed", {
                 "execution_id": execution_state.execution_id,
                 "node_id": node_id,
-                "result": result
+                "node_type": node_type,
+                "node_name": node_name,
+                "result": result,
+                "execution_time_ms": round((time.time() - start_time) * 1000, 2),
+                "timestamp": datetime.now().isoformat()
             })
             
+            # WebSocket broadcast
+            if _websocket_broadcasts['node_completed']:
+                try:
+                    await _websocket_broadcasts['node_completed'](
+                        execution_state.execution_id, 
+                        node_id, 
+                        node_type, 
+                        result, 
+                        node_name=node_name,
+                        execution_time_ms=round((time.time() - start_time) * 1000, 2)
+                    )
+                except Exception as e:
+                    print(f"❌ WebSocket broadcast error: {e}")
+            
         except Exception as e:
+            execution_time = (time.time() - start_time) * 1000
+            print(f"❌ Node failed: {node_name} (took {execution_time:.1f}ms) - {str(e)}")
+            
             # Update node status to failed
             await self.state_manager.update_node_status(execution_state.execution_id, node_id, NodeStatus.FAILED)
             
             await self.event_bus.emit("workflow.node.failed", {
                 "execution_id": execution_state.execution_id,
                 "node_id": node_id,
-                "error": str(e)
+                "node_type": node_type,
+                "node_name": node_name,
+                "error": str(e),
+                "execution_time_ms": round(execution_time, 2),
+                "timestamp": datetime.now().isoformat()
             })
+            
+            # WebSocket broadcast
+            if _websocket_broadcasts['node_failed']:
+                try:
+                    await _websocket_broadcasts['node_failed'](
+                        execution_state.execution_id, 
+                        node_id, 
+                        node_type, 
+                        str(e), 
+                        node_name=node_name,
+                        execution_time_ms=round(execution_time, 2)
+                    )
+                except Exception as e:
+                    print(f"❌ WebSocket broadcast error: {e}")
             
             raise ProcessIQError(f"Node {node_id} failed: {e}")
     
@@ -494,20 +642,107 @@ class WorkflowExecutor:
         return {"status": "completed", "method": method, "url": url, "status_code": 200}
     
     async def _handle_python_script(self, node_id: str, node_config: Dict[str, Any], execution_state) -> Any:
-        """Handle Python script execution"""
+        """Handle Python script execution with proper output capture"""
+        import io
+        import sys
+        import contextlib
+        import traceback
+        
         config = node_config.get('config', {})
         script = config.get('script', '')
         
-        # For security, we'll simulate script execution rather than using eval/exec
-        output_variables = config.get('output_variables', [])
+        if not script.strip():
+            return {"status": "completed", "output": "Empty script", "error": None}
         
-        # Mock some output variables
-        for var_name in output_variables:
-            execution_state.variables[var_name] = f"mock_value_for_{var_name}"
+        # Capture stdout and stderr
+        stdout_capture = io.StringIO()
+        stderr_capture = io.StringIO()
         
-        await self.state_manager.update_variables(execution_state.execution_id, execution_state.variables)
+        # Create execution environment with full Python capabilities
+        execution_globals = {
+            '__builtins__': __builtins__,  # Full Python builtins including __import__
+            # Include current workflow variables
+            **execution_state.variables
+        }
         
-        return {"status": "completed", "script_length": len(script), "output_variables": output_variables}
+        result = {
+            "status": "completed",
+            "output": "",
+            "error": None,
+            "execution_time_ms": 0,
+            "updated_variables": {}
+        }
+        
+        start_time = time.time()
+        
+        try:
+            # Redirect stdout/stderr to capture output
+            with contextlib.redirect_stdout(stdout_capture), contextlib.redirect_stderr(stderr_capture):
+                # Execute the script safely
+                exec(script, execution_globals)
+            
+            # Capture execution time
+            execution_time = (time.time() - start_time) * 1000
+            result["execution_time_ms"] = round(execution_time, 2)
+            
+            # Capture output
+            stdout_content = stdout_capture.getvalue()
+            stderr_content = stderr_capture.getvalue()
+            
+            output_lines = []
+            if stdout_content:
+                output_lines.append(f"STDOUT:\n{stdout_content}")
+            if stderr_content:
+                output_lines.append(f"STDERR:\n{stderr_content}")
+            
+            result["output"] = "\n".join(output_lines) if output_lines else "Script executed successfully (no output)"
+            
+            # Check for updated variables (exclude builtins and system variables)
+            original_vars = set(execution_state.variables.keys())
+            for key, value in execution_globals.items():
+                # Skip system variables, builtins, and imported modules
+                if (not key.startswith('__') and 
+                    key != '__builtins__' and
+                    key in original_vars and execution_state.variables.get(key) != value):
+                    
+                    # Variable was updated by the script
+                    execution_state.variables[key] = value
+                    result["updated_variables"][key] = value
+                elif (not key.startswith('__') and 
+                      key != '__builtins__' and
+                      key not in original_vars and
+                      not hasattr(__builtins__, key) if isinstance(__builtins__, dict) else not hasattr(__builtins__, key)):
+                    
+                    # New variable was created by the script (not a builtin)
+                    # Check if the value is JSON serializable
+                    try:
+                        import json
+                        json.dumps(value)  # Test serialization
+                        execution_state.variables[key] = value
+                        result["updated_variables"][key] = value
+                    except (TypeError, ValueError):
+                        # Skip non-serializable values (like modules, functions, etc.)
+                        print(f"⚠️  Skipping non-serializable variable: {key} = {type(value)}")
+                        pass
+            
+            # Update workflow variables
+            if result["updated_variables"]:
+                await self.state_manager.update_variables(execution_state.execution_id, execution_state.variables)
+                
+        except Exception as e:
+            execution_time = (time.time() - start_time) * 1000
+            result["execution_time_ms"] = round(execution_time, 2)
+            result["status"] = "failed"
+            result["error"] = str(e)
+            result["output"] = f"Script execution failed:\n{traceback.format_exc()}"
+            
+            # Still capture any stdout/stderr before the error
+            stdout_content = stdout_capture.getvalue()
+            stderr_content = stderr_capture.getvalue()
+            if stdout_content or stderr_content:
+                result["output"] += f"\n\nPartial output before error:\nSTDOUT:\n{stdout_content}\nSTDERR:\n{stderr_content}"
+        
+        return result
     
     async def _handle_condition(self, node_id: str, node_config: Dict[str, Any], execution_state) -> Any:
         """Handle conditional logic"""

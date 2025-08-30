@@ -42,7 +42,8 @@ export default function Settings() {
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
+    <div className="h-full overflow-y-auto">
+      <div className="p-6 max-w-4xl mx-auto">
       <div className="mb-6">
         <div className="flex items-center mb-2">
           <SettingsIcon className="w-6 h-6 text-primary mr-2" />
@@ -204,6 +205,7 @@ export default function Settings() {
             )}
           </button>
         </div>
+      </div>
       </div>
     </div>
   );

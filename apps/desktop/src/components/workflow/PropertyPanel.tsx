@@ -44,6 +44,7 @@ export function PropertyPanel({ selectedNode, onClose, onUpdateNode }: PropertyP
                 placeholder="https://example.com"
                 value={config.url || ''}
                 onChange={(e) => handleConfigChange('url', e.target.value)}
+                onKeyDown={(e) => e.stopPropagation()}
               />
             </div>
             <div>
@@ -52,6 +53,7 @@ export function PropertyPanel({ selectedNode, onClose, onUpdateNode }: PropertyP
               </label>
               <select
                 className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
+                onKeyDown={(e) => e.stopPropagation()}
                 value={config.wait_for || 'networkidle'}
                 onChange={(e) => handleConfigChange('wait_for', e.target.value)}
               >
@@ -73,6 +75,7 @@ export function PropertyPanel({ selectedNode, onClose, onUpdateNode }: PropertyP
               <input
                 type="text"
                 className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
+                onKeyDown={(e) => e.stopPropagation()}
                 placeholder=".data-element"
                 value={config.selector || ''}
                 onChange={(e) => handleConfigChange('selector', e.target.value)}
@@ -84,6 +87,7 @@ export function PropertyPanel({ selectedNode, onClose, onUpdateNode }: PropertyP
               </label>
               <select
                 className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
+                onKeyDown={(e) => e.stopPropagation()}
                 value={config.extract_type || 'text'}
                 onChange={(e) => handleConfigChange('extract_type', e.target.value)}
               >
@@ -100,6 +104,7 @@ export function PropertyPanel({ selectedNode, onClose, onUpdateNode }: PropertyP
               <input
                 type="text"
                 className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
+                onKeyDown={(e) => e.stopPropagation()}
                 placeholder="extracted_data"
                 value={config.variable_name || ''}
                 onChange={(e) => handleConfigChange('variable_name', e.target.value)}
@@ -130,6 +135,7 @@ export function PropertyPanel({ selectedNode, onClose, onUpdateNode }: PropertyP
               <input
                 type="text"
                 className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
+                onKeyDown={(e) => e.stopPropagation()}
                 placeholder="Email subject"
                 value={config.subject || ''}
                 onChange={(e) => handleConfigChange('subject', e.target.value)}
@@ -141,6 +147,7 @@ export function PropertyPanel({ selectedNode, onClose, onUpdateNode }: PropertyP
               </label>
               <textarea
                 className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
+                onKeyDown={(e) => e.stopPropagation()}
                 rows={4}
                 placeholder="Email body content"
                 value={config.body || ''}
@@ -161,6 +168,7 @@ export function PropertyPanel({ selectedNode, onClose, onUpdateNode }: PropertyP
               <input
                 type="text"
                 className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
+                onKeyDown={(e) => e.stopPropagation()}
                 placeholder="/path/to/file.xlsx"
                 value={config.file_path || ''}
                 onChange={(e) => handleConfigChange('file_path', e.target.value)}
@@ -173,6 +181,7 @@ export function PropertyPanel({ selectedNode, onClose, onUpdateNode }: PropertyP
               <input
                 type="text"
                 className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
+                onKeyDown={(e) => e.stopPropagation()}
                 placeholder="Sheet1"
                 value={config.sheet_name || ''}
                 onChange={(e) => handleConfigChange('sheet_name', e.target.value)}
@@ -219,6 +228,7 @@ export function PropertyPanel({ selectedNode, onClose, onUpdateNode }: PropertyP
               <input
                 type="text"
                 className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
+                onKeyDown={(e) => e.stopPropagation()}
                 placeholder="db_connection"
                 value={config.connection || ''}
                 onChange={(e) => handleConfigChange('connection', e.target.value)}
@@ -243,6 +253,7 @@ export function PropertyPanel({ selectedNode, onClose, onUpdateNode }: PropertyP
               <input
                 type="text"
                 className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
+                onKeyDown={(e) => e.stopPropagation()}
                 placeholder="query_result"
                 value={config.result_variable || ''}
                 onChange={(e) => handleConfigChange('result_variable', e.target.value)}
@@ -276,9 +287,14 @@ import pandas as pd
               <input
                 type="text"
                 className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
+                onKeyDown={(e) => e.stopPropagation()}
                 placeholder="var1, var2, var3"
                 value={config.input_variables?.join(', ') || ''}
-                onChange={(e) => handleConfigChange('input_variables', e.target.value.split(',').map(v => v.trim()).filter(v => v))}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const variables = value ? value.split(',').map(v => v.trim()).filter(v => v) : [];
+                  handleConfigChange('input_variables', variables);
+                }}
               />
             </div>
             <div>
@@ -288,9 +304,14 @@ import pandas as pd
               <input
                 type="text"
                 className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
+                onKeyDown={(e) => e.stopPropagation()}
                 placeholder="result1, result2"
                 value={config.output_variables?.join(', ') || ''}
-                onChange={(e) => handleConfigChange('output_variables', e.target.value.split(',').map(v => v.trim()).filter(v => v))}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const variables = value ? value.split(',').map(v => v.trim()).filter(v => v) : [];
+                  handleConfigChange('output_variables', variables);
+                }}
               />
             </div>
           </div>
@@ -306,6 +327,7 @@ import pandas as pd
               <input
                 type="text"
                 className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
+                onKeyDown={(e) => e.stopPropagation()}
                 placeholder="${variable} == 'value'"
                 value={config.condition || ''}
                 onChange={(e) => handleConfigChange('condition', e.target.value)}
@@ -323,6 +345,7 @@ import pandas as pd
               </label>
               <select
                 className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
+                onKeyDown={(e) => e.stopPropagation()}
                 value={config.method || 'GET'}
                 onChange={(e) => handleConfigChange('method', e.target.value)}
               >
@@ -352,6 +375,7 @@ import pandas as pd
               <input
                 type="text"
                 className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
+                onKeyDown={(e) => e.stopPropagation()}
                 placeholder="http_response"
                 value={config.response_variable || ''}
                 onChange={(e) => handleConfigChange('response_variable', e.target.value)}
@@ -401,6 +425,7 @@ import pandas as pd
                   className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
                   value={selectedNode.data.label}
                   onChange={(e) => handleLabelChange(e.target.value)}
+                  onKeyDown={(e) => e.stopPropagation()}
                 />
               </div>
               <div>

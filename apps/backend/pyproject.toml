@@ -31,46 +31,41 @@ dependencies = [
     "fastapi>=0.104.0",
     "uvicorn[standard]>=0.24.0",
     "pydantic>=2.5.0",
+    "pydantic_settings>=2.10.1",
     "sqlalchemy>=2.0.0",
     "alembic>=1.12.0",
-    
     # Task queue and caching - Traditional RPA core
     "celery>=5.3.0",
     "redis>=5.0.0",
-    
     # Web automation - Traditional RPA core
     "playwright>=1.40.0",
     "selenium>=4.15.0",
     "requests>=2.31.0",
     "httpx>=0.25.0",
-    
     # Data processing - Traditional RPA core
     "pandas>=2.1.0",
     "openpyxl>=3.1.0",
     "xlsxwriter>=3.1.0",
-    
     # Desktop automation - Traditional RPA core
     "pyautogui>=0.9.54",
     "pygetwindow>=0.0.9",
     "psutil>=5.9.0",
-    
     # Basic document processing - Traditional RPA core
     "pdfplumber>=0.10.0",
-    "pillow>=10.1.0",  # Basic image handling only
-    
+    "pillow>=10.1.0", # Basic image handling only
     # Database drivers - Traditional RPA core
     "psycopg2-binary>=2.9.7",
     "pymongo>=4.6.0",
-    
     # Configuration and utilities - Core infrastructure
     "pyyaml>=6.0.1",
     "python-dotenv>=1.0.0",
     "typer>=0.9.0",
     "rich>=13.7.0",
-    
     # Logging and monitoring - Core infrastructure
     "structlog>=23.2.0",
     "prometheus-client>=0.19.0",
+    "croniter",
+    "pytz",
 ]
 
 [project.optional-dependencies]
@@ -96,7 +91,7 @@ vision = [
     "opencv-python>=4.8.0",  # 36MB - Computer vision
     "pytesseract>=0.3.10",   # OCR capabilities
     "pdf2image>=1.16.3",     # PDF to image conversion
-    "browser-use>=0.7.0",    # Vision-guided browser automation
+    # "browser-use>=0.7.0",    # Vision-guided browser automation
 ]
 
 # ENTERPRISE TIER - Advanced analytics and reporting
@@ -104,7 +99,7 @@ analytics = [
     "polars>=0.19.0",        # High-performance data processing
     "plotly>=5.17.0",        # Advanced visualization
     "streamlit>=1.28.0",     # Interactive dashboards
-    "apache-superset>=3.0.0", # Business intelligence
+    # "apache-superset>=3.0.0", # Business intelligence
 ]
 
 # =============================================================================
@@ -127,7 +122,7 @@ dev = [
 # Production deployment
 production = [
     "gunicorn>=21.2.0",
-    "nginx>=1.25.0",
+    # "nginx>=1.25.0",
     "docker>=6.1.0",
 ]
 
