@@ -9,6 +9,8 @@ import { useElectronMenuHandler } from '@/hooks/useElectronMenuHandler';
 // Pages
 import Dashboard from '@/pages/Dashboard';
 import WorkflowDesigner from '@/pages/WorkflowDesigner';
+import WorkflowHistory from '@/pages/WorkflowHistory';
+import Scheduler from '@/pages/Scheduler';
 import Connectors from '@/pages/Connectors';
 import Logs from '@/pages/Logs';
 import Settings from '@/pages/Settings';
@@ -61,6 +63,8 @@ function App() {
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/designer" element={<WorkflowDesigner />} />
+            <Route path="/workflows" element={<WorkflowHistory />} />
+            <Route path="/scheduler" element={<Scheduler />} />
             <Route path="/connectors" element={<Connectors />} />
             <Route path="/plugins" element={<PluginManager />} />
             <Route path="/security" element={<Security />} />
