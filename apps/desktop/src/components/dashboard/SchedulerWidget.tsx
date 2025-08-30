@@ -65,8 +65,7 @@ export default function SchedulerWidget() {
   const enabledSchedules = schedules.filter(s => s.enabled);
   const upcomingSchedules = enabledSchedules
     .filter(s => s.next_run)
-    .sort((a, b) => new Date(a.next_run!).getTime() - new Date(b.next_run!).getTime())
-    .slice(0, 4);
+    .sort((a, b) => new Date(a.next_run!).getTime() - new Date(b.next_run!).getTime());
 
   const stats = {
     total: schedules.length,
@@ -161,7 +160,7 @@ export default function SchedulerWidget() {
           {upcomingSchedules.length > 0 && (
             <div>
               <h4 className="text-sm font-medium text-foreground mb-3">Upcoming Runs</h4>
-              <div className="space-y-2">
+              <div className="space-y-2 max-h-32 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
                 {upcomingSchedules.map(schedule => (
                   <div 
                     key={schedule.id}

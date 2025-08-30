@@ -691,6 +691,9 @@ function WorkflowDesignerContent() {
   });
   const [selectedDebugNode, setSelectedDebugNode] = useState<string | null>(null);
   
+  // Track current workflow ID for updates vs new saves
+  const [currentWorkflowId, setCurrentWorkflowId] = useState<string | null>(null);
+  
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null);
 
@@ -701,6 +704,7 @@ function WorkflowDesignerContent() {
     
     if (workflowId) {
       loadWorkflowById(workflowId);
+      setCurrentWorkflowId(workflowId);
     }
     
     if (tabParam && ['design', 'execute', 'debug'].includes(tabParam)) {
@@ -1611,8 +1615,16 @@ function WorkflowDesignerContent() {
       }
 
       const workflow = getWorkflowDefinition();
-      const response = await fetch('http://localhost:8000/api/v1/workflows/', {
-        method: 'POST',
+      const isUpdate = currentWorkflowId !== null;
+      
+      const url = isUpdate 
+        ? `http://localhost:8000/api/v1/workflows/${currentWorkflowId}`
+        : 'http://localhost:8000/api/v1/workflows/';
+        
+      const method = isUpdate ? 'PUT' : 'POST';
+      
+      const response = await fetch(url, {
+        method: method,
         headers: {
           'Content-Type': 'application/json',
         },
@@ -1633,13 +1645,20 @@ function WorkflowDesignerContent() {
       }
 
       const savedWorkflow = await response.json();
-      alert(`✅ Workflow "${workflowName}" saved successfully!`);
+      
+      // If this was a new workflow, set the current workflow ID for future saves
+      if (!isUpdate && savedWorkflow.id) {
+        setCurrentWorkflowId(savedWorkflow.id);
+      }
+      
+      const action = isUpdate ? 'updated' : 'created';
+      alert(`✅ Workflow "${workflowName}" ${action} successfully!`);
       console.log('Workflow saved:', savedWorkflow);
     } catch (error) {
       console.error('Failed to save workflow:', error);
       alert(`❌ Failed to save workflow: ${(error as Error).message}`);
     }
-  }, [getWorkflowDefinition, workflowName]);
+  }, [getWorkflowDefinition, workflowName, currentWorkflowId, edges]);
 
   // Load workflow
   const loadWorkflow = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
@@ -1767,13 +1786,35 @@ function WorkflowDesignerContent() {
           </div>
           
           <div className="flex items-center space-x-2">
-            <button
-              onClick={saveWorkflow}
-              className="flex items-center px-3 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90"
-            >
-              <Save className="w-4 h-4 mr-2" />
-              Save
-            </button>
+            {currentWorkflowId ? (
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={saveWorkflow}
+                  className="flex items-center px-3 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90"
+                >
+                  <Save className="w-4 h-4 mr-2" />
+                  Update
+                </button>
+                <button
+                  onClick={() => {
+                    setCurrentWorkflowId(null);
+                    saveWorkflow();
+                  }}
+                  className="flex items-center px-3 py-2 bg-secondary text-secondary-foreground rounded hover:bg-secondary/80 text-xs"
+                  title="Save as new workflow"
+                >
+                  Save As New
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={saveWorkflow}
+                className="flex items-center px-3 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90"
+              >
+                <Save className="w-4 h-4 mr-2" />
+                Save
+              </button>
+            )}
             
             <button
               onClick={exportWorkflow}
