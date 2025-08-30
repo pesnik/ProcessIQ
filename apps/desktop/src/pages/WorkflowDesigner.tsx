@@ -1,4 +1,5 @@
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
+import { useSearchParams, useLocation } from 'react-router-dom';
 import ReactFlow, {
   Node,
   Edge,
@@ -518,6 +519,9 @@ const nodeTypes = {
 };
 
 function WorkflowDesignerContent() {
+  const [searchParams] = useSearchParams();
+  const location = useLocation();
+  
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [selectedNode, setSelectedNode] = useState<Node<CustomNodeData> | null>(null);
@@ -529,8 +533,77 @@ function WorkflowDesignerContent() {
   const [nodeStatuses, setNodeStatuses] = useState<Record<string, { status: string; message?: string; timestamp?: string }>>({});
   const [currentExecutionId, setCurrentExecutionId] = useState<string | null>(null);
   
+  // New state for execution history
+  const [executionHistory, setExecutionHistory] = useState<Array<{
+    id: string;
+    status: string;
+    started_at: string;
+    completed_at?: string;
+    nodes: number;
+    completed_nodes: number;
+    failed_nodes: number;
+    logs: any[];
+    nodeStatuses: Record<string, any>;
+  }>>([]);
+  const [selectedExecutionId, setSelectedExecutionId] = useState<string | null>(null);
+  
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null);
+
+  // Load workflow from URL parameters
+  useEffect(() => {
+    const workflowId = searchParams.get('id');
+    const tabParam = searchParams.get('tab');
+    
+    if (workflowId) {
+      loadWorkflowById(workflowId);
+    }
+    
+    if (tabParam && ['design', 'execute', 'debug'].includes(tabParam)) {
+      setActiveTab(tabParam as 'design' | 'execute' | 'debug');
+    }
+  }, [searchParams]);
+
+  const loadWorkflowById = async (workflowId: string) => {
+    try {
+      const response = await fetch(`http://localhost:8000/api/v1/workflows/${workflowId}`);
+      if (!response.ok) {
+        throw new Error('Failed to load workflow');
+      }
+      
+      const workflow = await response.json();
+      
+      // Load workflow data
+      setWorkflowName(workflow.name || 'Untitled Workflow');
+      
+      if (workflow.nodes) {
+        // Convert stored nodes back to ReactFlow format
+        const loadedNodes = Object.values(workflow.nodes).map((nodeData: any) => ({
+          id: nodeData.id,
+          type: 'custom',
+          position: nodeData.position || { x: 100, y: 100 },
+          data: {
+            label: nodeData.data?.label || nodeData.label || 'Untitled Node',
+            nodeType: nodeData.data?.nodeType || nodeData.nodeType || nodeData.type || 'unknown',
+            config: nodeData.data?.config || nodeData.config || {},
+            status: 'idle' // Reset status when loading
+          }
+        }));
+        
+        // If there are edges in the stored workflow, load them too
+        const loadedEdges = workflow.edges || [];
+        
+        setNodes(loadedNodes);
+        setEdges(loadedEdges);
+        
+        console.log('Workflow loaded successfully:', workflow.name);
+        console.log('Loaded nodes:', loadedNodes);
+      }
+    } catch (error) {
+      console.error('Failed to load workflow:', error);
+      alert('Failed to load workflow. Please try again.');
+    }
+  };
   
   // Setup workflow execution service event listeners
   React.useEffect(() => {
@@ -633,21 +706,49 @@ function WorkflowDesignerContent() {
     const handleWorkflowCompleted = (event: WorkflowExecutionEvent) => {
       setIsExecuting(false);
       
-      // Update execution state to completed
-      setExecution(prev => prev ? {
-        ...prev,
+      const completedAt = event.timestamp || new Date().toISOString();
+      const completedNodes = nodes.filter(n => n.data.status === 'completed' || n.data.status !== 'failed').length;
+      const failedNodes = nodes.filter(n => n.data.status === 'failed').length;
+      
+      // Update execution state to completed with proper node counts
+      const updatedExecution = execution ? {
+        ...execution,
         status: 'completed',
-        completed_at: event.timestamp || new Date().toISOString()
-      } : null);
+        completed_at: completedAt,
+        completed_nodes: completedNodes,
+        failed_nodes: failedNodes
+      } : null;
+      
+      setExecution(updatedExecution);
       
       // Add completion log
-      setExecutionLogs(prev => [...prev, {
+      const completionLog = {
         id: `${Date.now()}-${Math.random()}`,
         type: 'workflow_completed',
-        timestamp: event.timestamp || new Date().toISOString(),
+        timestamp: completedAt,
         message: `🎉 Workflow completed successfully!`,
         level: 'success'
-      }]);
+      };
+      
+      setExecutionLogs(prev => [...prev, completionLog]);
+      
+      // Save to execution history
+      if (currentExecutionId && updatedExecution) {
+        const historyEntry = {
+          id: currentExecutionId,
+          status: 'completed',
+          started_at: updatedExecution.started_at,
+          completed_at: completedAt,
+          nodes: nodes.length,
+          completed_nodes: completedNodes,
+          failed_nodes: failedNodes,
+          logs: [...executionLogs, completionLog],
+          nodeStatuses: { ...nodeStatuses }
+        };
+        
+        setExecutionHistory(prev => [historyEntry, ...prev.filter(h => h.id !== currentExecutionId)]);
+        setSelectedExecutionId(currentExecutionId);
+      }
       
       console.log('Workflow completed:', event);
     };
@@ -655,21 +756,49 @@ function WorkflowDesignerContent() {
     const handleWorkflowFailed = (event: WorkflowExecutionEvent) => {
       setIsExecuting(false);
       
-      // Update execution state to failed
-      setExecution(prev => prev ? {
-        ...prev,
+      const failedAt = event.timestamp || new Date().toISOString();
+      const completedNodes = nodes.filter(n => n.data.status === 'completed').length;
+      const failedNodes = nodes.filter(n => n.data.status === 'failed').length;
+      
+      // Update execution state to failed with proper node counts
+      const updatedExecution = execution ? {
+        ...execution,
         status: 'failed',
-        completed_at: event.timestamp || new Date().toISOString()
-      } : null);
+        completed_at: failedAt,
+        completed_nodes: completedNodes,
+        failed_nodes: failedNodes
+      } : null;
+      
+      setExecution(updatedExecution);
       
       // Add failure log
-      setExecutionLogs(prev => [...prev, {
+      const failureLog = {
         id: `${Date.now()}-${Math.random()}`,
         type: 'workflow_failed',
-        timestamp: event.timestamp || new Date().toISOString(),
+        timestamp: failedAt,
         message: `💥 Workflow failed: ${event.error || 'Unknown error'}`,
         level: 'error'
-      }]);
+      };
+      
+      setExecutionLogs(prev => [...prev, failureLog]);
+      
+      // Save to execution history
+      if (currentExecutionId && updatedExecution) {
+        const historyEntry = {
+          id: currentExecutionId,
+          status: 'failed',
+          started_at: updatedExecution.started_at,
+          completed_at: failedAt,
+          nodes: nodes.length,
+          completed_nodes: completedNodes,
+          failed_nodes: failedNodes,
+          logs: [...executionLogs, failureLog],
+          nodeStatuses: { ...nodeStatuses }
+        };
+        
+        setExecutionHistory(prev => [historyEntry, ...prev.filter(h => h.id !== currentExecutionId)]);
+        setSelectedExecutionId(currentExecutionId);
+      }
       
       console.error('Workflow failed:', event);
     };
@@ -880,6 +1009,7 @@ function WorkflowDesignerContent() {
     },
     [setEdges, isValidConnection]
   );
+
 
   // Node selection
   const onNodeClick = useCallback((_event: React.MouseEvent, node: Node<CustomNodeData>) => {

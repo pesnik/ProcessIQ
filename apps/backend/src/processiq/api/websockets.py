@@ -207,6 +207,10 @@ async def broadcast_execution_progress(execution_id: str, state: dict, **kwargs)
         **kwargs
     })
 
+async def broadcast_message(message: dict, channel: str = "workflows"):
+    """Generic function to broadcast any message"""
+    await manager.broadcast_json(message, channel)
+
 # Export the manager for use in other modules
 __all__ = [
     "router",
@@ -217,5 +221,6 @@ __all__ = [
     "broadcast_node_started",
     "broadcast_node_completed",
     "broadcast_node_failed", 
-    "broadcast_execution_progress"
+    "broadcast_execution_progress",
+    "broadcast_message"
 ]

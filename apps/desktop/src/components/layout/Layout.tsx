@@ -64,12 +64,30 @@ export function Layout({ children, backendStatus }: LayoutProps) {
     // Custom event for programmatic navigation
     window.addEventListener('navigate', updatePath);
 
+    // Use MutationObserver to detect when URL changes without page reload
+    const observer = new MutationObserver(() => {
+      const newPath = window.location.pathname;
+      if (newPath !== currentPath) {
+        setCurrentPath(newPath);
+      }
+    });
+    
+    // Also use an interval as fallback for React Router navigation
+    const interval = setInterval(() => {
+      const newPath = window.location.pathname;
+      if (newPath !== currentPath) {
+        setCurrentPath(newPath);
+      }
+    }, 100);
+
     return () => {
       window.removeEventListener('popstate', updatePath);
       window.removeEventListener('hashchange', updatePath);
       window.removeEventListener('navigate', updatePath);
+      observer.disconnect();
+      clearInterval(interval);
     };
-  }, []);
+  }, [currentPath]);
 
   const navItems = [
     { href: '/dashboard', label: 'Dashboard', icon: BarChart3 },

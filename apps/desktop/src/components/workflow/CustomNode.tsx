@@ -15,9 +15,9 @@ import {
 } from 'lucide-react';
 
 export interface CustomNodeData {
-  label: string;
-  nodeType: string;
-  config: Record<string, any>;
+  label?: string;
+  nodeType?: string;
+  config?: Record<string, any>;
   status?: 'idle' | 'running' | 'completed' | 'failed';
   error?: string;
 }
@@ -104,28 +104,28 @@ export function CustomNode({ data, selected, id }: NodeProps<CustomNodeData>) {
       </div>
 
       <div className="text-sm font-medium text-foreground mb-1">
-        {data.label}
+        {data.label || 'Untitled Node'}
       </div>
       
       <div className="text-xs text-muted-foreground">
-        {data.nodeType.replace(/_/g, ' ')}
+        {data.nodeType ? data.nodeType.replace(/_/g, ' ') : 'Unknown Type'}
       </div>
 
       {/* Configuration preview */}
-      {Object.keys(data.config).length > 0 && (
+      {data.config && Object.keys(data.config).length > 0 && (
         <div className="mt-2 pt-2 border-t border-border">
           <div className="text-xs text-muted-foreground">
-            {data.nodeType === 'browser_navigate' && data.config.url && (
+            {data.nodeType === 'browser_navigate' && data.config?.url && (
               <div className="truncate" title={data.config.url}>
                 URL: {data.config.url}
               </div>
             )}
-            {data.nodeType === 'email_send' && data.config.to && (
+            {data.nodeType === 'email_send' && data.config?.to && (
               <div className="truncate" title={data.config.to}>
                 To: {data.config.to}
               </div>
             )}
-            {data.nodeType === 'excel_read' && data.config.file_path && (
+            {data.nodeType === 'excel_read' && data.config?.file_path && (
               <div className="truncate" title={data.config.file_path}>
                 File: {data.config.file_path}
               </div>

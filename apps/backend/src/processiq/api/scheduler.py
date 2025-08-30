@@ -458,3 +458,98 @@ async def validate_cron(expression: str):
             "valid": False,
             "error": str(e)
         }
+
+# Scheduler Daemon Control Endpoints
+
+@router.get("/daemon/status")
+async def get_daemon_status():
+    """Get scheduler daemon status"""
+    try:
+        from ..core.scheduler_daemon import get_scheduler_daemon
+        daemon = await get_scheduler_daemon()
+        return {
+            "status": daemon.get_status(),
+            "active_executions": daemon.get_active_executions()
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/daemon/start")
+async def start_daemon():
+    """Start the scheduler daemon"""
+    try:
+        from ..core.scheduler_daemon import start_scheduler_daemon
+        await start_scheduler_daemon()
+        return {"message": "Scheduler daemon started"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/daemon/stop")
+async def stop_daemon():
+    """Stop the scheduler daemon"""
+    try:
+        from ..core.scheduler_daemon import stop_scheduler_daemon
+        await stop_scheduler_daemon()
+        return {"message": "Scheduler daemon stopped"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/executions/history/{schedule_id}")
+async def get_schedule_execution_history(schedule_id: str, days: int = 7):
+    """Get execution history for a specific schedule"""
+    try:
+        import json
+        import os
+        from datetime import datetime, timedelta
+        
+        history_dir = os.path.join(os.getcwd(), "data", "schedule_executions")
+        executions = []
+        
+        # Look back specified number of days
+        for i in range(days):
+            date = datetime.now() - timedelta(days=i)
+            history_file = os.path.join(
+                history_dir,
+                f"{schedule_id}_{date.strftime('%Y%m%d')}.json"
+            )
+            
+            if os.path.exists(history_file):
+                with open(history_file, 'r') as f:
+                    daily_executions = json.load(f)
+                    executions.extend(daily_executions)
+        
+        # Sort by started_at descending
+        executions.sort(key=lambda x: x['started_at'], reverse=True)
+        
+        return {"executions": executions[:50]}  # Limit to 50 most recent
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/executions/recent")
+async def get_recent_executions(limit: int = 20):
+    """Get recent schedule executions across all schedules"""
+    try:
+        import json
+        import os
+        from datetime import datetime, timedelta
+        from glob import glob
+        
+        history_dir = os.path.join(os.getcwd(), "data", "schedule_executions")
+        all_executions = []
+        
+        # Get all execution files from last 7 days
+        pattern = os.path.join(history_dir, "*_*.json")
+        for file_path in glob(pattern):
+            try:
+                with open(file_path, 'r') as f:
+                    executions = json.load(f)
+                    all_executions.extend(executions)
+            except Exception as e:
+                continue
+        
+        # Sort by started_at descending and limit
+        all_executions.sort(key=lambda x: x['started_at'], reverse=True)
+        
+        return {"executions": all_executions[:limit]}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

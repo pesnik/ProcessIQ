@@ -47,9 +47,24 @@ async def lifespan(app: FastAPI):
         execution_progress=broadcast_execution_progress
     )
     
+    # Start the scheduler daemon
+    try:
+        from .core.scheduler_daemon import start_scheduler_daemon
+        await start_scheduler_daemon()
+        print("🕐 Scheduler daemon started successfully")
+    except Exception as e:
+        print(f"⚠️  Failed to start scheduler daemon: {e}")
+    
     yield
     
     # Cleanup
+    try:
+        from .core.scheduler_daemon import stop_scheduler_daemon
+        await stop_scheduler_daemon()
+        print("🕐 Scheduler daemon stopped")
+    except Exception as e:
+        print(f"⚠️  Error stopping scheduler daemon: {e}")
+        
     await event_bus.stop()
     await engine.cleanup()
 

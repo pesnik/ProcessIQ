@@ -13,9 +13,11 @@ import {
   CheckCircle,
   XCircle,
   AlertCircle,
-  Globe
+  Globe,
+  BarChart3
 } from 'lucide-react';
 import CronBuilder from '@/components/scheduler/CronBuilder';
+import SchedulerAnalytics from '@/components/scheduler/SchedulerAnalytics';
 
 interface Schedule {
   id: string;
@@ -87,6 +89,7 @@ export default function Scheduler() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'enabled' | 'disabled'>('all');
   const [triggerFilter, setTriggerFilter] = useState<'all' | 'cron' | 'interval' | 'event'>('all');
+  const [activeTab, setActiveTab] = useState<'schedules' | 'analytics'>('schedules');
 
   const [formData, setFormData] = useState<ScheduleFormData>({
     workflow_id: '',
@@ -307,57 +310,93 @@ export default function Scheduler() {
                 Automate workflow execution with cron-based scheduling
               </p>
             </div>
-            <button
-              onClick={() => setShowCreateForm(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
-            >
-              <Plus className="h-4 w-4" />
-              Create Schedule
-            </button>
+            <div className="flex items-center gap-4">
+              {/* Tab Navigation */}
+              <div className="flex gap-1 p-1 bg-muted rounded-lg">
+                <button
+                  onClick={() => setActiveTab('schedules')}
+                  className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                    activeTab === 'schedules' 
+                      ? 'bg-background text-foreground shadow-sm' 
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  <Clock className="h-4 w-4" />
+                  Schedules
+                </button>
+                <button
+                  onClick={() => setActiveTab('analytics')}
+                  className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                    activeTab === 'analytics' 
+                      ? 'bg-background text-foreground shadow-sm' 
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  <BarChart3 className="h-4 w-4" />
+                  Analytics
+                </button>
+              </div>
+              
+              {activeTab === 'schedules' && (
+                <button
+                  onClick={() => setShowCreateForm(true)}
+                  className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+                >
+                  <Plus className="h-4 w-4" />
+                  Create Schedule
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="flex-shrink-0 p-4 border-b border-border bg-card">
-        <div className="flex gap-4 items-center">
-          <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <input
-              type="text"
-              placeholder="Search schedules..."
-              className="w-full pl-10 pr-4 py-2 border border-border rounded-md bg-background"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+      {/* Filters - Only show for schedules tab */}
+      {activeTab === 'schedules' && (
+        <div className="flex-shrink-0 p-4 border-b border-border bg-card">
+          <div className="flex gap-4 items-center">
+            <div className="relative flex-1 max-w-sm">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Search schedules..."
+                className="w-full pl-10 pr-4 py-2 border border-border rounded-md bg-background"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            
+            <select
+              className="px-3 py-2 border border-border rounded-md bg-background"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value as typeof statusFilter)}
+            >
+              <option value="all">All Status</option>
+              <option value="enabled">Enabled</option>
+              <option value="disabled">Disabled</option>
+            </select>
+            
+            <select
+              className="px-3 py-2 border border-border rounded-md bg-background"
+              value={triggerFilter}
+              onChange={(e) => setTriggerFilter(e.target.value as typeof triggerFilter)}
+            >
+              <option value="all">All Triggers</option>
+              <option value="cron">Cron</option>
+              <option value="interval">Interval</option>
+              <option value="event">Event</option>
+            </select>
           </div>
-          
-          <select
-            className="px-3 py-2 border border-border rounded-md bg-background"
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as typeof statusFilter)}
-          >
-            <option value="all">All Status</option>
-            <option value="enabled">Enabled</option>
-            <option value="disabled">Disabled</option>
-          </select>
-          
-          <select
-            className="px-3 py-2 border border-border rounded-md bg-background"
-            value={triggerFilter}
-            onChange={(e) => setTriggerFilter(e.target.value as typeof triggerFilter)}
-          >
-            <option value="all">All Triggers</option>
-            <option value="cron">Cron</option>
-            <option value="interval">Interval</option>
-            <option value="event">Event</option>
-          </select>
         </div>
-      </div>
+      )}
 
       {/* Content */}
       <div className="flex-1 overflow-auto">
-        {loading ? (
+        {activeTab === 'analytics' ? (
+          <div className="p-6">
+            <SchedulerAnalytics />
+          </div>
+        ) : loading ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-muted-foreground">Loading schedules...</div>
           </div>
