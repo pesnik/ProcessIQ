@@ -204,18 +204,25 @@ function WorkflowDesignerContent() {
     setNodes((nds) =>
       nds.map((node) => {
         if (node.id === nodeId) {
-          return {
+          const updatedNode = {
             ...node,
             data: {
               ...node.data,
               ...updates,
             },
           };
+          
+          // Update selected node if it's the one being modified
+          if (selectedNode && selectedNode.id === nodeId) {
+            setSelectedNode(updatedNode);
+          }
+          
+          return updatedNode;
         }
         return node;
       })
     );
-  }, [setNodes]);
+  }, [setNodes, selectedNode]);
 
   // Convert React Flow state to workflow definition
   const getWorkflowDefinition = useCallback((): WorkflowDefinition => {
