@@ -25,6 +25,10 @@ import {
   Upload, 
   Download,
   Monitor,
+  ChevronDown,
+  FileText,
+  Copy,
+  Edit3,
   Bug,
   Settings,
   AlertCircle,
@@ -1786,35 +1790,44 @@ function WorkflowDesignerContent() {
           </div>
           
           <div className="flex items-center space-x-2">
-            {currentWorkflowId ? (
-              <div className="flex items-center space-x-2">
+            <div className="relative group">
+              {currentWorkflowId ? (
+                <button className="flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-all duration-200 shadow-sm">
+                  <Save className="w-4 h-4 mr-2" />
+                  Save
+                  <ChevronDown className="w-4 h-4 ml-2" />
+                </button>
+              ) : (
                 <button
                   onClick={saveWorkflow}
-                  className="flex items-center px-3 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90"
+                  className="flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-all duration-200 shadow-sm"
                 >
                   <Save className="w-4 h-4 mr-2" />
-                  Update
+                  Save
                 </button>
-                <button
-                  onClick={() => {
-                    setCurrentWorkflowId(null);
-                    saveWorkflow();
-                  }}
-                  className="flex items-center px-3 py-2 bg-secondary text-secondary-foreground rounded hover:bg-secondary/80 text-xs"
-                  title="Save as new workflow"
-                >
-                  Save As New
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={saveWorkflow}
-                className="flex items-center px-3 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90"
-              >
-                <Save className="w-4 h-4 mr-2" />
-                Save
-              </button>
-            )}
+              )}
+              {currentWorkflowId && (
+                <div className="absolute right-0 top-full mt-1 w-40 bg-card border border-border rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                  <button
+                    onClick={saveWorkflow}
+                    className="w-full flex items-center px-3 py-2 text-sm text-foreground hover:bg-accent transition-colors"
+                  >
+                    <Edit3 className="w-4 h-4 mr-2" />
+                    Update
+                  </button>
+                  <button
+                    onClick={() => {
+                      setCurrentWorkflowId(null);
+                      saveWorkflow();
+                    }}
+                    className="w-full flex items-center px-3 py-2 text-sm text-foreground hover:bg-accent transition-colors"
+                  >
+                    <Copy className="w-4 h-4 mr-2" />
+                    Save as New
+                  </button>
+                </div>
+              )}
+            </div>
             
             <button
               onClick={exportWorkflow}
