@@ -13,6 +13,7 @@ import Connectors from '@/pages/Connectors';
 import Logs from '@/pages/Logs';
 import Settings from '@/pages/Settings';
 import PluginManager from '@/pages/PluginManager';
+import Security from '@/pages/Security';
 import RPADemo from '@/pages/RPADemo';
 
 function App() {
@@ -62,6 +63,7 @@ function App() {
             <Route path="/designer" element={<WorkflowDesigner />} />
             <Route path="/connectors" element={<Connectors />} />
             <Route path="/plugins" element={<PluginManager />} />
+            <Route path="/security" element={<Security />} />
             <Route path="/rpa-demo" element={<RPADemo />} />
             <Route path="/logs" element={<Logs />} />
             <Route path="/settings" element={<Settings />} />
