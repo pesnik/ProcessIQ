@@ -236,10 +236,19 @@ export class WorkflowExecutionService extends BrowserEventEmitter {
               timestamp: new Date().toISOString()
             });
           }
+        } else {
+          // Execution not found (404), stop monitoring
+          console.warn(`Execution ${executionId} not found, stopping monitoring`);
+          this.stopExecutionMonitoring(executionId);
         }
       } catch (error) {
         console.error('Error polling execution state:', error);
-        // Continue polling unless it's a critical error
+        // Check if it's a 404 error (execution not found)
+        if (error instanceof Error && error.message.includes('Failed to get execution state')) {
+          console.warn(`Stopping monitoring for ${executionId} due to persistent errors`);
+          this.stopExecutionMonitoring(executionId);
+        }
+        // Continue polling for other errors (network issues, etc.)
       }
     }, 1000); // Poll every second
 
@@ -422,32 +431,42 @@ export class WorkflowExecutionService extends BrowserEventEmitter {
     const { event_type, execution_id, node_id, ...payload } = data;
 
     switch (event_type) {
+      case 'workflow_started':
+        console.log('🎬 WebSocket: Workflow started', data);
+        break;
+
       case 'node_started':
+        console.log('🚀 WebSocket: Node started', data);
         this.emit('node:started', {
           type: 'node_started',
           execution_id,
           node_id,
-          timestamp: new Date().toISOString(),
+          node_type: payload.node_type,
+          timestamp: payload.timestamp || new Date().toISOString(),
           data: payload
         } as NodeExecutionEvent);
         break;
 
       case 'node_completed':
+        console.log('✅ WebSocket: Node completed', data);
         this.emit('node:completed', {
           type: 'node_completed',
           execution_id,
           node_id,
-          timestamp: new Date().toISOString(),
-          data: payload
+          node_type: payload.node_type,
+          timestamp: payload.timestamp || new Date().toISOString(),
+          data: payload.data || payload
         } as NodeExecutionEvent);
         break;
 
       case 'node_failed':
+        console.log('❌ WebSocket: Node failed', data);
         this.emit('node:failed', {
           type: 'node_failed',
           execution_id,
           node_id,
-          timestamp: new Date().toISOString(),
+          node_type: payload.node_type,
+          timestamp: payload.timestamp || new Date().toISOString(),
           error: payload.error
         } as NodeExecutionEvent);
         break;

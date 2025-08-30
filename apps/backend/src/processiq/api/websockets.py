@@ -7,6 +7,7 @@ from typing import Dict, Set
 import asyncio
 import json
 import logging
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -136,7 +137,7 @@ async def broadcast_workflow_started(execution_id: str, workflow_id: str, **kwar
         "event_type": "workflow_started",
         "execution_id": execution_id,
         "workflow_id": workflow_id,
-        "timestamp": asyncio.get_event_loop().time(),
+        "timestamp": datetime.now().isoformat(),
         **kwargs
     })
 
@@ -146,7 +147,7 @@ async def broadcast_workflow_completed(execution_id: str, workflow_id: str, **kw
         "event_type": "workflow_completed", 
         "execution_id": execution_id,
         "workflow_id": workflow_id,
-        "timestamp": asyncio.get_event_loop().time(),
+        "timestamp": datetime.now().isoformat(),
         **kwargs
     })
 
@@ -157,7 +158,7 @@ async def broadcast_workflow_failed(execution_id: str, workflow_id: str, error: 
         "execution_id": execution_id,
         "workflow_id": workflow_id,
         "error": error,
-        "timestamp": asyncio.get_event_loop().time(),
+        "timestamp": datetime.now().isoformat(),
         **kwargs
     })
 
@@ -168,7 +169,7 @@ async def broadcast_node_started(execution_id: str, node_id: str, node_type: str
         "execution_id": execution_id,
         "node_id": node_id,
         "node_type": node_type,
-        "timestamp": asyncio.get_event_loop().time(),
+        "timestamp": datetime.now().isoformat(),
         **kwargs
     })
 
@@ -179,8 +180,8 @@ async def broadcast_node_completed(execution_id: str, node_id: str, node_type: s
         "execution_id": execution_id,
         "node_id": node_id, 
         "node_type": node_type,
-        "result": result,
-        "timestamp": asyncio.get_event_loop().time(),
+        "data": result,  # Changed from "result" to "data" to match frontend expectations
+        "timestamp": datetime.now().isoformat(),
         **kwargs
     })
 
@@ -192,7 +193,7 @@ async def broadcast_node_failed(execution_id: str, node_id: str, node_type: str,
         "node_id": node_id,
         "node_type": node_type, 
         "error": error,
-        "timestamp": asyncio.get_event_loop().time(),
+        "timestamp": datetime.now().isoformat(),
         **kwargs
     })
 
@@ -202,7 +203,7 @@ async def broadcast_execution_progress(execution_id: str, state: dict, **kwargs)
         "event_type": "execution_progress",
         "execution_id": execution_id,
         "state": state,
-        "timestamp": asyncio.get_event_loop().time(),
+        "timestamp": datetime.now().isoformat(),
         **kwargs
     })
 

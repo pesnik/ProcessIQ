@@ -249,9 +249,12 @@ class WorkflowExecutor:
             # WebSocket broadcast
             if _websocket_broadcasts['workflow_started']:
                 try:
+                    print(f"🔔 Broadcasting workflow_started for {execution_id}")
                     await _websocket_broadcasts['workflow_started'](execution_id, workflow_id)
                 except Exception as e:
                     print(f"❌ WebSocket broadcast error: {e}")
+            else:
+                print(f"⚠️ No WebSocket broadcast function for workflow_started")
             
             # Update status to running
             await self.state_manager.update_execution_status(execution_id, WorkflowStatus.RUNNING)
@@ -376,9 +379,17 @@ class WorkflowExecutor:
         # WebSocket broadcast
         if _websocket_broadcasts['node_started']:
             try:
-                await _websocket_broadcasts['node_started'](execution_state.execution_id, node_id, node_type)
+                print(f"🔔 Broadcasting node_started for {node_id} ({node_type})")
+                await _websocket_broadcasts['node_started'](
+                    execution_state.execution_id, 
+                    node_id, 
+                    node_type, 
+                    node_name=node_name
+                )
             except Exception as e:
                 print(f"❌ WebSocket broadcast error: {e}")
+        else:
+            print(f"⚠️ No WebSocket broadcast function for node_started")
         
         # Update node status to running
         await self.state_manager.update_node_status(execution_state.execution_id, node_id, NodeStatus.RUNNING)
@@ -422,7 +433,14 @@ class WorkflowExecutor:
             # WebSocket broadcast
             if _websocket_broadcasts['node_completed']:
                 try:
-                    await _websocket_broadcasts['node_completed'](execution_state.execution_id, node_id, node_type, result)
+                    await _websocket_broadcasts['node_completed'](
+                        execution_state.execution_id, 
+                        node_id, 
+                        node_type, 
+                        result, 
+                        node_name=node_name,
+                        execution_time_ms=round((time.time() - start_time) * 1000, 2)
+                    )
                 except Exception as e:
                     print(f"❌ WebSocket broadcast error: {e}")
             
@@ -446,7 +464,14 @@ class WorkflowExecutor:
             # WebSocket broadcast
             if _websocket_broadcasts['node_failed']:
                 try:
-                    await _websocket_broadcasts['node_failed'](execution_state.execution_id, node_id, node_type, str(e))
+                    await _websocket_broadcasts['node_failed'](
+                        execution_state.execution_id, 
+                        node_id, 
+                        node_type, 
+                        str(e), 
+                        node_name=node_name,
+                        execution_time_ms=round(execution_time, 2)
+                    )
                 except Exception as e:
                     print(f"❌ WebSocket broadcast error: {e}")
             
@@ -633,34 +658,9 @@ class WorkflowExecutor:
         stdout_capture = io.StringIO()
         stderr_capture = io.StringIO()
         
-        # Create a safe execution environment with current variables
+        # Create execution environment with full Python capabilities
         execution_globals = {
-            '__builtins__': {
-                'print': print,
-                'len': len,
-                'str': str,
-                'int': int,
-                'float': float,
-                'bool': bool,
-                'list': list,
-                'dict': dict,
-                'tuple': tuple,
-                'set': set,
-                'range': range,
-                'enumerate': enumerate,
-                'zip': zip,
-                'sum': sum,
-                'min': min,
-                'max': max,
-                'abs': abs,
-                'round': round,
-                'sorted': sorted,
-                'reversed': reversed,
-                'any': any,
-                'all': all,
-                'isinstance': isinstance,
-                'type': type,
-            },
+            '__builtins__': __builtins__,  # Full Python builtins including __import__
             # Include current workflow variables
             **execution_state.variables
         }
@@ -700,15 +700,30 @@ class WorkflowExecutor:
             # Check for updated variables (exclude builtins and system variables)
             original_vars = set(execution_state.variables.keys())
             for key, value in execution_globals.items():
+                # Skip system variables, builtins, and imported modules
                 if (not key.startswith('__') and 
-                    key not in ['print', 'len', 'str', 'int', 'float', 'bool', 'list', 'dict', 'tuple', 'set', 
-                               'range', 'enumerate', 'zip', 'sum', 'min', 'max', 'abs', 'round', 'sorted', 
-                               'reversed', 'any', 'all', 'isinstance', 'type']):
+                    key != '__builtins__' and
+                    key in original_vars and execution_state.variables.get(key) != value):
                     
-                    if key not in original_vars or execution_state.variables.get(key) != value:
-                        # Variable was created or updated
+                    # Variable was updated by the script
+                    execution_state.variables[key] = value
+                    result["updated_variables"][key] = value
+                elif (not key.startswith('__') and 
+                      key != '__builtins__' and
+                      key not in original_vars and
+                      not hasattr(__builtins__, key) if isinstance(__builtins__, dict) else not hasattr(__builtins__, key)):
+                    
+                    # New variable was created by the script (not a builtin)
+                    # Check if the value is JSON serializable
+                    try:
+                        import json
+                        json.dumps(value)  # Test serialization
                         execution_state.variables[key] = value
                         result["updated_variables"][key] = value
+                    except (TypeError, ValueError):
+                        # Skip non-serializable values (like modules, functions, etc.)
+                        print(f"⚠️  Skipping non-serializable variable: {key} = {type(value)}")
+                        pass
             
             # Update workflow variables
             if result["updated_variables"]:

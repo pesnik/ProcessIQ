@@ -575,6 +575,19 @@ function WorkflowDesignerContent() {
       );
       
       setCurrentExecutionId(result.execution_id);
+      
+      // Create initial execution state for immediate UI feedback
+      setExecution({
+        execution_id: result.execution_id,
+        workflow_id: result.workflow_id,
+        status: 'running',
+        started_at: new Date().toISOString(),
+        completed_nodes: 0,
+        failed_nodes: 0,
+        current_nodes: [],
+        variables: {}
+      });
+      
       console.log('Workflow execution started:', result);
       
     } catch (error) {
