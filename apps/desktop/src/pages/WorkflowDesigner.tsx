@@ -29,7 +29,6 @@ import {
   Settings,
   Users,
   FileText,
-  Zap,
   AlertCircle,
   CheckCircle,
   Clock
@@ -39,7 +38,6 @@ import CustomNode, { CustomNodeData } from '../components/workflow/CustomNode';
 import NodeSidebar, { NODE_TYPES } from '../components/workflow/NodeSidebar';
 import PropertyPanel from '../components/workflow/PropertyPanel';
 import workflowExecutionService, { WorkflowExecutionService, WorkflowDefinition, WorkflowExecutionState, NodeExecutionEvent, WorkflowExecutionEvent } from '../services/workflowExecutionService';
-import { TEST_WORKFLOWS } from '../utils/testWorkflow';
 
 // WorkflowDefinition now imported from service
 
@@ -80,6 +78,18 @@ function WorkflowDesignerContent() {
           timestamp: event.timestamp
         }
       }));
+      
+      // Add to execution logs
+      setExecutionLogs(prev => [...prev, {
+        id: `${Date.now()}-${Math.random()}`,
+        type: 'node_started',
+        timestamp: event.timestamp || new Date().toISOString(),
+        nodeId: event.node_id,
+        nodeType: event.node_type,
+        message: `🚀 Started: ${event.node_type} (${event.node_id})`,
+        level: 'info'
+      }]);
+      
       console.log('Node started:', event);
     };
     
@@ -93,6 +103,35 @@ function WorkflowDesignerContent() {
           timestamp: event.timestamp
         }
       }));
+      
+      // Add to execution logs with result details
+      const logEntry: any = {
+        id: `${Date.now()}-${Math.random()}`,
+        type: 'node_completed',
+        timestamp: event.timestamp || new Date().toISOString(),
+        nodeId: event.node_id,
+        nodeType: event.node_type,
+        message: `✅ Completed: ${event.node_type} (${event.node_id})`,
+        level: 'success'
+      };
+      
+      // Add python script output to logs
+      if (event.data && typeof event.data === 'object') {
+        if (event.data.output) {
+          logEntry.output = event.data.output;
+          logEntry.message += `\n📄 Output: ${event.data.output}`;
+        }
+        if (event.data.execution_time_ms) {
+          logEntry.executionTime = event.data.execution_time_ms;
+          logEntry.message += `\n⏱️  Execution time: ${event.data.execution_time_ms}ms`;
+        }
+        if (event.data.updated_variables && Object.keys(event.data.updated_variables).length > 0) {
+          logEntry.updatedVariables = event.data.updated_variables;
+          logEntry.message += `\n🔄 Updated variables: ${JSON.stringify(event.data.updated_variables)}`;
+        }
+      }
+      
+      setExecutionLogs(prev => [...prev, logEntry]);
       console.log('Node completed:', event);
     };
     
@@ -106,17 +145,49 @@ function WorkflowDesignerContent() {
           timestamp: event.timestamp
         }
       }));
+      
+      // Add to execution logs
+      setExecutionLogs(prev => [...prev, {
+        id: `${Date.now()}-${Math.random()}`,
+        type: 'node_failed',
+        timestamp: event.timestamp || new Date().toISOString(),
+        nodeId: event.node_id,
+        nodeType: event.node_type,
+        message: `❌ Failed: ${event.node_type} (${event.node_id})\nError: ${event.error || 'Unknown error'}`,
+        level: 'error'
+      }]);
+      
       console.error('Node failed:', event);
     };
     
     // Workflow execution events
     const handleWorkflowCompleted = (event: WorkflowExecutionEvent) => {
       setIsExecuting(false);
+      
+      // Add completion log
+      setExecutionLogs(prev => [...prev, {
+        id: `${Date.now()}-${Math.random()}`,
+        type: 'workflow_completed',
+        timestamp: event.timestamp || new Date().toISOString(),
+        message: `🎉 Workflow completed successfully!`,
+        level: 'success'
+      }]);
+      
       console.log('Workflow completed:', event);
     };
     
     const handleWorkflowFailed = (event: WorkflowExecutionEvent) => {
       setIsExecuting(false);
+      
+      // Add failure log
+      setExecutionLogs(prev => [...prev, {
+        id: `${Date.now()}-${Math.random()}`,
+        type: 'workflow_failed',
+        timestamp: event.timestamp || new Date().toISOString(),
+        message: `💥 Workflow failed: ${event.error || 'Unknown error'}`,
+        level: 'error'
+      }]);
+      
       console.error('Workflow failed:', event);
     };
     
@@ -476,6 +547,18 @@ function WorkflowDesignerContent() {
       const workflow = getWorkflowDefinition();
       setIsExecuting(true);
       
+      // Clear previous execution logs
+      setExecutionLogs([]);
+      
+      // Add workflow start log
+      setExecutionLogs([{
+        id: `${Date.now()}-${Math.random()}`,
+        type: 'workflow_started',
+        timestamp: new Date().toISOString(),
+        message: `🎬 Starting workflow: ${workflow.name || workflow.id}`,
+        level: 'info'
+      }]);
+      
       // Reset node statuses
       setNodes((nds) =>
         nds.map((node) => ({
@@ -509,61 +592,6 @@ function WorkflowDesignerContent() {
     }
   }, [getWorkflowDefinition, setNodes, validateWorkflow]);
 
-  // Load test workflow for quick testing
-  const loadTestWorkflow = useCallback((testType: 'basic' | 'dataProcessing' | 'errorHandling') => {
-    const testWorkflow = TEST_WORKFLOWS[testType]();
-    
-    // Convert test workflow to React Flow format
-    const flowNodes: Node<CustomNodeData>[] = Object.entries(testWorkflow.nodes).map(([id, nodeData]) => ({
-      id,
-      type: 'custom',
-      position: nodeData.position,
-      data: {
-        label: nodeData.name,
-        nodeType: nodeData.type,
-        config: nodeData.config,
-        status: 'idle'
-      }
-    }));
-
-    // Convert connections to React Flow edges
-    const flowEdges: Edge[] = [];
-    Object.entries(testWorkflow.nodes).forEach(([sourceId, nodeData]) => {
-      nodeData.connections.forEach((targetId: string) => {
-        flowEdges.push({
-          id: `edge_${sourceId}_${targetId}`,
-          source: sourceId,
-          target: targetId,
-          markerEnd: {
-            type: MarkerType.ArrowClosed,
-            width: 20,
-            height: 20,
-          },
-          style: { strokeWidth: 2 },
-        });
-      });
-    });
-
-    setWorkflowName(testWorkflow.name);
-    setNodes(flowNodes);
-    setEdges(flowEdges);
-    
-    // Reset execution state
-    setExecution(null);
-    setCurrentExecutionId(null);
-    setNodeStatuses({});
-    
-    // Fit view after loading
-    setTimeout(() => {
-      if (reactFlowInstance) {
-        reactFlowInstance.fitView({ 
-          padding: 100, 
-          maxZoom: 1.0,
-          duration: 500 
-        });
-      }
-    }, 100);
-  }, [setNodes, setEdges, reactFlowInstance]);
 
   // Save workflow
   const saveWorkflow = useCallback(() => {
@@ -690,34 +718,6 @@ function WorkflowDesignerContent() {
           </div>
           
           <div className="flex items-center space-x-2">
-            {/* Test Workflows Dropdown */}
-            <div className="relative group">
-              <button className="flex items-center px-3 py-2 bg-secondary text-secondary-foreground rounded hover:bg-secondary/80">
-                <Zap className="w-4 h-4 mr-2" />
-                Test Workflows
-              </button>
-              <div className="absolute top-full left-0 mt-1 w-48 bg-background border border-border rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
-                <button
-                  onClick={() => loadTestWorkflow('basic')}
-                  className="block w-full px-3 py-2 text-left text-sm hover:bg-secondary rounded-t-md"
-                >
-                  Basic Flow Test
-                </button>
-                <button
-                  onClick={() => loadTestWorkflow('dataProcessing')}
-                  className="block w-full px-3 py-2 text-left text-sm hover:bg-secondary"
-                >
-                  Data Processing Test
-                </button>
-                <button
-                  onClick={() => loadTestWorkflow('errorHandling')}
-                  className="block w-full px-3 py-2 text-left text-sm hover:bg-secondary rounded-b-md"
-                >
-                  Error Handling Test
-                </button>
-              </div>
-            </div>
-            
             <button
               onClick={saveWorkflow}
               className="flex items-center px-3 py-2 bg-secondary text-secondary-foreground rounded hover:bg-secondary/80"
@@ -1034,6 +1034,40 @@ function WorkflowDesignerContent() {
                     <h3 className="text-lg font-semibold mb-2 text-foreground">Variables</h3>
                     <div className="bg-secondary p-4 rounded font-mono text-sm">
                       <pre>{JSON.stringify(execution.variables, null, 2)}</pre>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold mb-2 text-foreground">Execution Logs</h3>
+                    <div className="bg-secondary p-4 rounded max-h-96 overflow-y-auto">
+                      {executionLogs.length === 0 ? (
+                        <p className="text-muted-foreground text-sm">No logs yet...</p>
+                      ) : (
+                        <div className="space-y-2">
+                          {executionLogs.map((log) => (
+                            <div 
+                              key={log.id}
+                              className={`p-3 rounded text-sm border-l-4 ${
+                                log.level === 'error' 
+                                  ? 'bg-red-50 border-red-500 text-red-900' 
+                                  : log.level === 'success'
+                                  ? 'bg-green-50 border-green-500 text-green-900'
+                                  : 'bg-blue-50 border-blue-500 text-blue-900'
+                              }`}
+                            >
+                              <div className="flex justify-between items-start mb-1">
+                                <span className="font-medium">{log.nodeType || 'Workflow'}</span>
+                                <span className="text-xs opacity-70">
+                                  {new Date(log.timestamp).toLocaleTimeString()}
+                                </span>
+                              </div>
+                              <div className="whitespace-pre-wrap font-mono text-xs">
+                                {log.message}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
