@@ -164,6 +164,13 @@ function WorkflowDesignerContent() {
     const handleWorkflowCompleted = (event: WorkflowExecutionEvent) => {
       setIsExecuting(false);
       
+      // Update execution state to completed
+      setExecution(prev => prev ? {
+        ...prev,
+        status: 'completed',
+        completed_at: event.timestamp || new Date().toISOString()
+      } : null);
+      
       // Add completion log
       setExecutionLogs(prev => [...prev, {
         id: `${Date.now()}-${Math.random()}`,
@@ -178,6 +185,13 @@ function WorkflowDesignerContent() {
     
     const handleWorkflowFailed = (event: WorkflowExecutionEvent) => {
       setIsExecuting(false);
+      
+      // Update execution state to failed
+      setExecution(prev => prev ? {
+        ...prev,
+        status: 'failed',
+        completed_at: event.timestamp || new Date().toISOString()
+      } : null);
       
       // Add failure log
       setExecutionLogs(prev => [...prev, {
@@ -606,8 +620,8 @@ function WorkflowDesignerContent() {
   }, [getWorkflowDefinition, setNodes, validateWorkflow]);
 
 
-  // Save workflow
-  const saveWorkflow = useCallback(() => {
+  // Export workflow as JSON file
+  const exportWorkflow = useCallback(() => {
     const workflow = getWorkflowDefinition();
     const blob = new Blob([JSON.stringify(workflow, null, 2)], {
       type: 'application/json'
@@ -620,6 +634,44 @@ function WorkflowDesignerContent() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+  }, [getWorkflowDefinition, workflowName]);
+
+  // Save workflow to backend storage
+  const saveWorkflow = useCallback(async () => {
+    try {
+      if (!workflowName.trim()) {
+        alert('Please enter a workflow name');
+        return;
+      }
+
+      const workflow = getWorkflowDefinition();
+      const response = await fetch('http://localhost:8000/api/v1/workflows/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: workflowName,
+          description: `Workflow created with ProcessIQ Designer`,
+          nodes: workflow.nodes,
+          variables: workflow.variables || {},
+          triggers: workflow.triggers || [],
+          tags: []
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to save workflow: ${errorText}`);
+      }
+
+      const savedWorkflow = await response.json();
+      alert(`✅ Workflow "${workflowName}" saved successfully!`);
+      console.log('Workflow saved:', savedWorkflow);
+    } catch (error) {
+      console.error('Failed to save workflow:', error);
+      alert(`❌ Failed to save workflow: ${(error as Error).message}`);
+    }
   }, [getWorkflowDefinition, workflowName]);
 
   // Load workflow
@@ -725,18 +777,37 @@ function WorkflowDesignerContent() {
       {/* Header */}
       <div className="border-b bg-background p-4">
         <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Workflow Designer</h1>
-            <p className="text-muted-foreground">{workflowName}</p>
+          <div className="flex items-center space-x-4">
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">Workflow Designer</h1>
+            </div>
+            <div className="flex flex-col">
+              <label className="text-xs text-muted-foreground mb-1">Workflow Name</label>
+              <input
+                type="text"
+                value={workflowName}
+                onChange={(e) => setWorkflowName(e.target.value)}
+                placeholder="Enter workflow name..."
+                className="px-3 py-1 border border-border rounded bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent min-w-[250px]"
+              />
+            </div>
           </div>
           
           <div className="flex items-center space-x-2">
             <button
               onClick={saveWorkflow}
-              className="flex items-center px-3 py-2 bg-secondary text-secondary-foreground rounded hover:bg-secondary/80"
+              className="flex items-center px-3 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90"
             >
               <Save className="w-4 h-4 mr-2" />
               Save
+            </button>
+            
+            <button
+              onClick={exportWorkflow}
+              className="flex items-center px-3 py-2 bg-secondary text-secondary-foreground rounded hover:bg-secondary/80"
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Export
             </button>
             
             <label className="flex items-center px-3 py-2 bg-secondary text-secondary-foreground rounded hover:bg-secondary/80 cursor-pointer">
