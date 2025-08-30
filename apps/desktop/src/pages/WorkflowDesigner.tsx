@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useMemo } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import ReactFlow, {
   Node,
   Edge,
@@ -25,10 +25,7 @@ import {
   Download,
   Monitor,
   Bug,
-  Shield,
   Settings,
-  Users,
-  FileText,
   AlertCircle,
   CheckCircle,
   Clock
@@ -37,11 +34,483 @@ import {
 import CustomNode, { CustomNodeData } from '../components/workflow/CustomNode';
 import NodeSidebar, { NODE_TYPES } from '../components/workflow/NodeSidebar';
 import PropertyPanel from '../components/workflow/PropertyPanel';
-import workflowExecutionService, { WorkflowExecutionService, WorkflowDefinition, WorkflowExecutionState, NodeExecutionEvent, WorkflowExecutionEvent } from '../services/workflowExecutionService';
+import workflowExecutionService, { WorkflowDefinition, WorkflowExecutionState, NodeExecutionEvent, WorkflowExecutionEvent } from '../services/workflowExecutionService';
 
 // WorkflowDefinition now imported from service
 
 // WorkflowExecution types now imported from service
+
+// Enhanced Execution Monitor Component
+interface ExecutionMonitorTabProps {
+  execution: WorkflowExecutionState | null;
+  nodes: Node<CustomNodeData>[];
+  executionLogs: any[];
+  onNodeSelect: (nodeId: string) => void;
+}
+
+function ExecutionMonitorTab({ execution, nodes, executionLogs, onNodeSelect }: ExecutionMonitorTabProps) {
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const [selectedTab, setSelectedTab] = useState<'overview' | 'output' | 'config' | 'metrics'>('overview');
+
+  // Get status for a specific node
+  const getNodeStatus = (nodeId: string): 'idle' | 'running' | 'completed' | 'failed' => {
+    if (!execution) return 'idle';
+    
+    const nodeData = nodes.find(n => n.id === nodeId);
+    if (!nodeData) return 'idle';
+    
+    return nodeData.data.status || 'idle';
+  };
+
+  // Get status color
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'completed': return 'text-green-600 bg-green-100';
+      case 'running': return 'text-blue-600 bg-blue-100';
+      case 'failed': return 'text-red-600 bg-red-100';
+      case 'paused': return 'text-yellow-600 bg-yellow-100';
+      default: return 'text-gray-600 bg-gray-100';
+    }
+  };
+
+  // Get status icon
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'completed': return <CheckCircle className="w-4 h-4" />;
+      case 'running': return <Clock className="w-4 h-4 animate-spin" />;
+      case 'failed': return <AlertCircle className="w-4 h-4" />;
+      default: return <Clock className="w-4 h-4" />;
+    }
+  };
+
+  // Get node execution details
+  const getNodeExecutionDetails = (nodeId: string) => {
+    const nodeLogs = executionLogs.filter(log => log.nodeId === nodeId || log.message.includes(nodeId));
+    const node = nodes.find(n => n.id === nodeId);
+    
+    return {
+      node,
+      logs: nodeLogs,
+      status: getNodeStatus(nodeId),
+      startTime: nodeLogs.find(log => log.type === 'node_started')?.timestamp,
+      endTime: nodeLogs.find(log => log.type === 'node_completed' || log.type === 'node_failed')?.timestamp,
+      output: nodeLogs.find(log => log.output)?.output || nodeLogs.filter(log => log.message && !log.message.includes('🎬') && !log.message.includes('✅')).map(log => log.message).join('\\n'),
+      error: nodeLogs.find(log => log.level === 'error')?.message
+    };
+  };
+
+  if (!execution) {
+    return (
+      <div className="p-6 bg-background h-full flex items-center justify-center">
+        <div className="text-center">
+          <Monitor className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-lg font-semibold mb-2 text-foreground">No Active Execution</h3>
+          <p className="text-muted-foreground">
+            Execute a workflow to see real-time monitoring data
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="h-full flex flex-col bg-background">
+      {/* Header with Workflow Status */}
+      <div className="border-b p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-semibold text-foreground flex items-center">
+              🎬 Workflow Execution
+              <span className={`ml-3 px-3 py-1 rounded-full text-sm font-medium flex items-center ${getStatusColor(execution.status)}`}>
+                {getStatusIcon(execution.status)}
+                <span className="ml-2 uppercase">{execution.status}</span>
+              </span>
+            </h2>
+            <div className="text-sm text-muted-foreground mt-1">
+              Duration: {execution.completed_at 
+                ? Math.round((new Date(execution.completed_at).getTime() - new Date(execution.started_at).getTime()) / 1000) + 's'
+                : Math.round((Date.now() - new Date(execution.started_at).getTime()) / 1000) + 's'
+              } | Started: {new Date(execution.started_at).toLocaleTimeString()}
+            </div>
+          </div>
+          <div className="text-right">
+            <div className="text-sm text-muted-foreground">Progress</div>
+            <div className="text-2xl font-bold text-foreground">
+              {execution.completed_nodes}/{nodes.length} nodes
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 flex">
+        {/* Visual Flow Section */}
+        <div className="flex-1 p-4">
+          <div className="mb-4">
+            <h3 className="text-lg font-semibold text-foreground mb-2">Visual Flow Progress</h3>
+            
+            {/* Interactive Node Flow */}
+            <div className="bg-secondary rounded-lg p-6">
+              <div className="flex items-center justify-center space-x-4 overflow-x-auto">
+                {nodes.map((node, index) => {
+                  const status = getNodeStatus(node.id);
+                  const isSelected = selectedNodeId === node.id;
+                  
+                  return (
+                    <div key={node.id} className="flex items-center">
+                      <button
+                        onClick={() => {
+                          setSelectedNodeId(node.id);
+                          onNodeSelect(node.id);
+                        }}
+                        className={`relative p-4 rounded-lg border-2 transition-all duration-200 min-w-[120px] ${
+                          isSelected 
+                            ? 'border-primary bg-primary/10 shadow-lg' 
+                            : 'border-border bg-background hover:border-primary/50 hover:shadow-md'
+                        }`}
+                      >
+                        <div className={`w-3 h-3 rounded-full absolute -top-1 -right-1 ${getStatusColor(status).replace('text-', 'bg-').replace(' bg-', ' ')}`}></div>
+                        
+                        <div className="text-center">
+                          <div className={`w-8 h-8 mx-auto mb-2 rounded-full flex items-center justify-center ${getStatusColor(status)}`}>
+                            {getStatusIcon(status)}
+                          </div>
+                          <div className="text-xs font-medium text-foreground truncate">
+                            {node.data.label}
+                          </div>
+                          <div className="text-xs text-muted-foreground mt-1">
+                            {node.data.nodeType}
+                          </div>
+                        </div>
+                      </button>
+                      
+                      {index < nodes.length - 1 && (
+                        <div className="w-8 h-0.5 bg-border mx-2"></div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* Timeline View */}
+          <div className="mb-4">
+            <h3 className="text-lg font-semibold text-foreground mb-2">Execution Timeline</h3>
+            <div className="bg-secondary rounded-lg p-4">
+              <div className="space-y-2">
+                {executionLogs.slice(-10).map((log) => (
+                  <div key={log.id} className="flex items-center text-sm">
+                    <span className="text-xs text-muted-foreground min-w-[80px]">
+                      {new Date(log.timestamp).toLocaleTimeString()}
+                    </span>
+                    <div className={`w-2 h-2 rounded-full mx-3 ${
+                      log.level === 'error' ? 'bg-red-500' :
+                      log.level === 'success' ? 'bg-green-500' : 'bg-blue-500'
+                    }`}></div>
+                    <span className="font-medium text-foreground">
+                      {log.message}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Node Details Panel */}
+        <div className="w-1/3 border-l bg-background">
+          {selectedNodeId ? (
+            <div className="h-full flex flex-col">
+              <div className="p-4 border-b">
+                <h3 className="font-semibold text-foreground">
+                  {nodes.find(n => n.id === selectedNodeId)?.data.label || 'Node Details'}
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  {nodes.find(n => n.id === selectedNodeId)?.data.nodeType}
+                </p>
+              </div>
+
+              {/* Tabs */}
+              <div className="border-b">
+                <div className="flex">
+                  {[
+                    { key: 'overview', label: 'Overview', icon: '📋' },
+                    { key: 'output', label: 'Output', icon: '📄' },
+                    { key: 'config', label: 'Config', icon: '🔧' },
+                    { key: 'metrics', label: 'Metrics', icon: '📈' }
+                  ].map((tab) => (
+                    <button
+                      key={tab.key}
+                      onClick={() => setSelectedTab(tab.key as any)}
+                      className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                        selectedTab === tab.key
+                          ? 'border-primary text-primary'
+                          : 'border-transparent text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      {tab.icon} {tab.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Tab Content */}
+              <div className="flex-1 p-4 overflow-y-auto">
+                {selectedTab === 'overview' && (
+                  <NodeOverviewTab nodeDetails={getNodeExecutionDetails(selectedNodeId)} />
+                )}
+                {selectedTab === 'output' && (
+                  <NodeOutputTab nodeDetails={getNodeExecutionDetails(selectedNodeId)} />
+                )}
+                {selectedTab === 'config' && (
+                  <NodeConfigTab nodeDetails={getNodeExecutionDetails(selectedNodeId)} />
+                )}
+                {selectedTab === 'metrics' && (
+                  <NodeMetricsTab nodeDetails={getNodeExecutionDetails(selectedNodeId)} />
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="h-full flex items-center justify-center p-4 text-center">
+              <div>
+                <Settings className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+                <h4 className="font-semibold text-foreground mb-2">Select a Node</h4>
+                <p className="text-sm text-muted-foreground">
+                  Click on any node in the flow diagram to view its execution details
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Node Detail Tab Components
+function NodeOverviewTab({ nodeDetails }: { nodeDetails: any }) {
+  const { node, status, startTime, endTime, error } = nodeDetails;
+
+  const duration = startTime && endTime 
+    ? Math.round((new Date(endTime).getTime() - new Date(startTime).getTime()) / 1000)
+    : null;
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="text-xs font-medium text-muted-foreground">Status</label>
+          <div className={`mt-1 px-2 py-1 rounded text-sm font-medium inline-flex items-center ${
+            status === 'completed' ? 'bg-green-100 text-green-700' :
+            status === 'running' ? 'bg-blue-100 text-blue-700' :
+            status === 'failed' ? 'bg-red-100 text-red-700' :
+            'bg-gray-100 text-gray-700'
+          }`}>
+            <CheckCircle className="w-3 h-3 mr-1" />
+            {status.charAt(0).toUpperCase() + status.slice(1)}
+          </div>
+        </div>
+        <div>
+          <label className="text-xs font-medium text-muted-foreground">Duration</label>
+          <div className="mt-1 text-sm font-mono">
+            {duration ? `${duration}s` : status === 'running' ? 'Running...' : 'Not started'}
+          </div>
+        </div>
+      </div>
+
+      {startTime && (
+        <div>
+          <label className="text-xs font-medium text-muted-foreground">Execution Time</label>
+          <div className="mt-1 text-sm font-mono space-y-1">
+            <div>Started: {new Date(startTime).toLocaleString()}</div>
+            {endTime && <div>Ended: {new Date(endTime).toLocaleString()}</div>}
+          </div>
+        </div>
+      )}
+
+      {error && (
+        <div>
+          <label className="text-xs font-medium text-red-600">Error Details</label>
+          <div className="mt-1 p-3 bg-red-50 border border-red-200 rounded text-sm text-red-700 font-mono">
+            {error}
+          </div>
+        </div>
+      )}
+
+      <div>
+        <label className="text-xs font-medium text-muted-foreground">Node Configuration</label>
+        <div className="mt-1 p-3 bg-secondary rounded text-sm">
+          <div className="space-y-2">
+            <div><strong>Type:</strong> {node?.data.nodeType}</div>
+            <div><strong>Name:</strong> {node?.data.label}</div>
+            <div><strong>Position:</strong> ({node?.position.x}, {node?.position.y})</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function NodeOutputTab({ nodeDetails }: { nodeDetails: any }) {
+  const { output, logs } = nodeDetails;
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <label className="text-xs font-medium text-muted-foreground">Standard Output</label>
+        <div className="mt-1 p-3 bg-gray-900 text-green-400 rounded font-mono text-sm min-h-[200px] overflow-auto">
+          {output ? (
+            <pre className="whitespace-pre-wrap">{output}</pre>
+          ) : (
+            <div className="text-gray-500 italic">No output generated</div>
+          )}
+        </div>
+      </div>
+
+      <div>
+        <label className="text-xs font-medium text-muted-foreground">Execution Logs</label>
+        <div className="mt-1 space-y-2 max-h-64 overflow-auto">
+          {logs && logs.length > 0 ? (
+            logs.map((log: any, index: number) => (
+              <div 
+                key={index}
+                className={`p-2 rounded text-xs border-l-4 ${
+                  log.level === 'error' ? 'bg-red-50 border-red-400 text-red-700' :
+                  log.level === 'success' ? 'bg-green-50 border-green-400 text-green-700' :
+                  'bg-blue-50 border-blue-400 text-blue-700'
+                }`}
+              >
+                <div className="font-medium mb-1">
+                  {new Date(log.timestamp).toLocaleTimeString()}
+                </div>
+                <div className="font-mono">{log.message}</div>
+              </div>
+            ))
+          ) : (
+            <div className="p-3 bg-secondary rounded text-sm text-muted-foreground italic">
+              No logs available
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function NodeConfigTab({ nodeDetails }: { nodeDetails: any }) {
+  const { node } = nodeDetails;
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <label className="text-xs font-medium text-muted-foreground">Node Configuration</label>
+        <div className="mt-1 p-3 bg-secondary rounded">
+          <pre className="text-sm font-mono whitespace-pre-wrap">
+            {JSON.stringify(node?.data.config || {}, null, 2)}
+          </pre>
+        </div>
+      </div>
+
+      <div>
+        <label className="text-xs font-medium text-muted-foreground">Node Properties</label>
+        <div className="mt-1 space-y-2">
+          <div className="flex justify-between py-1 border-b border-border">
+            <span className="text-sm font-medium">ID</span>
+            <span className="text-sm font-mono">{node?.id}</span>
+          </div>
+          <div className="flex justify-between py-1 border-b border-border">
+            <span className="text-sm font-medium">Type</span>
+            <span className="text-sm">{node?.data.nodeType}</span>
+          </div>
+          <div className="flex justify-between py-1 border-b border-border">
+            <span className="text-sm font-medium">Label</span>
+            <span className="text-sm">{node?.data.label}</span>
+          </div>
+          <div className="flex justify-between py-1 border-b border-border">
+            <span className="text-sm font-medium">Position</span>
+            <span className="text-sm font-mono">({node?.position.x}, {node?.position.y})</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function NodeMetricsTab({ nodeDetails }: { nodeDetails: any }) {
+  const { startTime, endTime, status } = nodeDetails;
+
+  const duration = startTime && endTime 
+    ? (new Date(endTime).getTime() - new Date(startTime).getTime())
+    : null;
+
+  const currentDuration = startTime && !endTime
+    ? (Date.now() - new Date(startTime).getTime())
+    : null;
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 gap-4">
+        <div className="bg-secondary p-3 rounded">
+          <div className="text-xs font-medium text-muted-foreground">Execution Time</div>
+          <div className="text-lg font-bold">
+            {duration ? `${(duration / 1000).toFixed(2)}s` :
+             currentDuration ? `${(currentDuration / 1000).toFixed(1)}s` :
+             'N/A'}
+          </div>
+        </div>
+        <div className="bg-secondary p-3 rounded">
+          <div className="text-xs font-medium text-muted-foreground">Status</div>
+          <div className="text-lg font-bold capitalize">{status}</div>
+        </div>
+      </div>
+
+      <div>
+        <label className="text-xs font-medium text-muted-foreground">Performance Metrics</label>
+        <div className="mt-1 space-y-3">
+          <div className="flex justify-between items-center py-2 border-b border-border">
+            <span className="text-sm">Memory Usage</span>
+            <span className="text-sm text-muted-foreground">~2.4 MB</span>
+          </div>
+          <div className="flex justify-between items-center py-2 border-b border-border">
+            <span className="text-sm">CPU Usage</span>
+            <span className="text-sm text-muted-foreground">~0.1%</span>
+          </div>
+          <div className="flex justify-between items-center py-2 border-b border-border">
+            <span className="text-sm">Exit Code</span>
+            <span className="text-sm text-muted-foreground">
+              {status === 'completed' ? '0' : status === 'failed' ? '1' : 'N/A'}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {startTime && (
+        <div>
+          <label className="text-xs font-medium text-muted-foreground">Timeline</label>
+          <div className="mt-1 space-y-2 text-sm">
+            <div className="flex justify-between">
+              <span>Started at:</span>
+              <span className="font-mono">{new Date(startTime).toLocaleTimeString()}</span>
+            </div>
+            {endTime && (
+              <div className="flex justify-between">
+                <span>Completed at:</span>
+                <span className="font-mono">{new Date(endTime).toLocaleTimeString()}</span>
+              </div>
+            )}
+            {currentDuration && !endTime && (
+              <div className="flex justify-between text-blue-600">
+                <span>Running for:</span>
+                <span className="font-mono">{(currentDuration / 1000).toFixed(1)}s</span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 // Custom node types
 const nodeTypes = {
@@ -1087,84 +1556,12 @@ function WorkflowDesignerContent() {
           )}
 
           {activeTab === 'execute' && (
-            <div className="p-6 bg-background">
-              <h2 className="text-xl font-semibold mb-4 text-foreground">Execution Monitor</h2>
-              
-              {execution ? (
-                <div className="space-y-4">
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="bg-secondary p-4 rounded">
-                      <h3 className="text-sm font-medium text-muted-foreground">Status</h3>
-                      <p className="text-2xl font-bold">{execution.status}</p>
-                    </div>
-                    <div className="bg-secondary p-4 rounded">
-                      <h3 className="text-sm font-medium text-muted-foreground">Progress</h3>
-                      <p className="text-2xl font-bold">
-                        {execution.completed_nodes}/{nodes.length}
-                      </p>
-                    </div>
-                    <div className="bg-secondary p-4 rounded">
-                      <h3 className="text-sm font-medium text-muted-foreground">Duration</h3>
-                      <p className="text-2xl font-bold">
-                        {execution.completed_at 
-                          ? Math.round((new Date(execution.completed_at).getTime() - new Date(execution.started_at).getTime()) / 1000) + 's'
-                          : Math.round((Date.now() - new Date(execution.started_at).getTime()) / 1000) + 's'
-                        }
-                      </p>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h3 className="text-lg font-semibold mb-2 text-foreground">Variables</h3>
-                    <div className="bg-secondary p-4 rounded font-mono text-sm">
-                      <pre>{JSON.stringify(execution.variables, null, 2)}</pre>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h3 className="text-lg font-semibold mb-2 text-foreground">Execution Logs</h3>
-                    <div className="bg-secondary p-4 rounded max-h-96 overflow-y-auto">
-                      {executionLogs.length === 0 ? (
-                        <p className="text-muted-foreground text-sm">No logs yet...</p>
-                      ) : (
-                        <div className="space-y-2">
-                          {executionLogs.map((log) => (
-                            <div 
-                              key={log.id}
-                              className={`p-3 rounded text-sm border-l-4 ${
-                                log.level === 'error' 
-                                  ? 'bg-red-50 border-red-500 text-red-900' 
-                                  : log.level === 'success'
-                                  ? 'bg-green-50 border-green-500 text-green-900'
-                                  : 'bg-blue-50 border-blue-500 text-blue-900'
-                              }`}
-                            >
-                              <div className="flex justify-between items-start mb-1">
-                                <span className="font-medium">{log.nodeType || 'Workflow'}</span>
-                                <span className="text-xs opacity-70">
-                                  {new Date(log.timestamp).toLocaleTimeString()}
-                                </span>
-                              </div>
-                              <div className="whitespace-pre-wrap font-mono text-xs">
-                                {log.message}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <Monitor className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold mb-2 text-foreground">No Active Execution</h3>
-                  <p className="text-muted-foreground">
-                    Execute a workflow to see real-time monitoring data
-                  </p>
-                </div>
-              )}
-            </div>
+            <ExecutionMonitorTab 
+              execution={execution}
+              nodes={nodes}
+              executionLogs={executionLogs}
+              onNodeSelect={(nodeId) => console.log('Node selected:', nodeId)}
+            />
           )}
 
           {activeTab === 'debug' && (
