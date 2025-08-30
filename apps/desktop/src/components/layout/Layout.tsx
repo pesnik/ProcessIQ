@@ -91,13 +91,13 @@ export function Layout({ children, backendStatus }: LayoutProps) {
 
   const navItems = [
     { href: '/dashboard', label: 'Dashboard', icon: BarChart3 },
-    { href: '/designer', label: 'Workflow Designer', icon: Workflow },
-    { href: '/workflows', label: 'Workflow History', icon: FolderOpen },
+    { href: '/designer', label: 'Designer', icon: Workflow },
+    { href: '/workflows', label: 'Workflows', icon: FolderOpen },
     { href: '/scheduler', label: 'Scheduler', icon: Clock },
     { href: '/connectors', label: 'Connectors', icon: Plug },
     { href: '/plugins', label: 'Plugins', icon: Puzzle },
     { href: '/security', label: 'Security', icon: Shield },
-    { href: '/rpa-demo', label: 'RPA Platform', icon: Zap },
+    { href: '/rpa-demo', label: 'RPA Demo', icon: Zap },
     { href: '/logs', label: 'Logs', icon: FileText },
     { href: '/settings', label: 'Settings', icon: Settings },
   ];

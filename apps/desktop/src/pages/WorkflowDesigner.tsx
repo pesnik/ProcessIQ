@@ -583,15 +583,32 @@ function WorkflowDesignerContent() {
           type: 'custom',
           position: nodeData.position || { x: 100, y: 100 },
           data: {
-            label: nodeData.data?.label || nodeData.label || 'Untitled Node',
-            nodeType: nodeData.data?.nodeType || nodeData.nodeType || nodeData.type || 'unknown',
-            config: nodeData.data?.config || nodeData.config || {},
+            label: nodeData.name || nodeData.data?.label || nodeData.label || 'Untitled Node',
+            nodeType: nodeData.type || nodeData.data?.nodeType || nodeData.nodeType || 'unknown',
+            config: nodeData.config || nodeData.data?.config || {},
             status: 'idle' // Reset status when loading
           }
         }));
         
-        // If there are edges in the stored workflow, load them too
-        const loadedEdges = workflow.edges || [];
+        // Load edges from the stored workflow or reconstruct from node connections
+        let loadedEdges = workflow.edges || [];
+        
+        // If no edges are stored but nodes have connections, rebuild edges
+        if (loadedEdges.length === 0) {
+          loadedEdges = [];
+          Object.values(workflow.nodes).forEach((nodeData: any) => {
+            if (nodeData.connections && Array.isArray(nodeData.connections)) {
+              nodeData.connections.forEach((targetId: string) => {
+                loadedEdges.push({
+                  id: `${nodeData.id}-${targetId}`,
+                  source: nodeData.id,
+                  target: targetId,
+                  type: 'default'
+                });
+              });
+            }
+          });
+        }
         
         setNodes(loadedNodes);
         setEdges(loadedEdges);
@@ -1253,6 +1270,7 @@ function WorkflowDesignerContent() {
           name: workflowName,
           description: `Workflow created with ProcessIQ Designer`,
           nodes: workflow.nodes,
+          edges: edges, // Include edges in the saved data
           variables: workflow.variables || {},
           triggers: workflow.triggers || [],
           tags: []
@@ -1365,6 +1383,12 @@ function WorkflowDesignerContent() {
 
   // Keyboard shortcuts
   const onKeyDown = useCallback((event: React.KeyboardEvent) => {
+    // Don't handle keyboard shortcuts if user is typing in an input field
+    const target = event.target as HTMLElement;
+    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.contentEditable === 'true') {
+      return;
+    }
+
     if (event.key === 'Delete' || event.key === 'Backspace') {
       event.preventDefault();
       deleteSelectedElements();
