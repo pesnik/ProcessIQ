@@ -33,6 +33,20 @@ class SetVariableRequest(BaseModel):
     variable_path: str
     new_value: Any
 
+class ExecuteNodeRequest(BaseModel):
+    node_id: str
+    node_type: str
+    config: Dict[str, Any]
+    input_data: Optional[Dict[str, Any]] = None
+
+class ExecuteNodeResponse(BaseModel):
+    success: bool
+    output: Any
+    error: Optional[str] = None
+    duration_ms: int
+    node_id: str
+    timestamp: str
+
 class DebugSessionResponse(BaseModel):
     session_id: str
     execution_id: str
@@ -458,6 +472,69 @@ async def export_debug_data(
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/execute-node", response_model=ExecuteNodeResponse)
+async def execute_single_node(
+    request: ExecuteNodeRequest,
+    engine: ProcessIQEngine = Depends(get_engine)
+):
+    """Execute a single node for debugging/testing purposes"""
+    try:
+        import time
+        from datetime import datetime
+        
+        start_time = time.time()
+        
+        # Get the workflow executor
+        executor = engine.workflow_executor
+        
+        # Create a minimal execution context for single node testing
+        execution_context = {
+            "node_id": request.node_id,
+            "node_type": request.node_type,
+            "config": request.config,
+            "input_data": request.input_data or {},
+            "variables": {},
+            "execution_id": f"debug_single_{int(time.time())}",
+            "workflow_id": "debug_single_node"
+        }
+        
+        try:
+            # Execute the single node
+            result = await executor.execute_single_node(
+                node_type=request.node_type,
+                config=request.config,
+                input_data=request.input_data or {},
+                context=execution_context
+            )
+            
+            end_time = time.time()
+            duration_ms = int((end_time - start_time) * 1000)
+            
+            return ExecuteNodeResponse(
+                success=True,
+                output=result,
+                error=None,
+                duration_ms=duration_ms,
+                node_id=request.node_id,
+                timestamp=datetime.now().isoformat()
+            )
+            
+        except Exception as exec_error:
+            end_time = time.time()
+            duration_ms = int((end_time - start_time) * 1000)
+            
+            return ExecuteNodeResponse(
+                success=False,
+                output=None,
+                error=str(exec_error),
+                duration_ms=duration_ms,
+                node_id=request.node_id,
+                timestamp=datetime.now().isoformat()
+            )
+            
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to execute node: {str(e)}")
 
 # WebSocket endpoint for real-time debugging
 @router.websocket("/sessions/{session_id}/ws")

@@ -29,7 +29,17 @@ import {
   Settings,
   AlertCircle,
   CheckCircle,
-  Clock
+  Clock,
+  StepForward,
+  StepBack,
+  SkipForward,
+  Circle,
+  Dot,
+  Eye,
+  Variable,
+  Activity,
+  Target,
+  Database
 } from 'lucide-react';
 
 import CustomNode, { CustomNodeData } from '../components/workflow/CustomNode';
@@ -40,6 +50,47 @@ import workflowExecutionService, { WorkflowDefinition, WorkflowExecutionState, N
 // WorkflowDefinition now imported from service
 
 // WorkflowExecution types now imported from service
+
+// Debug Session Interfaces
+interface DebugStep {
+  nodeId: string;
+  timestamp: Date;
+  input: any;
+  output: any;
+  duration: number;
+  status: 'success' | 'error';
+  error?: string;
+}
+
+interface NodeDebugData {
+  lastExecution: DebugStep | null;
+  breakpointEnabled: boolean;
+  watchedVariables: string[];
+  executionHistory: DebugStep[];
+}
+
+interface DebugSession {
+  id: string;
+  workflowId: string;
+  status: 'idle' | 'active' | 'paused' | 'stopped';
+  breakpoints: Set<string>;
+  watchedVariables: Set<string>;
+  currentExecutionStep: number;
+  stepHistory: DebugStep[];
+  nodeExecutionData: Map<string, NodeDebugData>;
+  mode: 'step' | 'run' | 'single-node';
+}
+
+interface VariableInspector {
+  globalVariables: Record<string, any>;
+  nodeOutputs: Map<string, any>;
+  watchedExpressions: string[];
+  executionContext: {
+    currentNode: string | null;
+    executionPath: string[];
+    callStack: string[];
+  };
+}
 
 // Enhanced Execution Monitor Component
 interface ExecutionMonitorTabProps {
@@ -547,6 +598,20 @@ function WorkflowDesignerContent() {
   }>>([]);
   const [selectedExecutionId, setSelectedExecutionId] = useState<string | null>(null);
   
+  // Debug Session State Management
+  const [debugSession, setDebugSession] = useState<DebugSession | null>(null);
+  const [variableInspector, setVariableInspector] = useState<VariableInspector>({
+    globalVariables: {},
+    nodeOutputs: new Map(),
+    watchedExpressions: [],
+    executionContext: {
+      currentNode: null,
+      executionPath: [],
+      callStack: []
+    }
+  });
+  const [selectedDebugNode, setSelectedDebugNode] = useState<string | null>(null);
+  
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null);
 
@@ -621,6 +686,71 @@ function WorkflowDesignerContent() {
       alert('Failed to load workflow. Please try again.');
     }
   };
+  
+  // Debug Session Management Functions
+  const createDebugSession = useCallback((mode: 'step' | 'run' | 'single-node' = 'step') => {
+    const sessionId = `debug_${Date.now()}`;
+    const newSession: DebugSession = {
+      id: sessionId,
+      workflowId: `workflow_${Date.now()}`,
+      status: 'idle',
+      breakpoints: new Set(),
+      watchedVariables: new Set(),
+      currentExecutionStep: 0,
+      stepHistory: [],
+      nodeExecutionData: new Map(),
+      mode
+    };
+    
+    setDebugSession(newSession);
+    return newSession;
+  }, []);
+
+  const toggleBreakpoint = useCallback((nodeId: string) => {
+    if (!debugSession) {
+      createDebugSession();
+      return;
+    }
+    
+    const newBreakpoints = new Set(debugSession.breakpoints);
+    if (newBreakpoints.has(nodeId)) {
+      newBreakpoints.delete(nodeId);
+    } else {
+      newBreakpoints.add(nodeId);
+    }
+    
+    setDebugSession({
+      ...debugSession,
+      breakpoints: newBreakpoints
+    });
+    
+    // Update node debug data
+    const nodeDebugData = debugSession.nodeExecutionData.get(nodeId) || {
+      lastExecution: null,
+      breakpointEnabled: false,
+      watchedVariables: [],
+      executionHistory: []
+    };
+    
+    nodeDebugData.breakpointEnabled = newBreakpoints.has(nodeId);
+    debugSession.nodeExecutionData.set(nodeId, nodeDebugData);
+  }, [debugSession, createDebugSession]);
+
+
+  const stopDebugSession = useCallback(() => {
+    setDebugSession(null);
+    setVariableInspector({
+      globalVariables: {},
+      nodeOutputs: new Map(),
+      watchedExpressions: [],
+      executionContext: {
+        currentNode: null,
+        executionPath: [],
+        callStack: []
+      }
+    });
+    setSelectedDebugNode(null);
+  }, []);
   
   // Setup workflow execution service event listeners
   React.useEffect(() => {
@@ -889,6 +1019,147 @@ function WorkflowDesignerContent() {
       })
     );
   }, [setNodes]);
+  
+  // Gather upstream data for single node execution
+  const gatherUpstreamData = useCallback((nodeId: string) => {
+    // Find all edges that connect to this node
+    const incomingEdges = edges.filter(edge => edge.target === nodeId);
+    const upstreamData: Record<string, any> = {};
+    
+    incomingEdges.forEach(edge => {
+      const sourceNode = nodes.find(n => n.id === edge.source);
+      if (sourceNode) {
+        // Get the last execution data for the source node
+        const nodeOutput = variableInspector.nodeOutputs.get(edge.source);
+        if (nodeOutput) {
+          upstreamData[edge.source] = nodeOutput;
+        }
+      }
+    });
+    
+    return upstreamData;
+  }, [edges, nodes, variableInspector.nodeOutputs]);
+
+  // Execute single node for debugging
+  const executeSingleNode = useCallback(async (nodeId: string, mockInput?: any) => {
+    const node = nodes.find(n => n.id === nodeId);
+    if (!node) {
+      console.error('Node not found:', nodeId);
+      return;
+    }
+
+    const startTime = Date.now();
+    
+    try {
+      // Update UI to show node is running
+      updateNodeStatus(nodeId, 'running');
+      
+      // Simulate node execution (in real implementation, this would call the backend)
+      const inputData = mockInput || gatherUpstreamData(nodeId);
+      
+      // Call the backend API for single node execution
+      const result = await fetch('http://localhost:8000/api/v1/debug/execute-node', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          node_id: nodeId,
+          node_type: node.data.nodeType,
+          config: node.data.config,
+          input_data: inputData
+        }),
+      });
+      
+      const executionResult = await result.json();
+      const endTime = Date.now();
+      
+      // Create debug step record
+      const debugStep: DebugStep = {
+        nodeId,
+        timestamp: new Date(),
+        input: inputData,
+        output: executionResult.output,
+        duration: endTime - startTime,
+        status: executionResult.success ? 'success' : 'error',
+        error: executionResult.error
+      };
+      
+      // Update debug session
+      if (debugSession) {
+        const updatedHistory = [...debugSession.stepHistory, debugStep];
+        setDebugSession({
+          ...debugSession,
+          stepHistory: updatedHistory,
+          currentExecutionStep: updatedHistory.length
+        });
+        
+        // Update node debug data
+        const nodeDebugData = debugSession.nodeExecutionData.get(nodeId) || {
+          lastExecution: null,
+          breakpointEnabled: false,
+          watchedVariables: [],
+          executionHistory: []
+        };
+        
+        nodeDebugData.lastExecution = debugStep;
+        nodeDebugData.executionHistory.push(debugStep);
+        debugSession.nodeExecutionData.set(nodeId, nodeDebugData);
+      }
+      
+      // Update variable inspector
+      setVariableInspector(prev => ({
+        ...prev,
+        nodeOutputs: new Map(prev.nodeOutputs).set(nodeId, executionResult.output),
+        executionContext: {
+          ...prev.executionContext,
+          currentNode: nodeId
+        }
+      }));
+      
+      // Update node status and debug output
+      updateNodeStatus(nodeId, executionResult.success ? 'completed' : 'failed', executionResult.error);
+      
+      // Update node with debug output
+      setNodes((nodes) =>
+        nodes.map((node) =>
+          node.id === nodeId
+            ? {
+                ...node,
+                data: {
+                  ...node.data,
+                  debugLastOutput: executionResult.output
+                }
+              }
+            : node
+        )
+      );
+      
+      console.log('Single node execution completed:', debugStep);
+      
+    } catch (error) {
+      console.error('Single node execution failed:', error);
+      updateNodeStatus(nodeId, 'failed', (error as Error).message);
+      
+      const debugStep: DebugStep = {
+        nodeId,
+        timestamp: new Date(),
+        input: mockInput,
+        output: null,
+        duration: Date.now() - startTime,
+        status: 'error',
+        error: (error as Error).message
+      };
+      
+      if (debugSession) {
+        const updatedHistory = [...debugSession.stepHistory, debugStep];
+        setDebugSession({
+          ...debugSession,
+          stepHistory: updatedHistory
+        });
+      }
+    }
+  }, [nodes, debugSession, updateNodeStatus, gatherUpstreamData, setNodes, variableInspector.nodeOutputs]);
   
   // Stop execution function
   const stopExecution = useCallback(async () => {
@@ -1613,30 +1884,189 @@ function WorkflowDesignerContent() {
             )}
 
             {activeTab === 'debug' && (
-              <div>
-                <h3 className="font-semibold mb-3 text-foreground">Debug Tools</h3>
-                
-                <div className="space-y-2">
-                  <button className="w-full px-3 py-2 bg-secondary rounded text-sm hover:bg-secondary/80">
-                    Set Breakpoint
-                  </button>
-                  <button className="w-full px-3 py-2 bg-secondary rounded text-sm hover:bg-secondary/80">
-                    Watch Variables
-                  </button>
-                  <button className="w-full px-3 py-2 bg-secondary rounded text-sm hover:bg-secondary/80">
-                    Step Through
-                  </button>
-                  <button className="w-full px-3 py-2 bg-secondary rounded text-sm hover:bg-secondary/80">
-                    Performance Profile
-                  </button>
+              <div className="space-y-4">
+                {/* Debug Session Controls */}
+                <div>
+                  <h3 className="font-semibold mb-3 text-foreground">Debug Session</h3>
+                  <div className="space-y-2">
+                    {!debugSession ? (
+                      <button 
+                        onClick={() => createDebugSession('step')}
+                        className="w-full px-3 py-2 bg-primary text-primary-foreground rounded text-sm hover:bg-primary/90 flex items-center justify-center gap-2"
+                      >
+                        <Play className="w-4 h-4" />
+                        Start Debug Session
+                      </button>
+                    ) : (
+                      <div className="space-y-2">
+                        <div className="flex gap-1">
+                          <button 
+                            onClick={() => setDebugSession({...debugSession, status: debugSession.status === 'paused' ? 'active' : 'paused'})}
+                            className="flex-1 px-2 py-1.5 bg-secondary rounded text-xs hover:bg-secondary/80 flex items-center justify-center gap-1"
+                            title={debugSession.status === 'paused' ? 'Resume' : 'Pause'}
+                          >
+                            {debugSession.status === 'paused' ? <Play className="w-3 h-3" /> : <Pause className="w-3 h-3" />}
+                          </button>
+                          <button 
+                            onClick={stopDebugSession}
+                            className="flex-1 px-2 py-1.5 bg-destructive text-destructive-foreground rounded text-xs hover:bg-destructive/90 flex items-center justify-center gap-1"
+                            title="Stop"
+                          >
+                            <Square className="w-3 h-3" />
+                          </button>
+                        </div>
+                        <div className="text-xs text-center p-2 bg-secondary/50 rounded">
+                          Status: <span className="font-medium capitalize">{debugSession.status}</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
-                
-                <div className="mt-4 p-3 bg-secondary rounded">
-                  <h4 className="text-sm font-medium mb-2">Debug Session</h4>
-                  <p className="text-xs text-muted-foreground">
-                    No active debug session. Execute workflow with debugging enabled.
-                  </p>
+
+                {/* Debug Mode Selection */}
+                <div>
+                  <h4 className="font-medium mb-2 text-sm text-foreground">Debug Mode</h4>
+                  <div className="grid grid-cols-1 gap-1">
+                    {[
+                      { mode: 'step' as const, label: 'Step Through', icon: StepForward },
+                      { mode: 'run' as const, label: 'Run with Breakpoints', icon: Target },
+                      { mode: 'single-node' as const, label: 'Single Node Test', icon: Circle }
+                    ].map(({ mode, label, icon: Icon }) => (
+                      <button
+                        key={mode}
+                        onClick={() => debugSession && setDebugSession({...debugSession, mode})}
+                        className={`w-full px-3 py-2 rounded text-xs flex items-center gap-2 ${
+                          debugSession?.mode === mode 
+                            ? 'bg-primary text-primary-foreground' 
+                            : 'bg-secondary hover:bg-secondary/80'
+                        }`}
+                      >
+                        <Icon className="w-3 h-3" />
+                        {label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
+
+                {/* Single Node Testing */}
+                {debugSession?.mode === 'single-node' && (
+                  <div>
+                    <h4 className="font-medium mb-2 text-sm text-foreground">Single Node Test</h4>
+                    <div className="space-y-2">
+                      <select 
+                        value={selectedDebugNode || ''}
+                        onChange={(e) => setSelectedDebugNode(e.target.value || null)}
+                        className="w-full px-2 py-1.5 bg-background border border-border rounded text-xs"
+                      >
+                        <option value="">Select Node</option>
+                        {nodes.map(node => (
+                          <option key={node.id} value={node.id}>
+                            {node.data.label || 'Untitled Node'}
+                          </option>
+                        ))}
+                      </select>
+                      <button
+                        onClick={() => selectedDebugNode && executeSingleNode(selectedDebugNode)}
+                        disabled={!selectedDebugNode}
+                        className="w-full px-3 py-2 bg-accent text-accent-foreground rounded text-xs hover:bg-accent/80 disabled:opacity-50 flex items-center justify-center gap-2"
+                      >
+                        <Play className="w-3 h-3" />
+                        Test Node
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Breakpoints */}
+                <div>
+                  <h4 className="font-medium mb-2 text-sm text-foreground flex items-center gap-2">
+                    <Dot className="w-4 h-4 text-red-500" />
+                    Breakpoints ({debugSession?.breakpoints.size || 0})
+                  </h4>
+                  <div className="space-y-1 max-h-32 overflow-y-auto">
+                    {debugSession && debugSession.breakpoints.size > 0 ? (
+                      Array.from(debugSession.breakpoints).map(nodeId => {
+                        const node = nodes.find(n => n.id === nodeId);
+                        return (
+                          <div key={nodeId} className="flex items-center justify-between px-2 py-1 bg-secondary rounded text-xs">
+                            <span className="truncate">{node?.data.label || nodeId}</span>
+                            <button
+                              onClick={() => toggleBreakpoint(nodeId)}
+                              className="text-red-500 hover:text-red-700"
+                              title="Remove breakpoint"
+                            >
+                              <Circle className="w-3 h-3 fill-current" />
+                            </button>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <p className="text-xs text-muted-foreground p-2 bg-secondary/50 rounded">
+                        No breakpoints set. Right-click nodes to add.
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Watch Variables */}
+                <div>
+                  <h4 className="font-medium mb-2 text-sm text-foreground flex items-center gap-2">
+                    <Eye className="w-4 h-4" />
+                    Variables
+                  </h4>
+                  <div className="space-y-1 max-h-32 overflow-y-auto">
+                    {variableInspector.executionContext.currentNode ? (
+                      <div className="space-y-1">
+                        <div className="px-2 py-1 bg-secondary rounded text-xs">
+                          <div className="font-medium">Current Node:</div>
+                          <div className="text-muted-foreground truncate">
+                            {nodes.find(n => n.id === variableInspector.executionContext.currentNode)?.data.label || variableInspector.executionContext.currentNode}
+                          </div>
+                        </div>
+                        {variableInspector.nodeOutputs.has(variableInspector.executionContext.currentNode) && (
+                          <div className="px-2 py-1 bg-secondary rounded text-xs">
+                            <div className="font-medium">Output:</div>
+                            <div className="text-muted-foreground max-h-16 overflow-y-auto">
+                              <pre className="text-xs">
+                                {JSON.stringify(variableInspector.nodeOutputs.get(variableInspector.executionContext.currentNode), null, 2)}
+                              </pre>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-xs text-muted-foreground p-2 bg-secondary/50 rounded">
+                        No variables to watch. Run a node to see data.
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Debug History */}
+                {debugSession && debugSession.stepHistory.length > 0 && (
+                  <div>
+                    <h4 className="font-medium mb-2 text-sm text-foreground flex items-center gap-2">
+                      <Clock className="w-4 h-4" />
+                      Execution History
+                    </h4>
+                    <div className="space-y-1 max-h-32 overflow-y-auto">
+                      {debugSession.stepHistory.slice(-5).map((step, index) => {
+                        const node = nodes.find(n => n.id === step.nodeId);
+                        return (
+                          <div key={`${step.nodeId}-${index}`} className="px-2 py-1 bg-secondary rounded text-xs">
+                            <div className="flex items-center justify-between">
+                              <span className="truncate">{node?.data.label || step.nodeId}</span>
+                              <span className={`w-2 h-2 rounded-full ${step.status === 'success' ? 'bg-green-500' : 'bg-red-500'}`} />
+                            </div>
+                            <div className="text-muted-foreground text-xs">
+                              {step.duration}ms
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
@@ -1719,24 +2149,268 @@ function WorkflowDesignerContent() {
           )}
 
           {activeTab === 'debug' && (
-            <div className="bg-background border p-6 text-center m-6 rounded-lg">
-              <div className="w-16 h-16 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Bug className="w-8 h-8 text-primary" />
+            <div className="h-full flex flex-col">
+              {/* Debug Tab Header */}
+              <div className="flex items-center justify-between p-4 border-b border-border bg-background">
+                <div className="flex items-center gap-3">
+                  <Bug className="w-5 h-5 text-primary" />
+                  <h2 className="text-lg font-semibold text-foreground">Debug Console</h2>
+                  {debugSession && (
+                    <div className="flex items-center gap-2">
+                      <div className={`w-2 h-2 rounded-full ${
+                        debugSession.status === 'active' ? 'bg-green-500' : 
+                        debugSession.status === 'paused' ? 'bg-yellow-500' : 
+                        'bg-gray-500'
+                      }`} />
+                      <span className="text-sm text-muted-foreground capitalize">
+                        {debugSession.status}
+                      </span>
+                    </div>
+                  )}
+                </div>
+                
+                {debugSession && (
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setDebugSession({...debugSession, mode: 'step'})}
+                      className={`px-3 py-1.5 rounded text-sm flex items-center gap-2 ${
+                        debugSession.mode === 'step' ? 'bg-primary text-primary-foreground' : 'bg-secondary hover:bg-secondary/80'
+                      }`}
+                      title="Step Through Mode"
+                    >
+                      <StepForward className="w-4 h-4" />
+                      Step
+                    </button>
+                    <button
+                      onClick={() => setDebugSession({...debugSession, mode: 'single-node'})}
+                      className={`px-3 py-1.5 rounded text-sm flex items-center gap-2 ${
+                        debugSession.mode === 'single-node' ? 'bg-primary text-primary-foreground' : 'bg-secondary hover:bg-secondary/80'
+                      }`}
+                      title="Single Node Test Mode"
+                    >
+                      <Target className="w-4 h-4" />
+                      Test
+                    </button>
+                  </div>
+                )}
               </div>
-              <h3 className="text-lg font-semibold mb-2 text-foreground">
-                Workflow Debugging
-              </h3>
-              <p className="text-muted-foreground mb-6">
-                Debug workflows with breakpoints, variable inspection, and performance analysis
-              </p>
-              <div className="flex justify-center space-x-2">
-                <button className="px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90">
-                  Start Debug Session
-                </button>
-                <button className="px-4 py-2 bg-secondary text-secondary-foreground rounded hover:bg-secondary/80">
-                  View Performance
-                </button>
-              </div>
+
+              {!debugSession ? (
+                /* Welcome State */
+                <div className="flex-1 flex items-center justify-center">
+                  <div className="text-center max-w-md">
+                    <div className="w-16 h-16 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
+                      <Bug className="w-8 h-8 text-primary" />
+                    </div>
+                    <h3 className="text-xl font-semibold mb-3 text-foreground">
+                      Start Debugging
+                    </h3>
+                    <p className="text-muted-foreground mb-6 leading-relaxed">
+                      Debug your workflow with breakpoints, single node testing, and real-time variable inspection. 
+                      Perfect for testing individual nodes and troubleshooting workflow logic.
+                    </p>
+                    <div className="flex flex-col gap-2">
+                      <button 
+                        onClick={() => createDebugSession('step')}
+                        className="px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 flex items-center justify-center gap-2 font-medium"
+                      >
+                        <StepForward className="w-4 h-4" />
+                        Start Step-by-Step Debug
+                      </button>
+                      <button 
+                        onClick={() => createDebugSession('single-node')}
+                        className="px-6 py-3 bg-accent text-accent-foreground rounded-lg hover:bg-accent/90 flex items-center justify-center gap-2"
+                      >
+                        <Target className="w-4 h-4" />
+                        Single Node Testing
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                /* Active Debug Session Interface */
+                <div className="flex-1 flex">
+                  {/* Left Panel - Canvas/Flow View */}
+                  <div className="flex-1 relative">
+                    <ReactFlow
+                      nodes={nodes.map(node => ({
+                        ...node,
+                        data: {
+                          ...node.data,
+                          // Add breakpoint visual indicator
+                          hasBreakpoint: debugSession.breakpoints.has(node.id),
+                          isCurrentDebugNode: variableInspector.executionContext.currentNode === node.id
+                        }
+                      }))}
+                      edges={edges}
+                      onNodesChange={onNodesChange}
+                      onEdgesChange={onEdgesChange}
+                      onConnect={onConnect}
+                      onNodeClick={(event, node) => {
+                        // Debug mode node click behavior
+                        if (event.detail === 2) { // Double click
+                          executeSingleNode(node.id);
+                        } else if (event.ctrlKey || event.metaKey) { // Ctrl/Cmd click
+                          toggleBreakpoint(node.id);
+                        } else {
+                          setSelectedDebugNode(node.id);
+                        }
+                      }}
+                      nodeTypes={nodeTypes}
+                      className="debug-canvas bg-muted/20"
+                      defaultViewport={{ x: 50, y: 50, zoom: 0.75 }}
+                      fitViewOptions={{ padding: 100, maxZoom: 1.0 }}
+                    >
+                      <Controls showInteractive={false} />
+                      <MiniMap
+                        nodeColor={(node) => {
+                          if (debugSession.breakpoints.has(node.id)) return '#ef4444';
+                          if (variableInspector.executionContext.currentNode === node.id) return '#f59e0b';
+                          switch (node.data.status) {
+                            case 'running': return '#3b82f6';
+                            case 'completed': return '#10b981';
+                            case 'failed': return '#ef4444';
+                            default: return '#6b7280';
+                          }
+                        }}
+                        maskColor="rgba(0, 0, 0, 0.1)"
+                      />
+                      <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
+                    </ReactFlow>
+
+                    {/* Debug Overlay */}
+                    <div className="absolute top-4 left-4 bg-background/95 backdrop-blur border rounded-lg p-3 shadow-lg">
+                      <div className="text-sm font-medium mb-2 flex items-center gap-2">
+                        <Activity className="w-4 h-4 text-primary" />
+                        Debug Controls
+                      </div>
+                      <div className="flex gap-1">
+                        {debugSession.mode === 'step' && (
+                          <>
+                            <button
+                              className="px-2 py-1 bg-secondary rounded text-xs hover:bg-secondary/80 flex items-center gap-1"
+                              title="Step Into"
+                            >
+                              <StepForward className="w-3 h-3" />
+                            </button>
+                            <button
+                              className="px-2 py-1 bg-secondary rounded text-xs hover:bg-secondary/80 flex items-center gap-1"
+                              title="Step Over"
+                            >
+                              <SkipForward className="w-3 h-3" />
+                            </button>
+                            <button
+                              className="px-2 py-1 bg-secondary rounded text-xs hover:bg-secondary/80 flex items-center gap-1"
+                              title="Step Back"
+                            >
+                              <StepBack className="w-3 h-3" />
+                            </button>
+                          </>
+                        )}
+                        <button
+                          onClick={() => selectedDebugNode && executeSingleNode(selectedDebugNode)}
+                          disabled={!selectedDebugNode}
+                          className="px-2 py-1 bg-primary text-primary-foreground rounded text-xs hover:bg-primary/90 disabled:opacity-50 flex items-center gap-1"
+                          title="Execute Selected Node"
+                        >
+                          <Play className="w-3 h-3" />
+                          Run
+                        </button>
+                      </div>
+                      {selectedDebugNode && (
+                        <div className="mt-2 text-xs text-muted-foreground">
+                          Selected: {nodes.find(n => n.id === selectedDebugNode)?.data.label || 'Unknown'}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Instructions Overlay */}
+                    <div className="absolute bottom-4 right-4 bg-background/95 backdrop-blur border rounded-lg p-3 shadow-lg max-w-xs">
+                      <div className="text-sm font-medium mb-1">Debug Tips:</div>
+                      <ul className="text-xs text-muted-foreground space-y-0.5">
+                        <li>• Double-click nodes to test them</li>
+                        <li>• Ctrl/Cmd+click to toggle breakpoints</li>
+                        <li>• Click to select for single execution</li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  {/* Right Panel - Variable Inspector & Timeline */}
+                  <div className="w-80 border-l border-border bg-background flex flex-col">
+                    {/* Variable Inspector */}
+                    <div className="p-4 border-b border-border">
+                      <h3 className="font-medium mb-3 flex items-center gap-2">
+                        <Variable className="w-4 h-4" />
+                        Variable Inspector
+                      </h3>
+                      <div className="space-y-3">
+                        {variableInspector.executionContext.currentNode ? (
+                          <div className="space-y-2">
+                            <div className="p-2 bg-secondary rounded text-sm">
+                              <div className="font-medium text-foreground">Current Node:</div>
+                              <div className="text-muted-foreground text-xs truncate">
+                                {nodes.find(n => n.id === variableInspector.executionContext.currentNode)?.data.label || 'Unknown'}
+                              </div>
+                            </div>
+                            {variableInspector.nodeOutputs.has(variableInspector.executionContext.currentNode) && (
+                              <div className="p-2 bg-secondary rounded text-sm">
+                                <div className="font-medium text-foreground mb-1">Output Data:</div>
+                                <div className="max-h-32 overflow-auto bg-background rounded p-2">
+                                  <pre className="text-xs text-muted-foreground">
+                                    {JSON.stringify(variableInspector.nodeOutputs.get(variableInspector.executionContext.currentNode), null, 2)}
+                                  </pre>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="p-3 bg-secondary/50 rounded text-sm text-muted-foreground text-center">
+                            Run a node to see variable data
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Execution Timeline */}
+                    <div className="flex-1 p-4">
+                      <h3 className="font-medium mb-3 flex items-center gap-2">
+                        <Database className="w-4 h-4" />
+                        Execution Timeline
+                      </h3>
+                      <div className="space-y-2 max-h-64 overflow-y-auto">
+                        {debugSession.stepHistory.length > 0 ? (
+                          debugSession.stepHistory.slice().reverse().map((step, index) => {
+                            const node = nodes.find(n => n.id === step.nodeId);
+                            return (
+                              <div key={`${step.nodeId}-${index}`} className="p-2 bg-secondary rounded text-sm">
+                                <div className="flex items-center justify-between mb-1">
+                                  <span className="font-medium truncate">{node?.data.label || step.nodeId}</span>
+                                  <div className="flex items-center gap-1">
+                                    <span className={`w-2 h-2 rounded-full ${step.status === 'success' ? 'bg-green-500' : 'bg-red-500'}`} />
+                                    <span className="text-xs text-muted-foreground">{step.duration}ms</span>
+                                  </div>
+                                </div>
+                                <div className="text-xs text-muted-foreground">
+                                  {step.timestamp.toLocaleTimeString()}
+                                </div>
+                                {step.error && (
+                                  <div className="mt-1 text-xs text-red-600 bg-red-50 dark:bg-red-950 rounded p-1">
+                                    {step.error}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })
+                        ) : (
+                          <div className="p-3 bg-secondary/50 rounded text-sm text-muted-foreground text-center">
+                            No execution history yet
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>

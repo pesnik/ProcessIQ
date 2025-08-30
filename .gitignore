@@ -209,3 +209,5 @@ dev.yml
 
 # OCR temporary files
 tesseract_temp/
+
+.claude
