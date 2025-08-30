@@ -17,6 +17,21 @@ from .events import EventBus
 from .exceptions import ProcessIQError
 from .workflow_debugger import WorkflowDebugger, create_workflow_debugger
 
+# WebSocket broadcasting functions (will be set by main app)
+_websocket_broadcasts = {
+    'workflow_started': None,
+    'workflow_completed': None,
+    'workflow_failed': None,
+    'node_started': None,
+    'node_completed': None,
+    'node_failed': None,
+    'execution_progress': None
+}
+
+def set_websocket_broadcasts(**broadcasts):
+    """Set WebSocket broadcast functions"""
+    _websocket_broadcasts.update(broadcasts)
+
 
 class NodeStatus(Enum):
     """Node execution status"""
@@ -216,6 +231,13 @@ class WorkflowExecutor:
                 "triggered_by": triggered_by
             })
             
+            # WebSocket broadcast
+            if _websocket_broadcasts['workflow_started']:
+                try:
+                    await _websocket_broadcasts['workflow_started'](execution_id, workflow_id)
+                except Exception as e:
+                    print(f"WebSocket broadcast error: {e}")
+            
             # Update status to running
             await self.state_manager.update_execution_status(execution_id, WorkflowStatus.RUNNING)
             
@@ -231,6 +253,13 @@ class WorkflowExecutor:
                 "workflow_id": workflow_id
             })
             
+            # WebSocket broadcast
+            if _websocket_broadcasts['workflow_completed']:
+                try:
+                    await _websocket_broadcasts['workflow_completed'](execution_id, workflow_id)
+                except Exception as e:
+                    print(f"WebSocket broadcast error: {e}")
+            
         except Exception as e:
             await self.state_manager.update_execution_status(execution_id, WorkflowStatus.FAILED)
             
@@ -239,6 +268,13 @@ class WorkflowExecutor:
                 "workflow_id": workflow_id,
                 "error": str(e)
             })
+            
+            # WebSocket broadcast
+            if _websocket_broadcasts['workflow_failed']:
+                try:
+                    await _websocket_broadcasts['workflow_failed'](execution_id, workflow_id, str(e))
+                except Exception as e:
+                    print(f"WebSocket broadcast error: {e}")
             
             raise ProcessIQError(f"Workflow execution failed: {e}")
         
@@ -296,6 +332,13 @@ class WorkflowExecutor:
             "node_type": node_type
         })
         
+        # WebSocket broadcast
+        if _websocket_broadcasts['node_started']:
+            try:
+                await _websocket_broadcasts['node_started'](execution_state.execution_id, node_id, node_type)
+            except Exception as e:
+                print(f"WebSocket broadcast error: {e}")
+        
         # Update node status to running
         await self.state_manager.update_node_status(execution_state.execution_id, node_id, NodeStatus.RUNNING)
         
@@ -317,6 +360,13 @@ class WorkflowExecutor:
                 "result": result
             })
             
+            # WebSocket broadcast
+            if _websocket_broadcasts['node_completed']:
+                try:
+                    await _websocket_broadcasts['node_completed'](execution_state.execution_id, node_id, node_type, result)
+                except Exception as e:
+                    print(f"WebSocket broadcast error: {e}")
+            
         except Exception as e:
             # Update node status to failed
             await self.state_manager.update_node_status(execution_state.execution_id, node_id, NodeStatus.FAILED)
@@ -326,6 +376,13 @@ class WorkflowExecutor:
                 "node_id": node_id,
                 "error": str(e)
             })
+            
+            # WebSocket broadcast
+            if _websocket_broadcasts['node_failed']:
+                try:
+                    await _websocket_broadcasts['node_failed'](execution_state.execution_id, node_id, node_type, str(e))
+                except Exception as e:
+                    print(f"WebSocket broadcast error: {e}")
             
             raise ProcessIQError(f"Node {node_id} failed: {e}")
     

@@ -29,33 +29,21 @@ import {
   Settings,
   Users,
   FileText,
-  Zap
+  Zap,
+  AlertCircle,
+  CheckCircle,
+  Clock
 } from 'lucide-react';
 
 import CustomNode, { CustomNodeData } from '../components/workflow/CustomNode';
 import NodeSidebar, { NODE_TYPES } from '../components/workflow/NodeSidebar';
 import PropertyPanel from '../components/workflow/PropertyPanel';
+import workflowExecutionService, { WorkflowExecutionService, WorkflowDefinition, WorkflowExecutionState, NodeExecutionEvent, WorkflowExecutionEvent } from '../services/workflowExecutionService';
+import { TEST_WORKFLOWS } from '../utils/testWorkflow';
 
-interface WorkflowDefinition {
-  id: string;
-  name: string;
-  description: string;
-  nodes: Record<string, any>;
-  variables: Record<string, any>;
-  triggers: any[];
-}
+// WorkflowDefinition now imported from service
 
-interface WorkflowExecution {
-  execution_id: string;
-  workflow_id: string;
-  status: string;
-  started_at: string;
-  completed_at?: string;
-  completed_nodes: number;
-  failed_nodes: number;
-  current_nodes: string[];
-  variables: Record<string, any>;
-}
+// WorkflowExecution types now imported from service
 
 // Custom node types
 const nodeTypes = {
@@ -66,19 +54,164 @@ function WorkflowDesignerContent() {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [selectedNode, setSelectedNode] = useState<Node<CustomNodeData> | null>(null);
-  const [execution, setExecution] = useState<WorkflowExecution | null>(null);
+  const [execution, setExecution] = useState<WorkflowExecutionState | null>(null);
   const [isExecuting, setIsExecuting] = useState(false);
   const [activeTab, setActiveTab] = useState<'design' | 'execute' | 'debug'>('design');
   const [workflowName, setWorkflowName] = useState('New Workflow');
+  const [executionLogs, setExecutionLogs] = useState<any[]>([]);
+  const [nodeStatuses, setNodeStatuses] = useState<Record<string, { status: string; message?: string; timestamp?: string }>>({});
+  const [currentExecutionId, setCurrentExecutionId] = useState<string | null>(null);
   
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null);
   
+  // Setup workflow execution service event listeners
+  React.useEffect(() => {
+    const executionService = workflowExecutionService;
+    
+    // Node execution events
+    const handleNodeStarted = (event: NodeExecutionEvent) => {
+      updateNodeStatus(event.node_id, 'running');
+      setNodeStatuses(prev => ({
+        ...prev,
+        [event.node_id]: {
+          status: 'running',
+          message: `Started ${event.node_type} node`,
+          timestamp: event.timestamp
+        }
+      }));
+      console.log('Node started:', event);
+    };
+    
+    const handleNodeCompleted = (event: NodeExecutionEvent) => {
+      updateNodeStatus(event.node_id, 'completed');
+      setNodeStatuses(prev => ({
+        ...prev,
+        [event.node_id]: {
+          status: 'completed',
+          message: `Completed ${event.node_type} node`,
+          timestamp: event.timestamp
+        }
+      }));
+      console.log('Node completed:', event);
+    };
+    
+    const handleNodeFailed = (event: NodeExecutionEvent) => {
+      updateNodeStatus(event.node_id, 'failed', event.error);
+      setNodeStatuses(prev => ({
+        ...prev,
+        [event.node_id]: {
+          status: 'failed',
+          message: event.error || `Failed ${event.node_type} node`,
+          timestamp: event.timestamp
+        }
+      }));
+      console.error('Node failed:', event);
+    };
+    
+    // Workflow execution events
+    const handleWorkflowCompleted = (event: WorkflowExecutionEvent) => {
+      setIsExecuting(false);
+      console.log('Workflow completed:', event);
+    };
+    
+    const handleWorkflowFailed = (event: WorkflowExecutionEvent) => {
+      setIsExecuting(false);
+      console.error('Workflow failed:', event);
+    };
+    
+    const handleExecutionProgress = (data: { execution_id: string; state: WorkflowExecutionState }) => {
+      if (data.execution_id === currentExecutionId) {
+        setExecution(data.state);
+        
+        // Update node statuses based on execution state
+        setNodes((nds) =>
+          nds.map((node) => {
+            let status: 'idle' | 'running' | 'completed' | 'failed' = 'idle';
+            
+            if (data.state.current_nodes.includes(node.id)) {
+              status = 'running';
+            } else if (data.state.completed_nodes > 0) {
+              // This is simplified - in the backend we track individual node completion
+              const nodeIndex = nds.findIndex(n => n.id === node.id);
+              if (nodeIndex < data.state.completed_nodes) {
+                status = 'completed';
+              }
+            }
+            
+            if (data.state.failed_nodes > 0 && status === 'idle') {
+              status = 'failed';
+            }
+            
+            return {
+              ...node,
+              data: { ...node.data, status }
+            };
+          })
+        );
+      }
+    };
+    
+    // Register event listeners
+    executionService.on('node:started', handleNodeStarted);
+    executionService.on('node:completed', handleNodeCompleted);
+    executionService.on('node:failed', handleNodeFailed);
+    executionService.on('workflow:completed', handleWorkflowCompleted);
+    executionService.on('workflow:failed', handleWorkflowFailed);
+    executionService.on('execution:progress', handleExecutionProgress);
+    
+    // Cleanup on unmount
+    return () => {
+      executionService.off('node:started', handleNodeStarted);
+      executionService.off('node:completed', handleNodeCompleted);
+      executionService.off('node:failed', handleNodeFailed);
+      executionService.off('workflow:completed', handleWorkflowCompleted);
+      executionService.off('workflow:failed', handleWorkflowFailed);
+      executionService.off('execution:progress', handleExecutionProgress);
+    };
+  }, [currentExecutionId]);
+  
+  // Helper function to update node status
+  const updateNodeStatus = useCallback((nodeId: string, status: 'idle' | 'running' | 'completed' | 'failed', error?: string) => {
+    setNodes((nds) =>
+      nds.map((node) => {
+        if (node.id === nodeId) {
+          return {
+            ...node,
+            data: { 
+              ...node.data, 
+              status,
+              error: status === 'failed' ? error : undefined
+            }
+          };
+        }
+        return node;
+      })
+    );
+  }, [setNodes]);
+  
   // Stop execution function
-  const stopExecution = useCallback(() => {
-    setIsExecuting(false);
-    setExecution(null);
-  }, []);
+  const stopExecution = useCallback(async () => {
+    if (currentExecutionId) {
+      try {
+        await workflowExecutionService.cancelExecution(currentExecutionId);
+        setIsExecuting(false);
+        setExecution(null);
+        setCurrentExecutionId(null);
+        
+        // Reset all node statuses
+        setNodes((nds) =>
+          nds.map((node) => ({
+            ...node,
+            data: { ...node.data, status: 'idle', error: undefined }
+          }))
+        );
+      } catch (error) {
+        console.error('Failed to stop execution:', error);
+        alert('Failed to stop execution: ' + (error as Error).message);
+      }
+    }
+  }, [currentExecutionId, setNodes]);
 
   // Drag and drop functionality
   const onDragStart = useCallback((event: React.DragEvent<HTMLDivElement>, nodeType: string) => {
@@ -332,109 +465,105 @@ function WorkflowDesignerContent() {
     return true;
   }, [nodes, edges]);
 
-  // Workflow execution
+  // Professional workflow execution using the execution service
   const executeWorkflow = useCallback(async () => {
-    // Validate workflow first
-    if (!validateWorkflow()) {
-      return;
-    }
-    
-    const workflow = getWorkflowDefinition();
-    setIsExecuting(true);
-    
-    // Reset node statuses
-    setNodes((nds) =>
-      nds.map((node) => ({
-        ...node,
-        data: { ...node.data, status: 'idle', error: undefined }
-      }))
-    );
-    
     try {
-      const response = await fetch('/api/workflows/execute', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          workflow_definition: workflow,
-          variables: workflow.variables || {},
-          triggered_by: 'manual'
-        })
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        console.log('Workflow execution started:', result);
-        
-        // Poll for execution status
-        const pollExecution = async (executionId: string) => {
-          try {
-            const statusResponse = await fetch(`/api/workflows/execution/${executionId}`);
-            if (statusResponse.ok) {
-              const executionData = await statusResponse.json();
-              setExecution(executionData);
-              
-              // Update node statuses based on execution state
-              setNodes((nds) =>
-                nds.map((node) => {
-                  let status: 'idle' | 'running' | 'completed' | 'failed' = 'idle';
-                  let error: string | undefined = undefined;
-                  
-                  if (executionData.current_nodes && executionData.current_nodes.includes(node.id)) {
-                    status = 'running';
-                  } else if (executionData.completed_nodes && executionData.completed_nodes > 0) {
-                    // In a real implementation, you'd track individual node completion
-                    // For now, we'll mark nodes as completed based on execution progress
-                    const nodeIndex = nds.findIndex(n => n.id === node.id);
-                    if (nodeIndex < executionData.completed_nodes) {
-                      status = 'completed';
-                    }
-                  }
-                  
-                  // Handle failed nodes
-                  if (executionData.failed_nodes && executionData.failed_nodes > 0) {
-                    // This is simplified - in practice you'd get specific error info
-                    if (status !== 'completed' && status !== 'running') {
-                      status = 'failed';
-                      error = 'Node execution failed';
-                    }
-                  }
-                  
-                  return {
-                    ...node,
-                    data: { ...node.data, status, error }
-                  };
-                })
-              );
-              
-              if (executionData.status === 'running' || executionData.status === 'pending') {
-                setTimeout(() => pollExecution(executionId), 1000);
-              } else {
-                setIsExecuting(false);
-                console.log('Workflow execution completed:', executionData.status);
-              }
-            } else {
-              console.error('Failed to get execution status');
-              setIsExecuting(false);
-            }
-          } catch (error) {
-            console.error('Error polling execution status:', error);
-            setIsExecuting(false);
-          }
-        };
-
-        await pollExecution(result.execution_id);
-      } else {
-        const errorData = await response.text();
-        console.error('Workflow execution failed:', errorData);
-        alert(`Failed to execute workflow: ${errorData}`);
-        setIsExecuting(false);
+      // Validate workflow first
+      if (!validateWorkflow()) {
+        return;
       }
+      
+      const workflow = getWorkflowDefinition();
+      setIsExecuting(true);
+      
+      // Reset node statuses
+      setNodes((nds) =>
+        nds.map((node) => ({
+          ...node,
+          data: { ...node.data, status: 'idle', error: undefined }
+        }))
+      );
+      
+      // Execute workflow using the professional service
+      const result = await workflowExecutionService.executeWorkflow(
+        workflow,
+        {},
+        'manual'
+      );
+      
+      setCurrentExecutionId(result.execution_id);
+      console.log('Workflow execution started:', result);
+      
     } catch (error) {
       console.error('Workflow execution error:', error);
-      alert(`Workflow execution error: ${error}`);
+      alert(`Workflow execution error: ${(error as Error).message}`);
       setIsExecuting(false);
+      
+      // Reset node statuses on error
+      setNodes((nds) =>
+        nds.map((node) => ({
+          ...node,
+          data: { ...node.data, status: 'idle', error: undefined }
+        }))
+      );
     }
   }, [getWorkflowDefinition, setNodes, validateWorkflow]);
+
+  // Load test workflow for quick testing
+  const loadTestWorkflow = useCallback((testType: 'basic' | 'dataProcessing' | 'errorHandling') => {
+    const testWorkflow = TEST_WORKFLOWS[testType]();
+    
+    // Convert test workflow to React Flow format
+    const flowNodes: Node<CustomNodeData>[] = Object.entries(testWorkflow.nodes).map(([id, nodeData]) => ({
+      id,
+      type: 'custom',
+      position: nodeData.position,
+      data: {
+        label: nodeData.name,
+        nodeType: nodeData.type,
+        config: nodeData.config,
+        status: 'idle'
+      }
+    }));
+
+    // Convert connections to React Flow edges
+    const flowEdges: Edge[] = [];
+    Object.entries(testWorkflow.nodes).forEach(([sourceId, nodeData]) => {
+      nodeData.connections.forEach((targetId: string) => {
+        flowEdges.push({
+          id: `edge_${sourceId}_${targetId}`,
+          source: sourceId,
+          target: targetId,
+          markerEnd: {
+            type: MarkerType.ArrowClosed,
+            width: 20,
+            height: 20,
+          },
+          style: { strokeWidth: 2 },
+        });
+      });
+    });
+
+    setWorkflowName(testWorkflow.name);
+    setNodes(flowNodes);
+    setEdges(flowEdges);
+    
+    // Reset execution state
+    setExecution(null);
+    setCurrentExecutionId(null);
+    setNodeStatuses({});
+    
+    // Fit view after loading
+    setTimeout(() => {
+      if (reactFlowInstance) {
+        reactFlowInstance.fitView({ 
+          padding: 100, 
+          maxZoom: 1.0,
+          duration: 500 
+        });
+      }
+    }, 100);
+  }, [setNodes, setEdges, reactFlowInstance]);
 
   // Save workflow
   const saveWorkflow = useCallback(() => {
@@ -561,6 +690,34 @@ function WorkflowDesignerContent() {
           </div>
           
           <div className="flex items-center space-x-2">
+            {/* Test Workflows Dropdown */}
+            <div className="relative group">
+              <button className="flex items-center px-3 py-2 bg-secondary text-secondary-foreground rounded hover:bg-secondary/80">
+                <Zap className="w-4 h-4 mr-2" />
+                Test Workflows
+              </button>
+              <div className="absolute top-full left-0 mt-1 w-48 bg-background border border-border rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
+                <button
+                  onClick={() => loadTestWorkflow('basic')}
+                  className="block w-full px-3 py-2 text-left text-sm hover:bg-secondary rounded-t-md"
+                >
+                  Basic Flow Test
+                </button>
+                <button
+                  onClick={() => loadTestWorkflow('dataProcessing')}
+                  className="block w-full px-3 py-2 text-left text-sm hover:bg-secondary"
+                >
+                  Data Processing Test
+                </button>
+                <button
+                  onClick={() => loadTestWorkflow('errorHandling')}
+                  className="block w-full px-3 py-2 text-left text-sm hover:bg-secondary rounded-b-md"
+                >
+                  Error Handling Test
+                </button>
+              </div>
+            </div>
+            
             <button
               onClick={saveWorkflow}
               className="flex items-center px-3 py-2 bg-secondary text-secondary-foreground rounded hover:bg-secondary/80"
@@ -648,39 +805,93 @@ function WorkflowDesignerContent() {
                 <h3 className="font-semibold mb-3 text-foreground">Execution Status</h3>
                 
                 {execution && (
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <div className="p-3 bg-secondary rounded">
-                      <div className="text-sm">
-                        <div className="flex justify-between">
+                      <div className="text-sm space-y-1">
+                        <div className="flex justify-between items-center">
                           <span>Status:</span>
-                          <span className={`font-medium ${
-                            execution.status === 'completed' ? 'text-green-600' :
-                            execution.status === 'failed' ? 'text-red-600' :
-                            execution.status === 'running' ? 'text-blue-600' :
-                            'text-gray-600'
-                          }`}>
-                            {execution.status}
-                          </span>
+                          <div className="flex items-center">
+                            {execution.status === 'running' && <Clock className="w-3 h-3 mr-1 text-blue-600 animate-spin" />}
+                            {execution.status === 'completed' && <CheckCircle className="w-3 h-3 mr-1 text-green-600" />}
+                            {execution.status === 'failed' && <AlertCircle className="w-3 h-3 mr-1 text-red-600" />}
+                            <span className={`font-medium ${
+                              execution.status === 'completed' ? 'text-green-600' :
+                              execution.status === 'failed' ? 'text-red-600' :
+                              execution.status === 'running' ? 'text-blue-600' :
+                              'text-gray-600'
+                            }`}>
+                              {execution.status.charAt(0).toUpperCase() + execution.status.slice(1)}
+                            </span>
+                          </div>
                         </div>
                         <div className="flex justify-between">
-                          <span>Completed:</span>
-                          <span>{execution.completed_nodes}</span>
+                          <span>Progress:</span>
+                          <span>{execution.completed_nodes}/{nodes.length} nodes</span>
                         </div>
-                        <div className="flex justify-between">
-                          <span>Failed:</span>
-                          <span>{execution.failed_nodes}</span>
-                        </div>
+                        {execution.failed_nodes > 0 && (
+                          <div className="flex justify-between text-red-600">
+                            <span>Failed:</span>
+                            <span>{execution.failed_nodes}</span>
+                          </div>
+                        )}
                       </div>
                     </div>
                     
                     {execution.current_nodes.length > 0 && (
                       <div>
-                        <h4 className="text-sm font-medium mb-1">Current Nodes:</h4>
-                        {execution.current_nodes.map(nodeId => (
-                          <div key={nodeId} className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded mb-1">
-                            {nodeId}
-                          </div>
-                        ))}
+                        <h4 className="text-sm font-medium mb-2 flex items-center">
+                          <Clock className="w-3 h-3 mr-1 text-blue-600 animate-spin" />
+                          Currently Running:
+                        </h4>
+                        <div className="space-y-1">
+                          {execution.current_nodes.map(nodeId => {
+                            const node = nodes.find(n => n.id === nodeId);
+                            const nodeStatus = nodeStatuses[nodeId];
+                            return (
+                              <div key={nodeId} className="text-xs bg-blue-50 border border-blue-200 p-2 rounded">
+                                <div className="font-medium text-blue-800">
+                                  {node?.data.label || nodeId}
+                                </div>
+                                {nodeStatus?.message && (
+                                  <div className="text-blue-600 mt-1">
+                                    {nodeStatus.message}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {Object.keys(nodeStatuses).length > 0 && (
+                      <div>
+                        <h4 className="text-sm font-medium mb-2">Node Status History:</h4>
+                        <div className="max-h-40 overflow-y-auto space-y-1">
+                          {Object.entries(nodeStatuses).map(([nodeId, status]) => {
+                            const node = nodes.find(n => n.id === nodeId);
+                            return (
+                              <div key={nodeId} className={`text-xs p-2 rounded border ${
+                                status.status === 'completed' ? 'bg-green-50 border-green-200 text-green-800' :
+                                status.status === 'failed' ? 'bg-red-50 border-red-200 text-red-800' :
+                                status.status === 'running' ? 'bg-blue-50 border-blue-200 text-blue-800' :
+                                'bg-gray-50 border-gray-200 text-gray-800'
+                              }`}>
+                                <div className="font-medium">
+                                  {node?.data.label || nodeId}
+                                </div>
+                                <div className="flex justify-between items-start mt-1">
+                                  <span>{status.message}</span>
+                                  {status.timestamp && (
+                                    <span className="text-xs opacity-75">
+                                      {new Date(status.timestamp).toLocaleTimeString()}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
                       </div>
                     )}
                   </div>
