@@ -96,13 +96,89 @@ interface VariableInspector {
 interface ExecutionMonitorTabProps {
   execution: WorkflowExecutionState | null;
   nodes: Node<CustomNodeData>[];
+  edges: Edge[];
   executionLogs: any[];
   onNodeSelect: (nodeId: string) => void;
 }
 
-function ExecutionMonitorTab({ execution, nodes, executionLogs, onNodeSelect }: ExecutionMonitorTabProps) {
+function ExecutionMonitorTab({ execution, nodes, edges, executionLogs, onNodeSelect }: ExecutionMonitorTabProps) {
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [selectedTab, setSelectedTab] = useState<'overview' | 'output' | 'config' | 'metrics'>('overview');
+
+  // Calculate proper execution order based on workflow dependencies
+  const getExecutionOrderedNodes = useCallback(() => {
+    // Build dependency graph
+    const dependencies: Record<string, Set<string>> = {};
+    const allNodes = new Set(nodes.map(n => n.id));
+    
+    // Initialize all nodes with empty dependencies
+    allNodes.forEach(nodeId => {
+      dependencies[nodeId] = new Set();
+    });
+    
+    // Build the dependency graph from edges
+    edges.forEach(edge => {
+      if (dependencies[edge.target]) {
+        dependencies[edge.target].add(edge.source);
+      }
+    });
+    
+    // Topological sort to get execution order
+    const executed = new Set<string>();
+    const executionOrder: Node<CustomNodeData>[] = [];
+    
+    // Find start nodes (nodes with no dependencies)
+    const startNodes = Array.from(allNodes).filter(nodeId => dependencies[nodeId].size === 0);
+    
+    // If no start nodes found, look for nodes with type 'start'
+    if (startNodes.length === 0) {
+      const typeStartNodes = nodes.filter(n => n.data.nodeType === 'start');
+      startNodes.push(...typeStartNodes.map(n => n.id));
+    }
+    
+    while (executed.size < allNodes.size) {
+      // Find nodes with all dependencies satisfied
+      const readyNodes = Array.from(allNodes).filter(nodeId => 
+        !executed.has(nodeId) && 
+        Array.from(dependencies[nodeId]).every(dep => executed.has(dep))
+      );
+      
+      if (readyNodes.length === 0) {
+        // Handle remaining nodes (might be disconnected or cyclic)
+        const remaining = Array.from(allNodes).filter(nodeId => !executed.has(nodeId));
+        remaining.forEach(nodeId => executed.add(nodeId));
+        executionOrder.push(...nodes.filter(n => remaining.includes(n.id)));
+        break;
+      }
+      
+      // Sort ready nodes to prefer start nodes first, then by position
+      readyNodes.sort((a, b) => {
+        const nodeA = nodes.find(n => n.id === a);
+        const nodeB = nodes.find(n => n.id === b);
+        
+        if (!nodeA || !nodeB) return 0;
+        
+        // Prioritize start nodes
+        if (nodeA.data.nodeType === 'start' && nodeB.data.nodeType !== 'start') return -1;
+        if (nodeB.data.nodeType === 'start' && nodeA.data.nodeType !== 'start') return 1;
+        
+        // Sort by position (left to right, top to bottom)
+        if (nodeA.position.x !== nodeB.position.x) return nodeA.position.x - nodeB.position.x;
+        return nodeA.position.y - nodeB.position.y;
+      });
+      
+      // Add ready nodes to execution order
+      readyNodes.forEach(nodeId => {
+        executed.add(nodeId);
+        const node = nodes.find(n => n.id === nodeId);
+        if (node) {
+          executionOrder.push(node);
+        }
+      });
+    }
+    
+    return executionOrder;
+  }, [nodes, edges]);
 
   // Get status for a specific node
   const getNodeStatus = (nodeId: string): 'idle' | 'running' | 'completed' | 'failed' => {
@@ -204,7 +280,7 @@ function ExecutionMonitorTab({ execution, nodes, executionLogs, onNodeSelect }: 
             {/* Interactive Node Flow */}
             <div className="bg-secondary rounded-lg p-6">
               <div className="flex items-center justify-center space-x-4 overflow-x-auto">
-                {nodes.map((node, index) => {
+                {getExecutionOrderedNodes().map((node, index) => {
                   const status = getNodeStatus(node.id);
                   const isSelected = selectedNodeId === node.id;
                   
@@ -236,8 +312,11 @@ function ExecutionMonitorTab({ execution, nodes, executionLogs, onNodeSelect }: 
                         </div>
                       </button>
                       
-                      {index < nodes.length - 1 && (
-                        <div className="w-8 h-0.5 bg-border mx-2"></div>
+                      {index < getExecutionOrderedNodes().length - 1 && (
+                        <div className="flex items-center mx-2">
+                          <div className="w-6 h-0.5 bg-primary opacity-60"></div>
+                          <div className="w-0 h-0 border-l-[6px] border-l-primary opacity-60 border-y-[4px] border-y-transparent ml-1"></div>
+                        </div>
                       )}
                     </div>
                   );
@@ -2143,6 +2222,7 @@ function WorkflowDesignerContent() {
             <ExecutionMonitorTab 
               execution={execution}
               nodes={nodes}
+              edges={edges}
               executionLogs={executionLogs}
               onNodeSelect={(nodeId) => console.log('Node selected:', nodeId)}
             />

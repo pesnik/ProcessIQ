@@ -334,30 +334,70 @@ class WorkflowExecutor:
             await self._execute_node_chain(start_node, nodes, execution_state)
     
     async def _execute_node_chain(self, node_id: str, nodes: Dict[str, Any], execution_state: WorkflowExecutionState):
-        """Execute a chain of connected nodes"""
+        """Execute a chain of connected nodes in proper dependency order"""
         
+        # Build dependency graph - map each node to its dependencies (incoming connections)
+        dependencies = {}
+        all_nodes = set(nodes.keys())
+        
+        # Initialize all nodes with empty dependencies
+        for node in all_nodes:
+            dependencies[node] = set()
+            
+        # Build the dependency graph by looking at connections
+        for source_node_id, source_config in nodes.items():
+            connections = source_config.get('connections', [])
+            for target_node_id in connections:
+                if target_node_id in dependencies:
+                    dependencies[target_node_id].add(source_node_id)
+        
+        # Execute nodes using topological sort (dependency-first execution)
+        executed = set()
+        
+        # Get all nodes reachable from the start node
+        reachable_nodes = self._get_reachable_nodes(node_id, nodes)
+        
+        while len(executed) < len(reachable_nodes):
+            # Find nodes with no unmet dependencies
+            ready_nodes = [
+                node for node in reachable_nodes 
+                if node not in executed and dependencies[node].issubset(executed)
+            ]
+            
+            if not ready_nodes:
+                # If no ready nodes but not all executed, we have a cycle or disconnected graph
+                remaining = reachable_nodes - executed
+                print(f"⚠️ Cannot proceed with workflow execution. Remaining nodes: {remaining}")
+                print(f"Dependencies: {[(n, dependencies[n] - executed) for n in remaining]}")
+                break
+            
+            # Execute all ready nodes (they can run in parallel but we'll do sequential for now)
+            for current_node_id in ready_nodes:
+                if current_node_id not in nodes:
+                    executed.add(current_node_id)
+                    continue
+                    
+                node_config = nodes[current_node_id]
+                
+                # Execute single node
+                await self._execute_single_node(current_node_id, node_config, execution_state)
+                executed.add(current_node_id)
+    
+    def _get_reachable_nodes(self, start_node_id: str, nodes: Dict[str, Any]) -> set:
+        """Get all nodes reachable from the start node"""
         visited = set()
-        node_queue = [node_id]
+        queue = [start_node_id]
         
-        while node_queue:
-            current_node_id = node_queue.pop(0)
-            
-            if current_node_id in visited:
+        while queue:
+            current_node_id = queue.pop(0)
+            if current_node_id in visited or current_node_id not in nodes:
                 continue
-            
+                
             visited.add(current_node_id)
+            connections = nodes[current_node_id].get('connections', [])
+            queue.extend(connections)
             
-            if current_node_id not in nodes:
-                continue
-            
-            node_config = nodes[current_node_id]
-            
-            # Execute single node
-            await self._execute_single_node(current_node_id, node_config, execution_state)
-            
-            # Add connected nodes to queue
-            connections = node_config.get('connections', [])
-            node_queue.extend(connections)
+        return visited
     
     async def _execute_single_node(self, node_id: str, node_config: Dict[str, Any], execution_state):
         """Execute a single workflow node with detailed logging"""
