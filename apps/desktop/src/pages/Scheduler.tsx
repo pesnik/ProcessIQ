@@ -15,6 +15,7 @@ import {
   AlertCircle,
   Globe
 } from 'lucide-react';
+import CronBuilder from '@/components/scheduler/CronBuilder';
 
 interface Schedule {
   id: string;
@@ -539,56 +540,26 @@ export default function Scheduler() {
               
               {formData.trigger_type === 'cron' && (
                 <>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-foreground mb-1">
-                        Cron Expression
-                      </label>
-                      <input
-                        type="text"
-                        className={`w-full px-3 py-2 border rounded-md bg-background font-mono ${
-                          cronValidation.valid ? 'border-border' : 'border-red-500'
-                        }`}
-                        value={formData.cron_expression}
-                        onChange={(e) => setFormData({ ...formData, cron_expression: e.target.value })}
-                        placeholder="0 9 * * *"
-                        required
-                      />
-                      <div className="mt-1">
-                        <select
-                          className="text-xs px-2 py-1 border border-border rounded bg-background"
-                          onChange={(e) => {
-                            if (e.target.value) {
-                              setFormData({ ...formData, cron_expression: e.target.value });
-                            }
-                          }}
-                          value=""
-                        >
-                          <option value="">Quick presets</option>
-                          {COMMON_CRON_EXPRESSIONS.map(expr => (
-                            <option key={expr.value} value={expr.value}>
-                              {expr.label}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-foreground mb-1">
-                        <Globe className="inline h-4 w-4 mr-1" />
-                        Timezone
-                      </label>
-                      <select
-                        className="w-full px-3 py-2 border border-border rounded-md bg-background"
-                        value={formData.timezone}
-                        onChange={(e) => setFormData({ ...formData, timezone: e.target.value })}
-                      >
-                        {TIMEZONES.map(tz => (
-                          <option key={tz} value={tz}>{tz}</option>
-                        ))}
-                      </select>
-                    </div>
+                  <CronBuilder
+                    value={formData.cron_expression}
+                    onChange={(expression) => setFormData({ ...formData, cron_expression: expression })}
+                    onValidation={setCronValidation}
+                  />
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-foreground mb-1">
+                      <Globe className="inline h-4 w-4 mr-1" />
+                      Timezone
+                    </label>
+                    <select
+                      className="w-full px-3 py-2 border border-border rounded-md bg-background"
+                      value={formData.timezone}
+                      onChange={(e) => setFormData({ ...formData, timezone: e.target.value })}
+                    >
+                      {TIMEZONES.map(tz => (
+                        <option key={tz} value={tz}>{tz}</option>
+                      ))}
+                    </select>
                   </div>
                   
                   {!cronValidation.valid && (
