@@ -1,4 +1,5 @@
 import React from 'react';
+import SchedulerWidget from '@/components/dashboard/SchedulerWidget';
 
 export default function Dashboard() {
   return (
@@ -66,7 +67,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="bg-card p-6 rounded-lg border border-border">
           <h3 className="text-lg font-semibold text-foreground mb-4">Recent Activity</h3>
           <div className="space-y-3">
@@ -93,6 +94,8 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
+
+        <SchedulerWidget />
 
         <div className="bg-card p-6 rounded-lg border border-border">
           <h3 className="text-lg font-semibold text-foreground mb-4">System Health</h3>
